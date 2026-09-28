@@ -1,26 +1,44 @@
-import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "cn"
+import * as React from "react"
 import { Slot } from "radix-ui"
 
+/**
+ * Badges stay quiet by default — a soft rose wash rather than a saturated fill.
+ * The four status variants use the `-background` / `-foreground` token pairs so
+ * the text always clears WCAG AA; the mid `--wearly-success` tone is for dots and
+ * icons, never for text on a light surface.
+ */
 const badgeVariants = cva(
-  "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3",
+  [
+    "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden",
+    "rounded-badge border border-transparent px-2.5 py-0.5",
+    "text-caption whitespace-nowrap",
+    "transition-colors duration-150 ease-out",
+    "focus-visible:ring-4 focus-visible:ring-ring/25 focus-visible:outline-none",
+    "[&>svg]:pointer-events-none [&>svg]:size-3",
+  ],
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
-        secondary:
-          "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
-        destructive:
-          "bg-destructive text-white focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40 [a&]:hover:bg-destructive/90",
-        outline:
-          "border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-        ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 [a&]:hover:underline",
+        default: "bg-accent text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground",
+        success: "bg-success-background text-success-foreground",
+        warning: "bg-warning-background text-warning-foreground",
+        info: "bg-info-background text-info-foreground",
+        destructive: "bg-destructive-background text-destructive-foreground",
+        outline: "border-border bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground",
+        ghost: "bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        sm: "px-2 py-0 text-[11px]",
+        default: "",
       },
     },
     defaultVariants: {
       variant: "default",
+      size: "default",
     },
   }
 )
@@ -28,6 +46,7 @@ const badgeVariants = cva(
 function Badge({
   className,
   variant = "default",
+  size = "default",
   asChild = false,
   ...props
 }: React.ComponentProps<"span"> &
@@ -36,9 +55,10 @@ function Badge({
 
   return (
     <Comp
+      className={cn(badgeVariants({ variant, size }), className)}
+      data-size={size}
       data-slot="badge"
       data-variant={variant}
-      className={cn(badgeVariants({ variant }), className)}
       {...props}
     />
   )
