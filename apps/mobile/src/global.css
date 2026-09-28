@@ -4,10 +4,28 @@
 @import "tailwindcss";
 @import "uniwind";
 
-/* Shared Wearly tokens: the same palette the web app uses. */
-@import "@wearly/design-tokens/tokens.css";
+/* 2. HeroUI Native's own stylesheet. This was previously missing entirely, which
+      left every HeroUI Native component rendering unstyled — its Button/Card
+      classes come from here. Must be imported before our bridge so the bridge
+      wins. */
+@import "heroui-native/styles";
+
+/* 3. Wearly tokens, then the Tailwind/Uniwind utility mapping built from them.
+      `theme.css` must follow the token files it references. */
+@import "@wearly/design-tokens/colors.css";
+@import "@wearly/design-tokens/radius.css";
+@import "@wearly/design-tokens/spacing.css";
+@import "@wearly/design-tokens/typography.css";
+@import "@wearly/design-tokens/shadows.css";
+@import "@wearly/design-tokens/motion.css";
 @import "@wearly/design-tokens/theme.css";
-@import "@wearly/design-tokens/heroui.css";
+
+/* 4. HeroUI Native bridge. Imported last and left unlayered so these
+      declarations outrank the `@layer theme` variables HeroUI ships with.
+      Because the block is a plain `:root` resolving through `var(--wearly-*)`,
+      and those are themselves theme-scoped by `@variant`, values still switch
+      correctly when the OS theme changes. */
+@import "@wearly/design-tokens/heroui-native.css";
 
 /* Shared native components live outside this app, so Tailwind must scan them
    explicitly — Uniwind only scans upward from this file's directory. */
