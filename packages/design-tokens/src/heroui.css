@@ -1,20 +1,25 @@
 /**
- * Bridges the Wearly tokens into HeroUI's token names, so HeroUI web
- * components and HeroUI Native components pick up exactly the same palette as
- * shadcn/ui and our own utilities.
+ * Bridges the Wearly tokens into HeroUI **web** token names, so HeroUI web
+ * components inherit exactly the same palette as shadcn/ui and Uniwind.
  *
- * HeroUI declares its tokens inside `@layer base`; unlayered declarations win
- * in the cascade, so importing this file *after* `@heroui/styles` is enough.
+ * HeroUI declares its variables inside `@layer base`, and unlayered declarations
+ * win the cascade, so this file must be imported *after* `@heroui/styles`.
  *
- * Only `:root` is mapped. Each declaration resolves through `var(--wearly-*)`,
- * and those flip automatically when `.dark` is applied, so light and dark stay
- * in sync from a single block.
+ * Only `:root` is mapped. Each value resolves through `var(--wearly-*)`, and
+ * those flip automatically when the theme changes, so light and dark stay in
+ * sync from a single block — no duplicated dark override here.
+ *
+ * Note the deliberate absence of a HeroUI dark block: overriding `:root` in one
+ * place is what keeps the two platforms from drifting apart.
  */
 
 :root {
+  /* Base */
   --background: var(--wearly-background);
   --foreground: var(--wearly-foreground);
 
+  /* Surfaces. HeroUI distinguishes card surfaces from overlay surfaces; the
+     only difference we want is that overlays sit a step brighter than cards. */
   --surface: var(--wearly-card);
   --surface-foreground: var(--wearly-card-foreground);
   --surface-secondary: var(--wearly-secondary);
@@ -23,36 +28,72 @@
   --surface-tertiary-foreground: var(--wearly-foreground);
   --surface-hover: var(--wearly-accent);
 
+  --overlay: var(--wearly-popover);
+  --overlay-foreground: var(--wearly-popover-foreground);
+  --backdrop: var(--wearly-backdrop);
+
   --background-secondary: var(--wearly-muted);
   --background-tertiary: var(--wearly-secondary);
+  --background-inverse: var(--wearly-foreground);
 
-  --default: var(--wearly-primary);
-  --default-foreground: var(--wearly-primary-foreground);
-  --default-hover: var(--wearly-primary);
+  /* `default` is HeroUI's neutral action fill. Ours is a soft rose wash, which
+     is what the brief asks for in place of a second saturated colour. */
+  --default: var(--wearly-accent);
+  --default-foreground: var(--wearly-accent-foreground);
+  --default-hover: var(--wearly-accent);
+  --default-soft: var(--wearly-accent);
 
+  /* `accent` is HeroUI's primary action — our brand rose. */
   --accent: var(--wearly-primary);
   --accent-foreground: var(--wearly-primary-foreground);
   --accent-hover: var(--wearly-primary);
+  --accent-soft: var(--wearly-accent);
 
-  --muted: var(--wearly-muted);
+  /* HeroUI's `muted` is a TEXT role (placeholder / secondary label), not a
+     surface. Mapping it to a background token here produced light text on a
+     light surface, so it points at the foreground token instead. */
+  --muted: var(--wearly-muted-foreground);
 
+  /* Status */
   --danger: var(--wearly-destructive);
   --danger-foreground: var(--wearly-destructive-foreground);
+  --danger-hover: var(--wearly-destructive);
   --success: var(--wearly-success);
   --success-foreground: var(--wearly-success-foreground);
+  --success-hover: var(--wearly-success);
+  --warning: var(--wearly-warning);
+  --warning-foreground: var(--wearly-warning-foreground);
+  --warning-hover: var(--wearly-warning);
 
+  /* Lines and focus */
   --border: var(--wearly-border);
   --separator: var(--wearly-border);
   --focus: var(--wearly-ring);
   --link: var(--wearly-primary);
 
-  --field-background: var(--wearly-background);
+  /* Fields */
+  --field-background: var(--wearly-card);
   --field-foreground: var(--wearly-foreground);
   --field-border: var(--wearly-input);
   --field-placeholder: var(--wearly-muted-foreground);
+  --field-hover: var(--wearly-muted);
+  --field-focus: var(--wearly-card);
+  --field-border-hover: var(--wearly-border);
+  --field-border-focus: var(--wearly-ring);
 
+  /* Segmented controls */
+  --segment: var(--wearly-muted);
+  --segment-foreground: var(--wearly-foreground);
+
+  /* Shape — controls inherit the same generous radius as shadcn. */
   --radius: var(--wearly-radius-md);
-  --field-radius: var(--wearly-radius-lg);
+  --field-radius: var(--wearly-radius-input);
+  --border-width: 1px;
+  --field-border-width: 1px;
+  --disabled-opacity: 0.5;
 
-  --scrollbar-thumb: var(--wearly-border);
+  /* Elevation */
+  --surface-shadow: var(--wearly-shadow-sm);
+  --overlay-shadow: var(--wearly-shadow-lg);
+  --field-shadow: var(--wearly-shadow-sm);
 }

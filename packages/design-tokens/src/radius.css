@@ -1,0 +1,38 @@
+/**
+ * Radius — the single most recognisable part of the Wearly silhouette.
+ * Everything is generously rounded; `rounded-sm` (4px) and sharp corners are
+ * not part of the visual language.
+ *
+ * The scale is rem-based so it scales with the user's font size.
+ */
+
+@layer theme {
+  :root {
+    --wearly-radius-xs: 0.5rem; /* 8px — chips, small controls */
+    --wearly-radius-sm: 0.75rem; /* 12px — sidebar items, compact fields */
+    --wearly-radius-md: 1rem; /* 16px — inputs, selects */
+    --wearly-radius-lg: 1.25rem; /* 20px — nested surfaces */
+    --wearly-radius-xl: 1.5rem; /* 24px — cards */
+    --wearly-radius-2xl: 1.75rem; /* 28px — dialogs, bottom sheets */
+    --wearly-radius-3xl: 2rem; /* 32px — promotional surfaces */
+    --wearly-radius-pill: 9999px; /* buttons, badges, chips */
+  }
+}
+
+/**
+ * Component radius defaults. Components read these rather than picking a step,
+ * so re-theming a single component is a one-line change.
+ */
+@layer theme {
+  :root {
+    --wearly-radius-button: var(--wearly-radius-pill);
+    --wearly-radius-badge: var(--wearly-radius-pill);
+    --wearly-radius-input: var(--wearly-radius-md);
+    --wearly-radius-search: var(--wearly-radius-pill);
+    --wearly-radius-card: var(--wearly-radius-xl);
+    --wearly-radius-dialog: var(--wearly-radius-2xl);
+    --wearly-radius-sheet: var(--wearly-radius-3xl);
+    --wearly-radius-media: var(--wearly-radius-lg);
+    --wearly-radius-avatar: var(--wearly-radius-pill);
+  }
+}

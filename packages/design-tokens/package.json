@@ -3,7 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./tokens.css": "./src/tokens.css",
+    "./index.css": "./src/index.css",
+    "./colors.css": "./src/colors.css",
+    "./radius.css": "./src/radius.css",
+    "./spacing.css": "./src/spacing.css",
+    "./typography.css": "./src/typography.css",
+    "./shadows.css": "./src/shadows.css",
+    "./motion.css": "./src/motion.css",
     "./theme.css": "./src/theme.css",
     "./heroui.css": "./src/heroui.css",
     "./heroui-native.css": "./src/heroui-native.css"

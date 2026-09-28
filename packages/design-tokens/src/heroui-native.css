@@ -1,0 +1,92 @@
+/**
+ * Bridges the Wearly tokens into HeroUI **Native** variable names.
+ *
+ * HeroUI Native has its own token vocabulary which overlaps heavily with web
+ * but is not identical (`--danger` rather than `--destructive`, `--default` for
+ * neutral fills, `--overlay`/`--backdrop` for floating surfaces, and
+ * `--opacity-disabled`). This file maps our tokens onto that vocabulary so
+ * HeroUI Native components look like the rest of the product.
+ *
+ * CASCADE
+ * HeroUI Native declares its variables inside `@layer theme` with
+ * `@variant light` / `@variant dark`. Unlayered declarations outrank layered
+ * ones, so this file wins as long as it is imported *after*
+ * `heroui-native/styles`. Because our block is a plain `:root` that resolves
+ * through `var(--wearly-*)`, and those are themselves theme-scoped, the values
+ * still switch correctly at runtime — we never duplicate a dark block.
+ *
+ * Text roles are mapped to foreground tokens on purpose. HeroUI's `--muted` is
+ * a text colour (placeholder, secondary label); binding it to a surface token
+ * is what makes a placeholder unreadable.
+ */
+
+:root {
+  /* Base */
+  --background: var(--wearly-background);
+  --foreground: var(--wearly-foreground);
+
+  /* Surfaces */
+  --surface: var(--wearly-card);
+  --surface-foreground: var(--wearly-card-foreground);
+  --surface-secondary: var(--wearly-secondary);
+  --surface-secondary-foreground: var(--wearly-secondary-foreground);
+  --surface-tertiary: var(--wearly-muted);
+  --surface-tertiary-foreground: var(--wearly-foreground);
+  --surface-hover: var(--wearly-accent);
+
+  /* Floating surfaces — dialogs, sheets, menus */
+  --overlay: var(--wearly-popover);
+  --overlay-foreground: var(--wearly-popover-foreground);
+  --backdrop: var(--wearly-backdrop);
+
+  /* Neutral action fill: a soft rose wash rather than a second loud colour. */
+  --default: var(--wearly-accent);
+  --default-foreground: var(--wearly-accent-foreground);
+
+  /* Primary action — the brand rose. HeroUI Native's `primary` Button variant
+     resolves to this, which is what keeps its buttons on-brand for free. */
+  --accent: var(--wearly-primary);
+  --accent-foreground: var(--wearly-primary-foreground);
+
+  /* Text role, not a surface. */
+  --muted: var(--wearly-muted-foreground);
+
+  /* Status */
+  --success: var(--wearly-success);
+  --success-foreground: var(--wearly-success-foreground);
+  --warning: var(--wearly-warning);
+  --warning-foreground: var(--wearly-warning-foreground);
+  --danger: var(--wearly-destructive);
+  --danger-foreground: var(--wearly-destructive-foreground);
+
+  /* Form fields */
+  --field-background: var(--wearly-card);
+  --field-foreground: var(--wearly-foreground);
+  --field-placeholder: var(--wearly-muted-foreground);
+  --field-border: var(--wearly-input);
+
+  /* Segmented controls, switches, chips */
+  --segment: var(--wearly-muted);
+  --segment-foreground: var(--wearly-foreground);
+
+  /* Lines and focus */
+  --border: var(--wearly-border);
+  --separator: var(--wearly-border);
+  --focus: var(--wearly-ring);
+  --link: var(--wearly-primary);
+
+  /* Shape. HeroUI Native's Button sizes resolve their radius from the
+     `--radius-3xl` scale (remapped to 32px in `theme.css`), so buttons read as
+     fully rounded here without touching the component. */
+  --radius: var(--wearly-radius-md);
+  --field-radius: var(--wearly-radius-input);
+  --border-width: 1px;
+  --field-border-width: 1px;
+  --opacity-disabled: 0.5;
+
+  /* Elevation. Native shadows are faint by design — surfaces read through
+     their border and tone instead. */
+  --surface-shadow: var(--wearly-shadow-sm);
+  --overlay-shadow: var(--wearly-shadow-lg);
+  --field-shadow: var(--wearly-shadow-sm);
+}

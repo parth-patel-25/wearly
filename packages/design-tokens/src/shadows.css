@@ -1,0 +1,27 @@
+/**
+ * Elevation — barely there by design.
+ *
+ * Wearly separates surfaces with borders and tonal shifts first; shadows are
+ * reserved for things that genuinely float (dialogs, sheets, sticky bars,
+ * draggable elements). If a card needs a strong shadow to be readable, the
+ * problem is the border or surface contrast, not the shadow.
+ *
+ * Shadow values themselves live in `colors.css` so that the light and dark
+ * theme blocks stay adjacent and symmetric.
+ *
+ * React Native supports only a single `boxShadow`/`elevation` per view, so
+ * these are mapped to the one-step scale; native surfaces rely on `border` plus
+ * surface tone rather than on stacking elevations.
+ */
+
+@layer theme {
+  :root {
+    /* Control heights. 44px is the WCAG 2.2 minimum target size. */
+    --wearly-height-control: 2.75rem; /* 44px */
+    --wearly-height-control-lg: 3rem; /* 48px */
+    --wearly-height-touch: 3.25rem; /* 52px — mobile primary action */
+
+    --wearly-padding-control-inline: 1.25rem; /* 20px */
+    --wearly-padding-control-inline-lg: 1.5rem; /* 24px */
+  }
+}

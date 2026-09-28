@@ -1,0 +1,30 @@
+/**
+ * Wearly design tokens — the single source of truth for colour, radius,
+ * typography, spacing, elevation and motion across web (Tailwind v4 / shadcn /
+ * HeroUI) and mobile (Uniwind / HeroUI Native).
+ *
+ * Prefer importing the whole barrel:
+ *
+ *   @import "@wearly/design-tokens/index.css";
+ *
+ * The individual files are exported too, for the cases where only one concern
+ * is needed (for example a native screen that only needs the colour layer).
+ *
+ * ORDER MATTERS. `theme.css` maps the others onto Tailwind utility names, and
+ * the HeroUI bridges must come last so their unlayered `:root` declarations
+ * outrank the component libraries' own layered variables.
+ */
+
+@import "./colors.css";
+@import "./radius.css";
+@import "./spacing.css";
+@import "./typography.css";
+@import "./shadows.css";
+@import "./motion.css";
+
+/* Maps --wearly-* onto Tailwind/Uniwind utility names. */
+@import "./theme.css";
+
+/* HeroUI bridges. Must be last — see the note above. */
+@import "./heroui.css";
+@import "./heroui-native.css";

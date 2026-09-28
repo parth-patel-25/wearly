@@ -1,44 +1,223 @@
 /**
- * Maps the Wearly tokens onto Tailwind v4 utility names.
+ * Maps the Wearly tokens onto Tailwind v4 / Uniwind utility names.
  *
- * The same class names (`bg-background`, `text-muted-foreground`,
- * `border-border`, `bg-primary`, `rounded-lg`, `font-sans`, …) therefore resolve
- * to identical values on web and on mobile.
+ * Because both platforms compile this same file, a class name means the same
+ * value everywhere:
  *
- * Requires `tokens.css` to be imported first.
+ *   bg-primary · text-muted-foreground · border-border · rounded-card
+ *   text-display · shadow-soft · ease-out
+ *
+ * `inline` matters: it makes each utility emit `var(--wearly-*)` directly
+ * rather than a snapshot, which is what allows a single token edit to
+ * propagate live to both apps.
+ *
+ * Requires the other token files to be imported first — use `index.css`.
  */
 
 @theme inline {
+  /* ---------------------------------------------------------------------
+   * Colour
+   * ------------------------------------------------------------------ */
   --color-background: var(--wearly-background);
   --color-foreground: var(--wearly-foreground);
   --color-card: var(--wearly-card);
   --color-card-foreground: var(--wearly-card-foreground);
   --color-popover: var(--wearly-popover);
   --color-popover-foreground: var(--wearly-popover-foreground);
+
   --color-primary: var(--wearly-primary);
   --color-primary-foreground: var(--wearly-primary-foreground);
+  /* Decorative brand pink. Never place text on it. */
+  --color-brand: var(--wearly-brand);
+
   --color-secondary: var(--wearly-secondary);
   --color-secondary-foreground: var(--wearly-secondary-foreground);
   --color-muted: var(--wearly-muted);
   --color-muted-foreground: var(--wearly-muted-foreground);
   --color-accent: var(--wearly-accent);
   --color-accent-foreground: var(--wearly-accent-foreground);
-  --color-destructive: var(--wearly-destructive);
-  --color-destructive-foreground: var(--wearly-destructive-foreground);
-  --color-success: var(--wearly-success);
-  --color-success-foreground: var(--wearly-success-foreground);
+
   --color-border: var(--wearly-border);
   --color-input: var(--wearly-input);
   --color-ring: var(--wearly-ring);
 
+  --color-success: var(--wearly-success);
+  --color-success-foreground: var(--wearly-success-foreground);
+  --color-success-background: var(--wearly-success-background);
+  --color-warning: var(--wearly-warning);
+  --color-warning-foreground: var(--wearly-warning-foreground);
+  --color-warning-background: var(--wearly-warning-background);
+  --color-destructive: var(--wearly-destructive);
+  --color-destructive-foreground: var(--wearly-destructive-foreground);
+  --color-destructive-background: var(--wearly-destructive-background);
+  --color-info: var(--wearly-info);
+  --color-info-foreground: var(--wearly-info-foreground);
+  --color-info-background: var(--wearly-info-background);
+
+  /* ---------------------------------------------------------------------
+   * Radius
+   *
+   * The numeric scale is remapped so `rounded-sm` is 12px rather than
+   * Tailwind's 4px default. Prefer the semantic names below.
+   * ------------------------------------------------------------------ */
+  --radius-xs: var(--wearly-radius-xs);
   --radius-sm: var(--wearly-radius-sm);
   --radius-md: var(--wearly-radius-md);
   --radius-lg: var(--wearly-radius-lg);
   --radius-xl: var(--wearly-radius-xl);
+  --radius-2xl: var(--wearly-radius-2xl);
+  --radius-3xl: var(--wearly-radius-3xl);
+  --radius-4xl: var(--wearly-radius-3xl);
+  --radius-pill: var(--wearly-radius-pill);
 
+  /* Component defaults — re-theming one component is a single line. */
+  --radius-button: var(--wearly-radius-button);
+  --radius-badge: var(--wearly-radius-badge);
+  --radius-input: var(--wearly-radius-input);
+  --radius-search: var(--wearly-radius-search);
+  --radius-card: var(--wearly-radius-card);
+  --radius-dialog: var(--wearly-radius-dialog);
+  --radius-sheet: var(--wearly-radius-sheet);
+  --radius-media: var(--wearly-radius-media);
+  --radius-avatar: var(--wearly-radius-avatar);
+
+  /* ---------------------------------------------------------------------
+   * Typography
+   * ------------------------------------------------------------------ */
   --font-sans: var(--wearly-font-sans);
   --font-mono: var(--wearly-font-mono);
 
+  --font-weight-light: var(--wearly-weight-light);
+  --font-weight-normal: var(--wearly-weight-normal);
+  --font-weight-medium: var(--wearly-weight-medium);
+  --font-weight-bold: var(--wearly-weight-bold);
+  --font-weight-black: var(--wearly-weight-black);
+
+  --tracking-tight: var(--wearly-tracking-tight);
+  --tracking-normal: var(--wearly-tracking-normal);
+  --tracking-wide: var(--wearly-tracking-wide);
+
+  --leading-tight: var(--wearly-leading-tight);
+  --leading-snug: var(--wearly-leading-snug);
+  --leading-normal: var(--wearly-leading-normal);
+  --leading-relaxed: var(--wearly-leading-relaxed);
+
+  /* Semantic steps. The `--line-height` / `--font-weight` / `--letter-spacing`
+     suffixes are the Tailwind v4 convention for bundled companions. */
+  --text-display: var(--wearly-text-display);
+  --text-display--line-height: var(--wearly-text-display--line-height);
+  --text-display--font-weight: var(--wearly-text-display--font-weight);
+  --text-display--letter-spacing: var(--wearly-text-display--letter-spacing);
+
+  --text-heading-xl: var(--wearly-text-heading-xl);
+  --text-heading-xl--line-height: var(--wearly-text-heading-xl--line-height);
+  --text-heading-xl--font-weight: var(--wearly-text-heading-xl--font-weight);
+  --text-heading-xl--letter-spacing: var(
+    --wearly-text-heading-xl--letter-spacing
+  );
+
+  --text-heading-lg: var(--wearly-text-heading-lg);
+  --text-heading-lg--line-height: var(--wearly-text-heading-lg--line-height);
+  --text-heading-lg--font-weight: var(--wearly-text-heading-lg--font-weight);
+  --text-heading-lg--letter-spacing: var(
+    --wearly-text-heading-lg--letter-spacing
+  );
+
+  --text-heading-md: var(--wearly-text-heading-md);
+  --text-heading-md--line-height: var(--wearly-text-heading-md--line-height);
+  --text-heading-md--font-weight: var(--wearly-text-heading-md--font-weight);
+  --text-heading-md--letter-spacing: var(
+    --wearly-text-heading-md--letter-spacing
+  );
+
+  --text-heading-sm: var(--wearly-text-heading-sm);
+  --text-heading-sm--line-height: var(--wearly-text-heading-sm--line-height);
+  --text-heading-sm--font-weight: var(--wearly-text-heading-sm--font-weight);
+
+  --text-body-lg: var(--wearly-text-body-lg);
+  --text-body-lg--line-height: var(--wearly-text-body-lg--line-height);
+  --text-body-lg--font-weight: var(--wearly-text-body-lg--font-weight);
+
+  --text-body-md: var(--wearly-text-body-md);
+  --text-body-md--line-height: var(--wearly-text-body-md--line-height);
+  --text-body-md--font-weight: var(--wearly-text-body-md--font-weight);
+
+  --text-body-sm: var(--wearly-text-body-sm);
+  --text-body-sm--line-height: var(--wearly-text-body-sm--line-height);
+  --text-body-sm--font-weight: var(--wearly-text-body-sm--font-weight);
+
+  --text-caption: var(--wearly-text-caption);
+  --text-caption--line-height: var(--wearly-text-caption--line-height);
+  --text-caption--font-weight: var(--wearly-text-caption--font-weight);
+
+  --text-label: var(--wearly-text-label);
+  --text-label--line-height: var(--wearly-text-label--line-height);
+  --text-label--font-weight: var(--wearly-text-label--font-weight);
+
+  --text-button: var(--wearly-text-button);
+  --text-button--line-height: var(--wearly-text-button--line-height);
+  --text-button--font-weight: var(--wearly-text-button--font-weight);
+
+  --text-button-sm: var(--wearly-text-button-sm);
+  --text-button-sm--line-height: var(--wearly-text-button-sm--line-height);
+  --text-button-sm--font-weight: var(--wearly-text-button-sm--font-weight);
+
+  --text-button-lg: var(--wearly-text-button-lg);
+  --text-button-lg--line-height: var(--wearly-text-button-lg--line-height);
+  --text-button-lg--font-weight: var(--wearly-text-button-lg--font-weight);
+
+  /* Fixed counterparts for React Native, which cannot resolve `clamp()`. */
+  --text-native-display: var(--wearly-text-native-display);
+  --text-native-heading-xl: var(--wearly-text-native-heading-xl);
+  --text-native-heading-lg: var(--wearly-text-native-heading-lg);
+  --text-native-heading-md: var(--wearly-text-native-heading-md);
+  --text-native-heading-sm: var(--wearly-text-native-heading-sm);
+  --text-native-body-lg: var(--wearly-text-native-body-lg);
+  --text-native-body-md: var(--wearly-text-native-body-md);
+  --text-native-body-sm: var(--wearly-text-native-body-sm);
+  --text-native-caption: var(--wearly-text-native-caption);
+  --text-native-label: var(--wearly-text-native-label);
+
+  /* ---------------------------------------------------------------------
+   * Elevation — `soft` is the everyday one, `float` the rare one.
+   * ------------------------------------------------------------------ */
+  --shadow-soft: var(--wearly-shadow-sm);
+  --shadow-raised: var(--wearly-shadow-md);
+  --shadow-float: var(--wearly-shadow-lg);
+  --shadow-focus: var(--wearly-ring-shadow);
+  /* Keep Tailwind's built-in names aligned with the scale. */
+  --shadow-xs: var(--wearly-shadow-sm);
   --shadow-sm: var(--wearly-shadow-sm);
   --shadow-md: var(--wearly-shadow-md);
+  --shadow-lg: var(--wearly-shadow-lg);
+
+  /* ---------------------------------------------------------------------
+   * Motion
+   * ------------------------------------------------------------------ */
+  --ease-out: var(--wearly-ease-out);
+  --ease-in-out: var(--wearly-ease-in-out);
+  --ease-spring: var(--wearly-ease-spring);
+
+  /* ---------------------------------------------------------------------
+   * Spacing — 4px base. Tailwind's numeric scale derives from this single
+   * multiplier, so `p-4` is 1rem on both platforms.
+   * ------------------------------------------------------------------ */
+  --spacing: 0.25rem;
+
+  --spacing-gutter: var(--wearly-space-gutter);
+  --spacing-section: var(--wearly-space-section);
+  --spacing-page-inline: var(--wearly-space-page-inline);
+}
+
+/**
+ * `prefers-reduced-motion` collapses every duration to near-zero rather than
+ * removing transitions, so state changes stay legible without movement.
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --wearly-duration-instant: 1ms;
+    --wearly-duration-fast: 1ms;
+    --wearly-duration-base: 1ms;
+    --wearly-duration-slow: 1ms;
+  }
 }

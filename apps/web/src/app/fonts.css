@@ -1,0 +1,42 @@
+/* Satoshi — Indian Type Foundry, via Fontshare. Licensed under the ITF Free
+   Font License; see docs/DESIGN_SYSTEM.md for the licence note.
+
+   These are declared by hand rather than through `next/font` on purpose.
+   `next/font` emits a build-hashed family name (`__Satoshi_xxxx`) and exposes it
+   only through a CSS variable, which React Native cannot resolve — so the
+   shared `--wearly-font-sans` token would work on web and break on mobile.
+   Declaring the family as plain "Satoshi" lets one token name mean the same
+   thing on both platforms. The trade-off is that preload hints are declared by
+   hand in the root layout. */
+
+@font-face {
+  font-display: swap;
+  font-family: "Satoshi";
+  font-style: normal;
+  font-weight: 300;
+  src: url("/fonts/satoshi-Light.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Satoshi";
+  font-style: normal;
+  font-weight: 400;
+  src: url("/fonts/satoshi-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Satoshi";
+  font-style: normal;
+  font-weight: 500;
+  src: url("/fonts/satoshi-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Satoshi";
+  font-style: normal;
+  font-weight: 700;
+  src: url("/fonts/satoshi-Bold.woff2") format("woff2");
+}

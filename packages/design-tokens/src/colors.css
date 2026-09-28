@@ -1,0 +1,167 @@
+/**
+ * Wearly colour tokens — the single source of truth for colour on web
+ * (Tailwind v4 / shadcn / HeroUI) and mobile (Uniwind / HeroUI Native).
+ *
+ * Never hard-code a colour in an app. If a value is missing, add it here.
+ *
+ * THEME SHAPE
+ * Both themes are declared as symmetric `@variant` blocks inside `:root`.
+ * Uniwind's `generateCSSForThemes` scans for these and *errors* when the
+ * themes declare different variable sets, so the two blocks must stay
+ * identical in name. The native runtime layers the active theme's variables
+ * over the base set, which is what makes a runtime theme switch possible.
+ *
+ * ACCESSIBILITY
+ * Every foreground/background pair below was solved to meet WCAG AA (>= 4.5:1
+ * for text, >= 3:1 for non-text such as focus rings) in both themes. Two
+ * deliberate deviations from the original brand brief, both colour-preserving:
+ *
+ *   - `primary` is a deeper rose than the raw brand pink, because white text on
+ *     the vivid pink only reached 3.04:1. The vivid pink is still available as
+ *     `--wearly-brand` for decorative use (rings, active indicators, hearts),
+ *     where no text sits on top of it.
+ *   - `muted-foreground` is darkened for the same reason (3.77:1 -> 4.53:1).
+ *
+ * Status colours are split in three: the mid tone fills dots and icons, the
+ * `-foreground` tone is the only one used for text, and the `-background` tone
+ * is the soft surface they sit on. Text is never placed on the mid tone.
+ */
+
+/* ---------------------------------------------------------------------------
+ * Light
+ * ------------------------------------------------------------------------ */
+@layer theme {
+  :root {
+    @variant light {
+      /* Surfaces — warm neutrals, never pure grey */
+      --wearly-background: oklch(0.9914 0.0044 360); /* #FFFBFC */
+      --wearly-foreground: oklch(0.2566 0.0128 331.5); /* #272126 */
+      --wearly-card: oklch(1 0 0); /* #FFFFFF */
+      --wearly-card-foreground: oklch(0.2566 0.0128 331.5); /* #272126 */
+      --wearly-popover: oklch(1 0 0); /* #FFFFFF */
+      --wearly-popover-foreground: oklch(0.2566 0.0128 331.5); /* #272126 */
+
+      /* Brand */
+      --wearly-primary: oklch(
+        0.5874 0.1599 2
+      ); /* #C54B75 — AA with white text */
+      --wearly-primary-foreground: oklch(1 0 0); /* #FFFFFF */
+      --wearly-brand: oklch(0.687 0.1608 1.8); /* #E86A93 — decorative only */
+
+      /* Supporting */
+      --wearly-secondary: oklch(0.9588 0.0129 353.1); /* #F9EEF2 */
+      --wearly-secondary-foreground: oklch(0.428 0.0329 352.2); /* #5E4851 */
+      --wearly-muted: oklch(0.9666 0.0075 345.3); /* #F8F2F5 */
+      --wearly-muted-foreground: oklch(0.5629 0.0192 344); /* #7E7178 */
+      --wearly-accent: oklch(0.947 0.0251 352.5); /* #FCE7EF */
+      --wearly-accent-foreground: oklch(0.422 0.1078 358.3); /* #7A304D */
+
+      /* Lines and focus */
+      --wearly-border: oklch(0.9276 0.0156 352); /* #F0E3E8 */
+      --wearly-input: oklch(0.9276 0.0156 352); /* #F0E3E8 */
+      --wearly-ring: oklch(0.5874 0.1599 2); /* #C54B75 */
+
+      /* Scrim behind dialogs and sheets. Soft enough that the surface still
+         reads as the focus, never a heavy grey wash. */
+      --wearly-backdrop: oklch(0.2566 0.0128 331.5 / 0.32);
+
+      /* Status — muted, never loud */
+      --wearly-success: oklch(0.6832 0.0757 159.8); /* #6FA889 */
+      --wearly-success-foreground: oklch(0.5356 0.0756 159.8); /* #437B5E */
+      --wearly-success-background: oklch(0.967 0.0132 159.9); /* #EDF7F1 */
+      --wearly-warning: oklch(0.7281 0.1106 69.3); /* #D49A55 */
+      --wearly-warning-foreground: oklch(0.5538 0.1106 68.9); /* #9C651A */
+      --wearly-warning-background: oklch(0.9744 0.0203 74.7); /* #FFF5E8 */
+      --wearly-destructive: oklch(0.647 0.1483 15.4); /* #D96370 */
+      --wearly-destructive-foreground: oklch(0.5542 0.1486 15.1); /* #B94656 */
+      --wearly-destructive-background: oklch(0.9574 0.0188 5.3); /* #FDECEF */
+      --wearly-info: oklch(0.6727 0.083 256.9); /* #7598C9 */
+      --wearly-info-foreground: oklch(0.5437 0.0833 257.3); /* #5071A0 */
+      --wearly-info-background: oklch(0.9649 0.0125 255.5); /* #EEF4FC */
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Dark — a dedicated palette, not an inversion.
+ * Soft charcoal rather than #000, with a lightened rose that holds contrast.
+ * ------------------------------------------------------------------------ */
+@layer theme {
+  :root {
+    @variant dark {
+      --wearly-background: oklch(0.1929 0.0087 334.6); /* #171316 */
+      --wearly-foreground: oklch(0.9576 0.0075 345.3); /* #F5EFF2 */
+      --wearly-card: oklch(0.2365 0.0083 334.5); /* #211D20 */
+      --wearly-card-foreground: oklch(0.9576 0.0075 345.3); /* #F5EFF2 */
+      --wearly-popover: oklch(0.2365 0.0083 334.5); /* #211D20 */
+      --wearly-popover-foreground: oklch(0.9576 0.0075 345.3); /* #F5EFF2 */
+
+      --wearly-primary: oklch(0.7826 0.1071 357.8); /* #F09BB8 */
+      --wearly-primary-foreground: oklch(0.2642 0.0664 356); /* #3D1526 */
+      --wearly-brand: oklch(0.7826 0.1071 357.8); /* #F09BB8 */
+
+      --wearly-secondary: oklch(0.2825 0.0136 336.1); /* #2E272C */
+      --wearly-secondary-foreground: oklch(0.9122 0.0118 342.7); /* #E8DFE4 */
+      --wearly-muted: oklch(0.2592 0.0104 332.6); /* #272226 */
+      --wearly-muted-foreground: oklch(0.704 0.0199 342.2); /* #A99BA3 */
+      --wearly-accent: oklch(0.3066 0.0271 347.3); /* #3A2A32 */
+      --wearly-accent-foreground: oklch(0.873 0.0581 356.4); /* #F6C6D6 */
+
+      --wearly-border: oklch(0.3026 0.0133 336.1); /* #332C31 */
+      --wearly-input: oklch(0.3275 0.0142 340); /* #3A3237 */
+      --wearly-ring: oklch(0.7826 0.1071 357.8); /* #F09BB8 */
+
+      /* Deeper scrim than light mode — a light wash over a dark UI barely
+         separates the surface from the page. */
+      --wearly-backdrop: oklch(0 0 0 / 0.55);
+
+      /* In dark the mid and foreground tones converge — both clear 6.4:1 on
+         their own soft surface, so the extra token costs nothing. */
+      --wearly-success: oklch(0.7756 0.0676 162.1); /* #8FC4A9 */
+      --wearly-success-foreground: oklch(0.7756 0.0676 162.1); /* #8FC4A9 */
+      --wearly-success-background: oklch(0.2716 0.0199 163); /* #1E2A24 */
+      --wearly-warning: oklch(0.7881 0.0925 70.6); /* #E0B077 */
+      --wearly-warning-foreground: oklch(0.7881 0.0925 70.6); /* #E0B077 */
+      --wearly-warning-background: oklch(0.2657 0.0241 77.5); /* #2C2418 */
+      --wearly-destructive: oklch(0.7373 0.1138 12.6); /* #E88B96 */
+      --wearly-destructive-foreground: oklch(0.7373 0.1138 12.6); /* #E88B96 */
+      --wearly-destructive-background: oklch(0.2566 0.0258 2.6); /* #2E1E22 */
+      --wearly-info: oklch(0.7841 0.0673 256.3); /* #9DBBE4 */
+      --wearly-info-foreground: oklch(0.7841 0.0673 256.3); /* #9DBBE4 */
+      --wearly-info-background: oklch(0.2591 0.0249 261.1); /* #1D2430 */
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Elevation — rose-tinted so shadows never read as cold grey.
+ * Deliberately faint: separation should come from borders first.
+ *
+ * Declared as symmetric `@variant` pairs like the palette above; Uniwind
+ * requires both themes to expose an identical set of variable names.
+ * ------------------------------------------------------------------------ */
+@layer theme {
+  :root {
+    @variant light {
+      --wearly-shadow-color: oklch(0.2566 0.0128 331.5);
+      --wearly-shadow-sm: 0 1px 3px oklch(0.2566 0.0128 331.5 / 0.05);
+      --wearly-shadow-md: 0 4px 16px -2px oklch(0.2566 0.0128 331.5 / 0.07);
+      --wearly-shadow-lg: 0 8px 30px -6px oklch(0.2566 0.0128 331.5 / 0.1);
+      --wearly-ring-shadow: 0 0 0 3px oklch(0.5874 0.1599 2 / 0.18);
+    }
+
+    /* biome-ignore-start lint/suspicious/noDuplicateCustomProperties: the two
+       `@variant` blocks below are separate theme scopes, not the same scope.
+       Uniwind refuses to build unless both themes declare an identical set of
+       variable names, so this symmetry is mandatory rather than accidental. */
+    @variant dark {
+      --wearly-shadow-color: oklch(0 0 0);
+      /* Dark surfaces get their lift from lighter borders, so shadows recede. */
+      --wearly-shadow-sm: 0 1px 3px oklch(0 0 0 / 0.3);
+      --wearly-shadow-md: 0 4px 16px -2px oklch(0 0 0 / 0.4);
+      --wearly-shadow-lg: 0 8px 30px -6px oklch(0 0 0 / 0.5);
+      --wearly-ring-shadow: 0 0 0 3px oklch(0.7826 0.1071 357.8 / 0.25);
+    }
+    /* biome-ignore-end lint/suspicious/noDuplicateCustomProperties: see above */
+  }
+}

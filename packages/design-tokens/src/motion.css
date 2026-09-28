@@ -1,0 +1,29 @@
+/**
+ * Motion — subtle, fast, and used sparingly.
+ *
+ * Small interactions (button press, focus ring, favourite heart) run at
+ * 150–200ms. Larger transitions (dialog, bottom sheet, page change) run at
+ * 200–300ms. Everything uses ease-out, which decelerates into the resting state
+ * and reads as calm rather than springy.
+ *
+ * The `*-reduced` tokens are swapped in globally under
+ * `prefers-reduced-motion: reduce`; see `theme.css`.
+ */
+
+@layer theme {
+  :root {
+    --wearly-duration-instant: 80ms;
+    --wearly-duration-fast: 150ms;
+    --wearly-duration-base: 200ms;
+    --wearly-duration-slow: 300ms;
+
+    --wearly-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --wearly-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --wearly-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Composite tokens — prefer these over a raw duration in a component. */
+    --wearly-transition-press: 150ms var(--wearly-ease-out);
+    --wearly-transition-surface: 200ms var(--wearly-ease-out);
+    --wearly-transition-overlay: 300ms var(--wearly-ease-out);
+  }
+}
