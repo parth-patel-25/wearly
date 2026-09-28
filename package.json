@@ -1,0 +1,32 @@
+{
+  "name": "wearly",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Wearly monorepo: Next.js web, NestJS API, Expo mobile.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "check": "turbo run typecheck && ultracite check",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "dev": "turbo run dev",
+    "fix": "ultracite fix",
+    "format": "ultracite format",
+    "lint": "ultracite check",
+    "lint:fix": "ultracite check --write",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.12",
+    "@types/node": "^24.10.1",
+    "turbo": "^2.11.4",
+    "typescript": "6.0.3",
+    "ultracite": "7.12.0"
+  },
+  "packageManager": "bun@1.3.14",
+  "engines": {
+    "node": ">=22"
+  }
+}

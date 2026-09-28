@@ -1,0 +1,44 @@
+/**
+ * Maps the Wearly tokens onto Tailwind v4 utility names.
+ *
+ * The same class names (`bg-background`, `text-muted-foreground`,
+ * `border-border`, `bg-primary`, `rounded-lg`, `font-sans`, …) therefore resolve
+ * to identical values on web and on mobile.
+ *
+ * Requires `tokens.css` to be imported first.
+ */
+
+@theme inline {
+  --color-background: var(--wearly-background);
+  --color-foreground: var(--wearly-foreground);
+  --color-card: var(--wearly-card);
+  --color-card-foreground: var(--wearly-card-foreground);
+  --color-popover: var(--wearly-popover);
+  --color-popover-foreground: var(--wearly-popover-foreground);
+  --color-primary: var(--wearly-primary);
+  --color-primary-foreground: var(--wearly-primary-foreground);
+  --color-secondary: var(--wearly-secondary);
+  --color-secondary-foreground: var(--wearly-secondary-foreground);
+  --color-muted: var(--wearly-muted);
+  --color-muted-foreground: var(--wearly-muted-foreground);
+  --color-accent: var(--wearly-accent);
+  --color-accent-foreground: var(--wearly-accent-foreground);
+  --color-destructive: var(--wearly-destructive);
+  --color-destructive-foreground: var(--wearly-destructive-foreground);
+  --color-success: var(--wearly-success);
+  --color-success-foreground: var(--wearly-success-foreground);
+  --color-border: var(--wearly-border);
+  --color-input: var(--wearly-input);
+  --color-ring: var(--wearly-ring);
+
+  --radius-sm: var(--wearly-radius-sm);
+  --radius-md: var(--wearly-radius-md);
+  --radius-lg: var(--wearly-radius-lg);
+  --radius-xl: var(--wearly-radius-xl);
+
+  --font-sans: var(--wearly-font-sans);
+  --font-mono: var(--wearly-font-mono);
+
+  --shadow-sm: var(--wearly-shadow-sm);
+  --shadow-md: var(--wearly-shadow-md);
+}

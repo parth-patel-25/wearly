@@ -1,0 +1,26 @@
+/* 1. Tailwind first — required by both Tailwind v4 and @heroui/styles. */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* 2. Wearly tokens, then the Tailwind theme mapping built from them. */
+@import "@wearly/design-tokens/tokens.css";
+@import "@wearly/design-tokens/theme.css";
+
+/* 3. HeroUI web. Its tokens are overridden below by our palette. */
+@import "@heroui/styles";
+@import "@wearly/design-tokens/heroui.css";
+
+/* shadcn/ui dark mode is class-based, matching HeroUI and our tokens. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  * {
+    border-color: var(--wearly-border);
+  }
+
+  body {
+    font-family: var(--wearly-font-sans);
+    color: var(--wearly-foreground);
+    background-color: var(--wearly-background);
+  }
+}

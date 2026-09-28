@@ -1,0 +1,12 @@
+[install]
+# Expo/RN require peer deps to be visible to the app workspace.
+peer = true
+strict = false
+
+[install.lockfile]
+# Text-based lockfile so Turborepo can do granular per-package cache invalidation.
+save = true
+
+[run]
+# Keep script output readable when turbo fans out.
+silent = false

@@ -1,0 +1,31 @@
+{
+  "name": "@wearly/ui-native",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./providers": "./src/providers.tsx",
+    "./screen": "./src/screen.tsx"
+  },
+  "scripts": {
+    "clean": "rm -rf .turbo *.tsbuildinfo",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "uniwind": "^1.12.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "@wearly/tsconfig": "workspace:*",
+    "heroui-native": "^1.0.10",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "typescript": "6.0.3"
+  },
+  "peerDependencies": {
+    "heroui-native": "^1.0.0",
+    "react": "^19.2.0",
+    "react-native": ">=0.86.0"
+  }
+}

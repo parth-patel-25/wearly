@@ -1,0 +1,14 @@
+/* Uniwind entry point. Import this file from a component (e.g. the root
+   layout) — never from index.js, or edits trigger a full reload. */
+
+@import "tailwindcss";
+@import "uniwind";
+
+/* Shared Wearly tokens: the same palette the web app uses. */
+@import "@wearly/design-tokens/tokens.css";
+@import "@wearly/design-tokens/theme.css";
+@import "@wearly/design-tokens/heroui.css";
+
+/* Shared native components live outside this app, so Tailwind must scan them
+   explicitly — Uniwind only scans upward from this file's directory. */
+@source "../../packages/ui-native/src";

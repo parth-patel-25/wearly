@@ -1,0 +1,10 @@
+{
+  "extends": "@wearly/tsconfig/base.json",
+  "compilerOptions": {
+    "lib": ["es2023", "dom"],
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["src/**/*.ts"]
+}

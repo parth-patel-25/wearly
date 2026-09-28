@@ -1,0 +1,69 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": [
+    "ultracite/biome/core",
+    "ultracite/biome/react",
+    "ultracite/biome/next",
+    "ultracite/biome/nestjs"
+  ],
+  "files": {
+    "includes": [
+      "!**/node_modules",
+      "!**/.next",
+      "!**/.expo",
+      "!**/.turbo",
+      "!**/dist",
+      "!**/build",
+      "!**/coverage",
+      "!**/assets",
+      "!**/public",
+      "!**/next-env.d.ts",
+      "!**/expo-env.d.ts",
+      "!**/uniwind-types.d.ts",
+      "!**/*.tsbuildinfo",
+      "!packages/ui/src/components/ui"
+    ]
+  },
+  "javascript": {
+    "parser": {
+      // NestJS uses legacy TypeScript decorators (experimentalDecorators +
+      // emitDecoratorMetadata). Biome only parses these in unsafe mode.
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "overrides": [
+    {
+      // NestJS resolves constructor dependencies through emitDecoratorMetadata,
+      // which needs the injected class as a *value* import. Rewriting it to
+      // `import type` makes TypeScript elide the import and DI breaks at
+      // runtime with "can't resolve dependencies of the ...Controller".
+      "includes": ["apps/api/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useImportType": "off"
+          }
+        }
+      }
+    },
+    {
+      // Tooling config files run in Node (CommonJS), where __dirname is correct.
+      // noGlobalDirnameFilename is aimed at bundled app code, not build scripts.
+      "includes": ["**/metro.config.js", "**/*.config.js", "**/*.config.cjs"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noGlobalDirnameFilename": "off"
+          }
+        }
+      }
+    }
+  ],
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
+}

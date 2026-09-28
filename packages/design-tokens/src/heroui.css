@@ -1,0 +1,58 @@
+/**
+ * Bridges the Wearly tokens into HeroUI's token names, so HeroUI web
+ * components and HeroUI Native components pick up exactly the same palette as
+ * shadcn/ui and our own utilities.
+ *
+ * HeroUI declares its tokens inside `@layer base`; unlayered declarations win
+ * in the cascade, so importing this file *after* `@heroui/styles` is enough.
+ *
+ * Only `:root` is mapped. Each declaration resolves through `var(--wearly-*)`,
+ * and those flip automatically when `.dark` is applied, so light and dark stay
+ * in sync from a single block.
+ */
+
+:root {
+  --background: var(--wearly-background);
+  --foreground: var(--wearly-foreground);
+
+  --surface: var(--wearly-card);
+  --surface-foreground: var(--wearly-card-foreground);
+  --surface-secondary: var(--wearly-secondary);
+  --surface-secondary-foreground: var(--wearly-secondary-foreground);
+  --surface-tertiary: var(--wearly-muted);
+  --surface-tertiary-foreground: var(--wearly-foreground);
+  --surface-hover: var(--wearly-accent);
+
+  --background-secondary: var(--wearly-muted);
+  --background-tertiary: var(--wearly-secondary);
+
+  --default: var(--wearly-primary);
+  --default-foreground: var(--wearly-primary-foreground);
+  --default-hover: var(--wearly-primary);
+
+  --accent: var(--wearly-primary);
+  --accent-foreground: var(--wearly-primary-foreground);
+  --accent-hover: var(--wearly-primary);
+
+  --muted: var(--wearly-muted);
+
+  --danger: var(--wearly-destructive);
+  --danger-foreground: var(--wearly-destructive-foreground);
+  --success: var(--wearly-success);
+  --success-foreground: var(--wearly-success-foreground);
+
+  --border: var(--wearly-border);
+  --separator: var(--wearly-border);
+  --focus: var(--wearly-ring);
+  --link: var(--wearly-primary);
+
+  --field-background: var(--wearly-background);
+  --field-foreground: var(--wearly-foreground);
+  --field-border: var(--wearly-input);
+  --field-placeholder: var(--wearly-muted-foreground);
+
+  --radius: var(--wearly-radius-md);
+  --field-radius: var(--wearly-radius-lg);
+
+  --scrollbar-thumb: var(--wearly-border);
+}

@@ -1,0 +1,11 @@
+{
+  "extends": "@wearly/tsconfig/nestjs.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "module": "node16",
+    "moduleResolution": "node16"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
