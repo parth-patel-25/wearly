@@ -1,0 +1,523 @@
+# Wearly design system
+
+**Soft fashion · modern editorial · minimal · premium · rounded**
+
+Wearly is a clothing rental marketplace. Renters browse, request and return
+garments; owners list what they own and approve rentals; admins moderate the
+marketplace. Every surface should feel calm, airy and quietly expensive —
+closer to a fashion editorial than to a SaaS dashboard.
+
+The system is not "web with a mobile port". Web and mobile are two native
+experiences that happen to share a brand:
+
+```
+              SHARED DESIGN TOKENS
+                       │
+          ┌────────────┴────────────┐
+          │                         │
+       WEB/ADMIN                 MOBILE
+          │                         │
+      shadcn/ui                HeroUI Native
+          │                         │
+      Tailwind                  Uniwind
+          │                         │
+          └────────────┬────────────┘
+                       │
+                SAME BRAND
+                SAME TOKENS
+                SAME VISUAL LANGUAGE
+```
+
+---
+
+## 1. Philosophy
+
+Four words carry most of the decisions.
+
+**Soft.** No harsh borders, no pure black, no sharp corners, no heavy shadows.
+Surfaces are separated by a hairline and a small step in tone; shadows are
+reserved for things that genuinely float.
+
+**Minimal.** Hierarchy comes from spacing, scale and contrast — not decoration.
+No gratuitous gradients, glassmorphism, blob backgrounds or illustrations.
+Restraint is what makes it read as premium.
+
+**Fashion-forward.** Photography leads. On a product card the image is the
+largest element and the metadata is capped at three facts. If a card needed
+another line of text, the answer is usually to remove one that already exists.
+
+**Generous.** The product should feel airy. When a layout feels tight, add a
+spacing step rather than shrinking type.
+
+### The 80 / 15 / 5 rule
+
+Roughly **80% neutral** surfaces, **15% brand rose**, **5% status colour**. Rose
+is an accent. If a screen reads as pink, something has gone too far.
+
+---
+
+## 2. Architecture
+
+Everything lives in `packages/design-tokens`. Nothing else defines a colour, a
+radius, a font size or a duration.
+
+| File | Responsibility |
+| --- | --- |
+| `colors.css` | The semantic palette. Light and dark, declared as symmetric `@variant` blocks. |
+| `radius.css` | The radius scale plus per-component radius defaults. |
+| `spacing.css` | The 4px scale plus named layout roles. |
+| `typography.css` | The Satoshi stack, the weights, and the semantic type scale. |
+| `shadows.css` | Control heights and padding. |
+| `motion.css` | Durations and easings. |
+| `theme.css` | Maps everything above onto Tailwind / Uniwind utility names. |
+| `heroui.css` | Bridges onto HeroUI **web** variable names. |
+| `heroui-native.css` | Bridges onto HeroUI **Native** variable names. |
+| `index.css` | Ordered barrel — import this. |
+
+### Why `@variant` and not `:root` + `.dark`
+
+A bare `.dark { --token: … }` block looks correct and works on the web, but on
+React Native it is dead. Uniwind's CSS processor treats a lone `.dark` selector
+as a *utility class name*, so those declarations never enter the theme scope
+and the app stays light. The working form is:
+
+```css
+@layer theme {
+  :root {
+    @variant light { --wearly-background: …; }
+    @variant dark  { --wearly-background: …; }
+  }
+}
+```
+
+Both blocks are also required to declare an **identical set of variable names**.
+Uniwind's `generateCSSForThemes` logs `Theme light is missing variable …` and
+bails out of theming otherwise. This is why the elevation tokens sit in
+`colors.css` rather than `shadows.css`.
+
+On the web, `@variant light` and `@variant dark` need matching `@custom-variant`
+declarations; `next-themes` always emits the resolved theme as a class on
+`<html>`, so `.light` and `.dark` are both present.
+
+### Import order
+
+```css
+@import "tailwindcss";        /* Tailwind must be first */
+@import "./fonts.css";        /* @font-face, before the stack that uses it */
+@import "@heroui/styles";     /* HeroUI's own variables… */
+@import "@wearly/design-tokens/…"; /* …overridden by ours */
+@import "@wearly/design-tokens/heroui.css"; /* unlayered, so it wins */
+```
+
+`heroui.css` must come last and stay unlayered: unlayered declarations outrank
+the `@layer base` / `@layer theme` variables HeroUI ships with.
+
+### Two things that are easy to get wrong
+
+**`@source`.** `packages/ui` and `packages/ui-native` live outside their apps, so
+Tailwind's automatic source detection never sees them and their components ship
+with no CSS at all. Both entry stylesheets declare an explicit `@source`.
+
+**Font delivery.** `next/font` emits a build-hashed family name
+(`__Satoshi_xxxx`) and exposes it only through a CSS variable, which React
+Native cannot resolve. The font is therefore self-hosted with a hand-written
+`@font-face` so the family is literally `"Satoshi"` on both platforms, and one
+token name means the same thing everywhere. Web preload hints are declared by
+hand in the root layout as the trade-off.
+
+---
+
+## 3. Colour
+
+### Light
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `background` | `#FFFBFC` | Page canvas |
+| `foreground` | `#272126` | Body text |
+| `card` / `card-foreground` | `#FFFFFF` | Raised surfaces |
+| `primary` | `#C54B75` | Fills that carry white text |
+| `brand` | `#E86A93` | Decorative only — rings, indicators, hearts |
+| `secondary` | `#F9EEF2` | Neutral fill |
+| `muted` | `#F8F2F5` | Subtle fill, skeleton base |
+| `muted-foreground` | `#7E7178` | Secondary text, captions |
+| `accent` / `accent-foreground` | `#FCE7EF` / `#7A304D` | Soft rose action |
+| `border` / `input` / `ring` | `#F0E3E8` / `#F0E3E8` / `#C54B75` | Hairlines and focus |
+| `backdrop` | `#272126` @ 32% | Dialog scrim |
+
+### Dark
+
+A dedicated palette, not an inversion. Anchored on `#171316` — never `#000` —
+with a lightened rose that holds contrast against it. Surfaces read through their
+borders, so shadows recede rather than deepen.
+
+### Two deliberate deviations from the brief
+
+Both preserve the intended hue and were required to pass WCAG AA.
+
+| Token | Brief | Shipped | Why |
+| --- | --- | --- | --- |
+| `primary` | `#E86A93` | `#C54B75` | White text on `#E86A93` is **3.04:1**. A 15px button label is not "large text", so it needs 4.5:1. The vivid pink is still available as `brand` for decoration, where no text sits on it. |
+| `muted-foreground` | `#8D8087` | `#7E7178` | 3.77:1 → **4.53:1** on the page background. |
+
+The rule this encodes: **the default token is the accessible one.** A developer
+who reaches for `bg-primary` cannot accidentally build an unreadable button. The
+decorative brand tone has a separate, explicitly named token.
+
+### Status
+
+Each status has three tones, and they are not interchangeable:
+
+| Token | Role |
+| --- | --- |
+| `--wearly-success` | Dots, icons, small fills |
+| `--wearly-success-foreground` | The **only** tone valid for text |
+| `--wearly-success-background` | The soft surface they sit on |
+
+In light mode the mid tone clears 4.5:1 on its soft background but not on white,
+which is why badges are built as `bg-*-background text-*-foreground` rather than
+a filled pill with white text. In dark the mid and foreground tones converge,
+since both clear 6.4:1 on their own surface.
+
+| Status | Foreground | Background |
+| --- | --- | --- |
+| success | `#437B5E` | `#EDF7F1` |
+| warning | `#9C651A` | `#FFF5E8` |
+| destructive | `#B94656` | `#FDECEF` |
+| info | `#5071A0` | `#EEF4FC` |
+
+---
+
+## 4. Typography
+
+Satoshi, by Indian Type Foundry. Self-hosted; see the licence note below.
+
+**Satoshi has no 600 weight.** The scale uses **500 for headings** and 700 for
+emphasis, and `--wearly-weight-semibold` is deliberately *not* defined so nobody
+reaches for a weight that does not exist. Large headings set in 500 also read
+more editorial than bold.
+
+| Token | Size | Weight | Use |
+| --- | --- | --- | --- |
+| `text-display` | 36–44px | 500 | Hero |
+| `text-heading-xl` | 30–36px | 500 | Page title |
+| `text-heading-lg` | 24–30px | 500 | Section title |
+| `text-heading-md` | 24px | 500 | Subsection |
+| `text-heading-sm` | 20px | 500 | Card title |
+| `text-body-lg` | 17px | 400 | Lead paragraph |
+| `text-body-md` | 15px | 400 | Default body |
+| `text-body-sm` | 14px | 400 | Secondary text |
+| `text-label` | 13px | 500 | Form labels |
+| `text-caption` | 12px | 400 | Metadata |
+
+Web sizes are `clamp()`-based so headings never overflow a phone or look lost on
+a large display. React Native cannot resolve `clamp()`, so each step has a
+`--wearly-text-native-*` counterpart at the fluid scale's floor. Using a web
+`clamp()` in a native `className` would silently resolve to garbage.
+
+Control labels get their own `text-button` / `-sm` / `-lg` steps. Combining
+`text-body-sm` with `font-medium` looks right but both utilities set
+`font-weight`, and which wins depends on stylesheet order rather than class
+order — a silent way to ship the wrong weight.
+
+---
+
+## 5. Radius
+
+The most recognisable part of the silhouette. `rounded-sm` is 12px, not
+Tailwind's 4px default.
+
+| Token | Value |
+| --- | --- |
+| `radius-xs` | 8px |
+| `radius-sm` | 12px |
+| `radius-md` | 16px |
+| `radius-lg` | 20px |
+| `radius-xl` | 24px |
+| `radius-2xl` | 28px |
+| `radius-3xl` | 32px |
+| `radius-pill` | 9999px |
+
+**Prefer the component names** over the numeric scale — re-theming one component
+is then a single token change:
+
+| Utility | Value | Used by |
+| --- | --- | --- |
+| `rounded-button` | pill | Buttons |
+| `rounded-badge` | pill | Badges, chips, icon buttons |
+| `rounded-input` | 16px | Inputs, selects |
+| `rounded-search` | pill | Search fields |
+| `rounded-card` | 24px | Cards |
+| `rounded-media` | 20px | Product imagery |
+| `rounded-dialog` | 28px | Dialogs |
+| `rounded-sheet` | 32px | Bottom sheets, promotional blocks |
+
+Not everything is a pill. Pills are for controls and small chips; cards,
+imagery and sheets use the scale. Making every element pill-shaped flattens the
+hierarchy.
+
+---
+
+## 6. Spacing
+
+A 4px base: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96.
+
+Tailwind's numeric scale derives from `--spacing: 0.25rem`, so `p-4` is 1rem on
+both platforms. Three named roles exist so screens do not each invent a rhythm:
+`gap-gutter`, `gap-section`, `px-page-inline`. `gutter` and `page-inline` widen at
+the `md` breakpoint.
+
+Heights: `h-9` 36, `h-11` 44 (the WCAG 2.2 minimum target), `h-12` 48,
+`h-13` 52 for mobile primary actions.
+
+---
+
+## 7. Elevation
+
+Barely noticeable by design.
+
+| Utility | Value | Used by |
+| --- | --- | --- |
+| `shadow-soft` | `0 1px 3px` @ 5% | Cards, resting surfaces |
+| `shadow-raised` | `0 4px 16px -2px` @ 7% | Hovered, draggable |
+| `shadow-float` | `0 8px 30px -6px` @ 10% | Dialogs, sheets, sticky bars |
+
+Shadows are rose-tinted so they never read as cold grey. If a card needs a
+strong shadow to be readable, the problem is its border or surface contrast,
+not the shadow. React Native supports one shadow per view, so native surfaces
+rely on `border` plus tone.
+
+---
+
+## 8. Motion
+
+| Token | Value |
+| --- | --- |
+| `duration-fast` | 150ms |
+| `duration-base` | 200ms |
+| `duration-slow` | 300ms |
+| `ease-out` | `cubic-bezier(0.16, 1, 0.3, 1)` |
+
+Small interactions (press, focus, favourite heart) run 150–200ms. Larger
+transitions (dialog, sheet) run 200–300ms. Everything eases out, which
+decelerates into rest and reads as calm rather than springy.
+
+Buttons animate colour only — no transform — so press feedback never shifts
+surrounding layout. Icons that do scale use `active:scale-95` paired with
+`motion-reduce:active:scale-100`.
+
+`prefers-reduced-motion: reduce` collapses every duration to 1ms in both
+`theme.css` and `globals.css`, so state changes stay legible without movement.
+
+---
+
+## 9. Components
+
+Shared concepts. Implementations differ per platform; the APIs do not have to
+match, because platform-native UX wins over symmetry.
+
+`Button` · `Input` · `SearchInput` · `Card` · `Badge` · `Avatar` · `Dialog` ·
+`BottomSheet` · `Tabs` · `SegmentedControl` · `Dropdown` · `Toast` · `Alert` ·
+`EmptyState` · `LoadingState` · `ErrorState` · `ProductCard`
+
+### Buttons
+
+Pill-shaped, 44px default, animated on colour only. Variants: `default`
+(primary), `soft` (soft rose), `secondary`, `outline`, `ghost`, `destructive`,
+`link`. `loading` shows a spinner, sets `aria-busy` and blocks interaction while
+keeping the label mounted so the button does not resize mid-request.
+
+```tsx
+// ✅ tokens only
+<Button variant="soft" size="lg" loading>Saving</Button>
+
+// ❌ brand values inline
+<Button className="rounded-[27px] bg-[#E86A93]" />
+```
+
+### Product cards
+
+Imagery dominates: a 4:5 media block, `rounded-media`. The favourite button is a
+44px circular control sitting in the media block's **padding**, not floating over
+the photograph — it must never cover the garment.
+
+Metadata is capped at three facts, led by name and price:
+
+```
+Brand
+Satin slip dress
+₹299 /day          Size S
+★ 4.8 (12)         Indiranagar
+```
+
+Upload timestamps and similar low-value facts are omitted rather than shrunk: a
+card that shows everything communicates nothing.
+
+The favourite heart uses `text-primary`, not `brand` — it is `aria-pressed`, so
+it is a control with text-equivalent state, not decoration.
+
+### Tables
+
+Rounded container, hairline row separators, `h-14` rows, pill status badges.
+Heavy borders and dense rows are what make a dashboard feel like a spreadsheet.
+
+### Dialogs
+
+28px radius, generous padding, `max-w-lg`. A scrim soft enough that the dialog
+stays the focus. On mobile, prefer a bottom sheet at 32px.
+
+---
+
+## 10. Mobile rules
+
+- **Flexbox only. Never absolute positioning.** It breaks across screen sizes,
+  densities, notches and platforms.
+- Minimum 44px touch targets; `h-13` (52px) for primary actions.
+- No hover. Pressed states carry the feedback that hover does on the web.
+- Mobile must not be a copy of the desktop layout. Share colour, type, radius,
+  spacing and iconography — not structure.
+- Dark mode follows the OS. There is no in-app switch yet; adding one means
+  Uniwind's `setTheme` plus persistence.
+- Mobile app frames sit above the system status bar, so `Screen` insets with
+  `edges={["top", "left", "right"]}` rather than padding by a guessed number.
+
+## 11. Admin rules
+
+Admin is the same brand, not a separate product — and specifically *not* a
+harsh full-height dark sidebar.
+
+- Sidebar on `background`, not a dark slab. Active item gets the soft rose
+  `accent` fill with a `primary` icon, at `rounded-sm`–`rounded-md`.
+- Stat cards at `rounded-card` with generous whitespace.
+- Tables per the rules above.
+- Charts echo the palette: rose for the primary series, status colours
+  sparingly, everything else neutral.
+
+---
+
+## 12. Accessibility
+
+Accessibility is a hard requirement, not a pass at the end.
+
+- **Contrast.** Every text/background pair in `colors.css` was solved to meet
+  WCAG AA (4.5:1 text, 3:1 non-text) in **both** themes. The two deviations from
+  the original brief above exist for exactly this reason. Re-check contrast
+  before adding a new colour pair.
+- **Focus.** Every interactive element has a visible `focus-visible` ring
+  (`ring-4 ring-ring/25`). Never `outline: none` without a replacement.
+- **Targets.** 44px minimum on mobile; icon buttons are `size-11`.
+- **Semantics.** Real `<button>`, `<a>`, `<label>`, table markup. Icon-only
+  controls carry `aria-label`; decorative icons are `aria-hidden`.
+- **State.** `aria-busy` while loading, `aria-pressed` on toggles,
+  `role="status"` and `role="alert"` on loading and error regions. Errors always
+  offer a retry when the failure is likely transient.
+- **Motion.** Respect `prefers-reduced-motion`.
+- **Images.** Always `alt`. Decorative imagery takes an empty `alt`.
+
+---
+
+## 13. Do / don't
+
+**Do** reach for a token.
+
+```tsx
+<div className="rounded-card bg-card p-6 text-foreground" />
+```
+
+**Don't** hardcode brand values.
+
+```tsx
+<div className="rounded-[27px] bg-[#E86A93] text-[#272126]" />
+```
+
+**Do** use the component radius names.
+
+```tsx
+<Button variant="soft" />   {/* rounded-button */}
+```
+
+**Don't** pick a numeric step for a component.
+
+```tsx
+<Button className="rounded-2xl" />   {/* drifts from --wearly-radius-button */}
+```
+
+**Do** add a missing value to `design-tokens`.
+
+```css
+--wearly-surface-raised: oklch(…);
+```
+
+**Don't** add a one-off hex "just this once". That is how a design system rots.
+
+**Do** keep both theme blocks symmetric.
+
+```css
+@variant light { --wearly-x: …; }
+@variant dark  { --wearly-x: …; }
+```
+
+**Don't** add `--wearly-y` to light only. Uniwind errors on mismatched themes.
+
+**Do** use a `*-foreground` status token for text.
+
+```tsx
+<Badge variant="success" />   {/* bg-success-background + text-success-foreground */}
+```
+
+**Don't** put white text on `bg-success` — 2.75:1 on white.
+
+---
+
+## 14. Changing the system
+
+A developer should be able to change the product's look from one file.
+
+| Goal | Edit | Propagates to |
+| --- | --- | --- |
+| Brand colour | `--wearly-primary` in `colors.css` | Buttons, links, rings, active nav, tabs, badges, HeroUI both platforms |
+| Decorative pink | `--wearly-brand` | Hearts, indicators |
+| Global roundness | `--wearly-radius-*` | Every button, input, card, dialog, sheet |
+| Type | `--wearly-font-sans` | Both platforms |
+| Elevation | `--wearly-shadow-*` | Cards, overlays |
+| Speed | `--wearly-duration-*` | All transitions |
+
+`/design-system` on the web renders every token live in both themes — use it to
+verify a change before shipping it.
+
+---
+
+## 15. Font licence
+
+Satoshi is by [Indian Type Foundry](https://www.indiantypefoundry.com/),
+distributed via [Fontshare](https://fontshare.com/fonts/satoshi) under the **ITF
+Free Font License v2.0** — not an SIL Open Font License.
+
+- Self-hosting and embedding in web and mobile applications are **explicitly
+  permitted**.
+- Use is free for commercial purposes with no attribution.
+- **Redistributing the font files themselves is prohibited** — do not publish
+  them in a public package or as a standalone download.
+
+If legal ever objects to self-hosting, font delivery is isolated to
+`apps/web/src/app/fonts.css` and `apps/mobile/src/lib/fonts.ts`. Swapping both to
+Fontshare's hosted CSS leaves every token and component untouched.
+
+---
+
+## 16. Adding components
+
+**Web** — shadcn, into `packages/ui`:
+
+```bash
+cd apps/web && bunx shadcn@latest add <component>
+```
+
+Components are written to `packages/ui/src/components/ui`. Restyle them onto the
+tokens after adding; the generated markup is plain shadcn, not Wearly.
+
+**Mobile** — HeroUI Native, in `packages/ui-native/src`. It picks up the palette
+automatically through `heroui-native.css`.
+
+**Both** — if a token is missing, add it to `packages/design-tokens` first.
+Never introduce a second styling system, and never add a component library.

@@ -14,6 +14,7 @@ Bun is the package manager and task runner; Node runs the apps.
 | Mobile | Expo SDK 57, React Native 0.86, Expo Router, Uniwind 1.12, HeroUI Native 1.0 |
 | API | NestJS 12 (ESM), zod validation, no database yet |
 | Contracts | `@wearly/shared` — zod schemas + inferred types + typed fetch client |
+| Design | `packages/design-tokens` + Satoshi (self-hosted, ITF FFL) |
 
 ## Layout
 
@@ -24,11 +25,12 @@ apps/
   api/       NestJS REST API (ESM)
 packages/
   shared/        zod schemas, API types, route constants, typed client
-  design-tokens/ OKLCH colour/radius/type tokens — the single source of truth
+  design-tokens/ colour / radius / type / spacing / motion tokens
   ui/            shadcn/ui components (web)
   ui-native/     shared native providers and layout primitives
   tsconfig/      base TypeScript configs
 docs/
+  DESIGN_SYSTEM.md    the design system: philosophy, tokens, rules, do/don't
   auth-and-database.md   planned Drizzle + Postgres + Better Auth work
 ```
 
@@ -46,6 +48,13 @@ bun run check             # typecheck + lint
 bun run fix               # ultracite fix (auto-format)
 ```
 
+Web routes:
+
+```
+http://localhost:3000/                landing page
+http://localhost:3000/design-system  token + component showcase
+```
+
 Individual apps:
 
 ```bash
@@ -56,20 +65,43 @@ bun run dev --filter=@wearly/mobile   # Expo dev server
 
 ## Design tokens and cross-platform consistency
 
-`packages/design-tokens` is the only place colours are defined. It is consumed
-three ways:
+**Start with [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md).** It documents the
+palette, type scale, radius, spacing, elevation, component rules and the do/don't
+list, and `/design-system` in the web app renders every token live in both themes.
 
-- `tokens.css` — the raw OKLCH custom properties (light + `.dark`)
-- `theme.css` — maps them onto Tailwind v4 names via `@theme inline`, so
-  `bg-background`, `text-muted-foreground`, `border-border`, `rounded-lg` mean
-  the same thing on web and mobile
-- `heroui.css` — maps them onto HeroUI's own token names (`--accent`,
-  `--surface`, `--danger`, …) so HeroUI web and HeroUI Native inherit the same
-  palette
+`packages/design-tokens` is the only place colours, radii, type sizes and
+durations are defined. It is split by concern and consumed by both platforms:
 
-Import order matters. `tailwindcss` must come first, and `heroui.css` must come
-*after* `@heroui/styles` so it wins the cascade. See
-`apps/web/src/app/globals.css` and `apps/mobile/src/global.css`.
+| File | Responsibility |
+| --- | --- |
+| `colors.css` | The semantic palette — light and dark, as symmetric `@variant` blocks |
+| `radius.css` | The radius scale plus per-component radius defaults |
+| `spacing.css` | The 4px scale plus named layout roles |
+| `typography.css` | The Satoshi stack, the weights, the semantic type scale |
+| `shadows.css` | Control heights and padding |
+| `motion.css` | Durations and easings |
+| `theme.css` | Maps all of the above onto Tailwind / Uniwind utility names |
+| `heroui.css` | Bridges onto HeroUI **web** variable names |
+| `heroui-native.css` | Bridges onto HeroUI **Native** variable names |
+
+So `bg-primary`, `text-muted-foreground`, `rounded-card` and `text-heading-lg`
+mean the same thing on web and on mobile, and changing `--wearly-primary` moves
+both apps at once.
+
+Three things about this setup are easy to get wrong, and all three are enforced
+by a comment where they matter:
+
+- **Import order.** `tailwindcss` first; the HeroUI bridges last and unlayered,
+  so their `:root` declarations outrank the variables HeroUI ships with.
+- **`@variant`, not `:root` + `.dark`.** A bare `.dark { --token: … }` block
+  works on the web but is dead code on React Native — Uniwind reads it as a
+  utility class name, not a theme. Both themes must also declare an identical
+  set of variable names or Uniwind refuses to build.
+- **`@source`.** `packages/ui` and `packages/ui-native` sit outside their apps,
+  so Tailwind does not scan them automatically. Both entry stylesheets declare an
+  explicit `@source`; without it those components ship with no CSS at all.
+
+See `apps/web/src/app/globals.css` and `apps/mobile/src/global.css`.
 
 ## The API contract
 
@@ -111,10 +143,16 @@ CLI imports `cn` from the official `shadcn-ui/cn` package rather than a local
   isolated `node_modules/.bun/*` store depends on it. `withUniwindConfig` must
   stay the outermost wrapper.
 - **Uniwind only scans upward from `global.css`.** Shared native components need
-  an explicit `@source "../../packages/ui-native/src";`.
+  an explicit `@source "../../packages/ui-native/src";`. Tailwind does the same
+  for web, which is why `apps/web/src/app/globals.css` sources `packages/ui`.
 - **Never rewrite a Nest provider import to `import type`** — see the
   `apps/api/**` override in `biome.jsonc`.
 - **Use flexbox, never absolute positioning**, in React Native code.
+- **Satoshi is licensed under the ITF Free Font License, not an OFL.**
+  Self-hosting and embedding are permitted; redistributing the font files is not.
+  See `docs/DESIGN_SYSTEM.md` §15.
+- **Never add a colour, radius or duration outside `packages/design-tokens`.**
+  One-off hex values are how a design system rots.
 
 ## Roadmap: database and auth
 
