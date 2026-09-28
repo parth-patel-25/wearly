@@ -136,8 +136,8 @@ hand in the root layout as the trade-off.
 | `background` | `#FFFBFC` | Page canvas |
 | `foreground` | `#272126` | Body text |
 | `card` / `card-foreground` | `#FFFFFF` | Raised surfaces |
-| `primary` | `#C54B75` | Fills that carry white text |
-| `brand` | `#E86A93` | Decorative only — rings, indicators, hearts |
+| `primary` / `primary-foreground` | `#C54B75` / `#FFFFFF` | Fills that carry white text |
+| `brand` / `brand-foreground` | `#E86A93` / `#272126` | Decorative by default — rings, indicators, hearts |
 | `secondary` | `#F9EEF2` | Neutral fill |
 | `muted` | `#F8F2F5` | Subtle fill, skeleton base |
 | `muted-foreground` | `#7E7178` | Secondary text, captions |
@@ -148,8 +148,28 @@ hand in the root layout as the trade-off.
 ### Dark
 
 A dedicated palette, not an inversion. Anchored on `#171316` — never `#000` —
-with a lightened rose that holds contrast against it. Surfaces read through their
+with a vivid rose that holds contrast against it. Surfaces read through their
 borders, so shadows recede rather than deepen.
+
+The two rose tokens behave differently on purpose:
+
+| Token | Dark value | Foreground | Why |
+| --- | --- | --- | --- |
+| `primary` | `#C54B75` — **same as light** | `#FFFFFF` | Text-bearing fill. Kept identical in both themes so `primary-foreground` is white everywhere and a filled button looks the same either way. |
+| `brand` | `#F09BB8` — lightened | `#3D1526` | Decoration only. The pale rose keeps its glow on charcoal (8.84:1) but is far too light for white (2.08:1). |
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `background` | `#171316` | Page canvas |
+| `foreground` | `#F5EFF2` | Body text |
+| `card` / `card-foreground` | `#211D20` / `#F5EFF2` | Raised surfaces |
+| `primary` / `primary-foreground` | `#C54B75` / `#FFFFFF` | Fills that carry white text |
+| `brand` / `brand-foreground` | `#F09BB8` / `#3D1526` | Decoration, rings, hearts |
+| `muted-foreground` | `#A99BA3` | Secondary text, captions |
+
+Because `brand` is light in dark mode, painting a brand background without its
+paired foreground leaves light text on a light surface — **1.28:1**, far below AA.
+Use the paired token; see [`Card` variants](#card-variants) below.
 
 ### Two deliberate deviations from the brief
 
@@ -157,12 +177,49 @@ Both preserve the intended hue and were required to pass WCAG AA.
 
 | Token | Brief | Shipped | Why |
 | --- | --- | --- | --- |
-| `primary` | `#E86A93` | `#C54B75` | White text on `#E86A93` is **3.04:1**. A 15px button label is not "large text", so it needs 4.5:1. The vivid pink is still available as `brand` for decoration, where no text sits on it. |
+| `primary` | `#E86A93` | `#C54B75` | White text on `#E86A93` is **3.04:1**. A 15px button label is not "large text", so it needs 4.5:1. The vivid pink is still available as `brand` for decoration. |
 | `muted-foreground` | `#8D8087` | `#7E7178` | 3.77:1 → **4.53:1** on the page background. |
 
 The rule this encodes: **the default token is the accessible one.** A developer
 who reaches for `bg-primary` cannot accidentally build an unreadable button. The
 decorative brand tone has a separate, explicitly named token.
+
+`brand-foreground` is a third such pairing, added after the showcase page proved
+the "no text on `brand`" convention could not be enforced by a comment alone:
+
+| Token | Light | Dark | Contrast on `brand` |
+| --- | --- | --- | --- |
+| `brand` | `#E86A93` | `#F09BB8` | — |
+| `brand-foreground` | `#272126` | `#3D1526` | 5.19:1 light · 7.56:1 dark |
+
+Note it is **not** the same token as `primary-foreground`, and the two roses
+diverge further in dark mode:
+
+| | Light | Dark |
+| --- | --- | --- |
+| `primary-foreground` on `primary` | `#FFFFFF` · 4.53:1 | `#FFFFFF` · 4.53:1 |
+| `brand-foreground` on `brand` | `#272126` · 5.19:1 | `#3D1526` · 7.56:1 |
+
+**White is reserved for `primary`.** Reusing it on `brand` would land at 3.04:1 in
+light mode and 2.08:1 in dark. If you need a rose fill that carries white text,
+use `bg-primary` — that is exactly what it is for.
+
+### `Card` variants
+
+`Card` is the one component that historically hardcoded its background and
+foreground together in a single base class. A caller overriding only the
+background left the light-on-light pairing behind. It now uses `cva`, so the
+pairing travels with the surface:
+
+| Variant | Classes | Intended for |
+| --- | --- | --- |
+| `default` | `bg-card text-card-foreground` | The normal product surface |
+| `primary` | `bg-primary text-primary-foreground` | Filled promotional card |
+| `brand` | `bg-brand text-brand-foreground` | Filled brand card; also re-tints `CardDescription` |
+
+Prefer a variant over a raw `className="bg-brand"`. Overriding the background by
+hand remains possible, but it is no longer a documented path — if you need a fill
+the variants do not cover, add a variant.
 
 ### Status
 
@@ -477,6 +534,7 @@ A developer should be able to change the product's look from one file.
 | --- | --- | --- |
 | Brand colour | `--wearly-primary` in `colors.css` | Buttons, links, rings, active nav, tabs, badges, HeroUI both platforms |
 | Decorative pink | `--wearly-brand` | Hearts, indicators |
+| Text on decorative pink | `--wearly-brand-foreground` | Filled `brand` cards |
 | Global roundness | `--wearly-radius-*` | Every button, input, card, dialog, sheet |
 | Type | `--wearly-font-sans` | Both platforms |
 | Elevation | `--wearly-shadow-*` | Cards, overlays |

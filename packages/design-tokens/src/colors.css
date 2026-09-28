@@ -18,9 +18,13 @@
  *
  *   - `primary` is a deeper rose than the raw brand pink, because white text on
  *     the vivid pink only reached 3.04:1. The vivid pink is still available as
- *     `--wearly-brand` for decorative use (rings, active indicators, hearts),
- *     where no text sits on top of it.
+ *     `--wearly-brand` for decorative use (rings, active indicators, hearts).
  *   - `muted-foreground` is darkened for the same reason (3.77:1 -> 4.53:1).
+ *
+ * The rose does NOT lighten for `primary` — it stays #C54B75 in both themes so
+ * `primary-foreground` can be white throughout, and a filled button looks
+ * identical light or dark. The "lighten the rose" behaviour lives on `brand`,
+ * which is decorative and therefore pairs with a dark foreground instead.
  *
  * Status colours are split in three: the mid tone fills dots and icons, the
  * `-foreground` tone is the only one used for text, and the `-background` tone
@@ -46,7 +50,11 @@
         0.5874 0.1599 2
       ); /* #C54B75 — AA with white text */
       --wearly-primary-foreground: oklch(1 0 0); /* #FFFFFF */
-      --wearly-brand: oklch(0.687 0.1608 1.8); /* #E86A93 — decorative only */
+      --wearly-brand: oklch(
+        0.687 0.1608 1.8
+      ); /* #E86A93 — decorative by default */
+      /* Dark, not white: white on #E86A93 is only 3.04:1, this is 5.19:1. */
+      --wearly-brand-foreground: oklch(0.2566 0.0128 331.5); /* #272126 */
 
       /* Supporting */
       --wearly-secondary: oklch(0.9588 0.0129 353.1); /* #F9EEF2 */
@@ -84,7 +92,8 @@
 
 /* ---------------------------------------------------------------------------
  * Dark — a dedicated palette, not an inversion.
- * Soft charcoal rather than #000, with a lightened rose that holds contrast.
+ * Soft charcoal rather than #000. The vivid rose is kept for decoration, but
+ * `primary` stays the light theme's deeper rose so its foreground can be white.
  * ------------------------------------------------------------------------ */
 @layer theme {
   :root {
@@ -96,9 +105,19 @@
       --wearly-popover: oklch(0.2365 0.0083 334.5); /* #211D20 */
       --wearly-popover-foreground: oklch(0.9576 0.0075 345.3); /* #F5EFF2 */
 
-      --wearly-primary: oklch(0.7826 0.1071 357.8); /* #F09BB8 */
-      --wearly-primary-foreground: oklch(0.2642 0.0664 356); /* #3D1526 */
-      --wearly-brand: oklch(0.7826 0.1071 357.8); /* #F09BB8 */
+      /* `primary` deliberately does NOT lighten in dark mode. It stays the same
+         accessible rose as light so `primary-foreground` can be white in both
+         themes (4.53:1) and a filled button reads identically either way. The
+         "lighten the rose" idea lives on `brand` below, which is decorative. */
+      --wearly-primary: oklch(
+        0.5874 0.1599 2
+      ); /* #C54B75 — unchanged from light */
+      --wearly-primary-foreground: oklch(1 0 0); /* #FFFFFF — same as light */
+
+      --wearly-brand: oklch(0.7826 0.1071 357.8); /* #F09BB8 — decorative */
+      /* The vivid rose is far too light for white (2.08:1), so its foreground is
+         dark instead. Decoration only: rings, hearts, active indicators. */
+      --wearly-brand-foreground: oklch(0.2642 0.0664 356); /* #3D1526 */
 
       --wearly-secondary: oklch(0.2825 0.0136 336.1); /* #2E272C */
       --wearly-secondary-foreground: oklch(0.9122 0.0118 342.7); /* #E8DFE4 */

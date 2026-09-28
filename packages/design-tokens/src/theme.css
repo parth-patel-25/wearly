@@ -27,8 +27,10 @@
 
   --color-primary: var(--wearly-primary);
   --color-primary-foreground: var(--wearly-primary-foreground);
-  /* Decorative brand pink. Never place text on it. */
+  /* Decorative brand pink. Text is allowed on it via `brand-foreground` —
+     do not pair it with `text-foreground`, which is light in dark mode. */
   --color-brand: var(--wearly-brand);
+  --color-brand-foreground: var(--wearly-brand-foreground);
 
   --color-secondary: var(--wearly-secondary);
   --color-secondary-foreground: var(--wearly-secondary-foreground);

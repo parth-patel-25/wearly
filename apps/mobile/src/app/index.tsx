@@ -6,17 +6,27 @@ import { Text, View } from "react-native";
  * Proves the token layer resolves natively: every class below is the same name
  * the web showcase uses, resolving through the same `--wearly-*` variables.
  *
+ * Each swatch carries the foreground that is actually legible on it, mirroring
+ * the `foregroundClassName` field in the web showcase's `Swatch` data. The rose
+ * inverts between themes, so a single `text-muted-foreground` for every chip
+ * cannot work: on the dark `bg-primary` / `bg-brand` fill (#F09BB8) the muted
+ * foreground is also light and lands at 1.28:1. The neutral swatches keep the
+ * muted tone; the filled ones use their paired foreground.
+ *
  * Flexbox only — no absolute positioning — so this scales across phones, tablets
  * and both platforms.
  */
 const swatches = [
-  "bg-background",
-  "bg-card",
-  "bg-muted",
-  "bg-secondary",
-  "bg-accent",
-  "bg-primary",
-  "bg-brand",
+  { className: "bg-background", foregroundClassName: "text-foreground" },
+  { className: "bg-card", foregroundClassName: "text-foreground" },
+  { className: "bg-muted", foregroundClassName: "text-foreground" },
+  {
+    className: "bg-secondary",
+    foregroundClassName: "text-secondary-foreground",
+  },
+  { className: "bg-accent", foregroundClassName: "text-accent-foreground" },
+  { className: "bg-primary", foregroundClassName: "text-primary-foreground" },
+  { className: "bg-brand", foregroundClassName: "text-brand-foreground" },
 ] as const;
 
 const statuses = [
@@ -33,7 +43,7 @@ export default function HomeScreen() {
     <AppProviders>
       <Screen contentClassName="flex flex-col gap-8 p-6">
         <View className="flex flex-col gap-1">
-          <Text className="text-display text-foreground">Wearly</Text>
+          <Text className="text-foreground text-native-display">Wearly</Text>
           <Text className="text-body-md text-muted-foreground">
             Same tokens as web · Expo · Uniwind · HeroUI Native
           </Text>
@@ -44,11 +54,14 @@ export default function HomeScreen() {
           <View className="flex flex-row flex-wrap gap-2">
             {swatches.map((swatch) => (
               <View
-                className={`h-14 w-20 flex-row items-end rounded-media border border-border p-2 ${swatch}`}
-                key={swatch}
+                className={`h-14 min-w-24 flex-1 flex-row items-end rounded-media border border-border p-2 ${swatch.className}`}
+                key={swatch.className}
               >
-                <Text className="text-caption text-muted-foreground">
-                  {swatch.replace("bg-", "")}
+                <Text
+                  className={`text-caption ${swatch.foregroundClassName}`}
+                  numberOfLines={1}
+                >
+                  {swatch.className.replace("bg-", "")}
                 </Text>
               </View>
             ))}
@@ -60,10 +73,13 @@ export default function HomeScreen() {
           <View className="flex flex-row flex-wrap gap-2">
             {statuses.map((status) => (
               <View
-                className={`h-14 flex-1 rounded-media border border-border p-2 ${status}`}
+                className={`h-14 min-w-24 flex-1 rounded-media border border-border p-2 ${status}`}
                 key={status}
               >
-                <Text className="text-caption text-foreground">
+                <Text
+                  className="text-caption text-foreground"
+                  numberOfLines={1}
+                >
                   {status.replace("bg-", "").replace("-background", "")}
                 </Text>
               </View>

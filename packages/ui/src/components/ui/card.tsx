@@ -1,3 +1,4 @@
+import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "cn"
 import * as React from "react"
 
@@ -5,15 +6,53 @@ import * as React from "react"
  * Cards are the product's main surface. 24px radius, a hairline border, and only
  * the faintest shadow — photography and whitespace should carry the visual
  * weight, not the container.
+ *
+ * Surface and foreground are declared together as a `variant` on purpose. An
+ * earlier version hardcoded `bg-card text-card-foreground` in one base string,
+ * so a caller overriding only the background left the light foreground behind —
+ * in dark mode that is light text on a light rose, 1.84:1. Pairing them here
+ * makes an unpaired fill a compile-time mistake rather than a design review one.
  */
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+const cardVariants = cva(
+  [
+    "flex flex-col gap-6 rounded-card border border-border py-6 shadow-soft",
+  ],
+  {
+    variants: {
+      variant: {
+        default: "bg-card text-card-foreground",
+        // The `border-border` from the base is deliberately left in place on the
+        // filled variants; a `border-primary` on `bg-primary` would be 1.00:1 and
+        // therefore invisible.
+        primary: "bg-primary text-primary-foreground",
+        // `brand` is the vivid rose, so its paired foreground is not the same
+        // token as `primary-foreground` in light mode. CardDescription carries
+        // its own `text-muted-foreground`, which would sit at 1.28:1 on this
+        // fill, so it is re-tinted from the same pair rather than left behind.
+        // 90% is the floor that clears AA in both themes (4.53:1 light, 6.25:1
+        // dark) — 80% drops to 3.82:1 on the lighter light-mode rose.
+        brand: [
+          "bg-brand text-brand-foreground",
+          "[&_[data-slot=card-description]]:text-brand-foreground/90",
+        ].join(" "),
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+interface CardProps
+  extends React.ComponentProps<"div">,
+    VariantProps<typeof cardVariants> {}
+
+function Card({ className, variant, ...props }: CardProps) {
   return (
     <div
-      className={cn(
-        "flex flex-col gap-6 rounded-card border border-border bg-card py-6 text-card-foreground shadow-soft",
-        className
-      )}
+      className={cn(cardVariants({ variant }), className)}
       data-slot="card"
+      data-variant={variant}
       {...props}
     />
   )
@@ -89,4 +128,6 @@ export {
   CardAction,
   CardDescription,
   CardContent,
+  cardVariants,
 }
+export type { CardProps }

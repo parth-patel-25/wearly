@@ -177,6 +177,28 @@ export function SurfacesSection() {
             </Button>
           </CardFooter>
         </Card>
+
+        <div className="grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2">
+          <Card variant="primary">
+            <CardHeader>
+              <CardTitle>Filled primary</CardTitle>
+              <CardDescription>
+                The `primary` variant carries its own foreground, so the label
+                and description never need hand-paired text colours.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+          <Card variant="brand">
+            <CardHeader>
+              <CardTitle>Filled brand</CardTitle>
+              <CardDescription>
+                The `brand` variant re-tints the description from the same pair.
+                Without it the rose kept `text-muted-foreground` and fell to
+                1.28:1 in dark mode.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
       </Section>
 
       <Section

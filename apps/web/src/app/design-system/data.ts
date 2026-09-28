@@ -6,6 +6,13 @@
 export interface Swatch {
   /** Tailwind background utility, e.g. `bg-primary`. */
   className: string;
+  /**
+   * Foreground utility to render the labels with. Required whenever the
+   * swatch's background is a filled tone, because these tones flip direction
+   * between themes and the default `text-foreground` is the wrong contrast
+   * against at least one of them.
+   */
+  foregroundClassName: string;
   /** Hex the token was derived from, for cross-checking against the brief. */
   hex: string;
   note?: string;
@@ -14,47 +21,88 @@ export interface Swatch {
 }
 
 export const surfaces: Swatch[] = [
-  { className: "bg-background", hex: "#FFFBFC", token: "--wearly-background" },
-  { className: "bg-card", hex: "#FFFFFF", token: "--wearly-card" },
-  { className: "bg-muted", hex: "#F8F2F5", token: "--wearly-muted" },
-  { className: "bg-secondary", hex: "#F9EEF2", token: "--wearly-secondary" },
-  { className: "bg-accent", hex: "#FCE7EF", token: "--wearly-accent" },
+  {
+    className: "bg-background",
+    foregroundClassName: "text-foreground",
+    hex: "#FFFBFC",
+    token: "--wearly-background",
+  },
+  {
+    className: "bg-card",
+    foregroundClassName: "text-card-foreground",
+    hex: "#FFFFFF",
+    token: "--wearly-card",
+  },
+  {
+    className: "bg-muted",
+    foregroundClassName: "text-foreground",
+    hex: "#F8F2F5",
+    token: "--wearly-muted",
+  },
+  {
+    className: "bg-secondary",
+    foregroundClassName: "text-secondary-foreground",
+    hex: "#F9EEF2",
+    token: "--wearly-secondary",
+  },
+  {
+    className: "bg-accent",
+    foregroundClassName: "text-accent-foreground",
+    hex: "#FCE7EF",
+    token: "--wearly-accent",
+  },
 ];
 
 export const brand: Swatch[] = [
   {
     className: "bg-primary",
+    foregroundClassName: "text-primary-foreground",
     hex: "#C54B75",
     note: "Accessible rose. Default for anything with text on it.",
     token: "--wearly-primary",
   },
   {
     className: "bg-brand",
+    foregroundClassName: "text-brand-foreground",
     hex: "#E86A93",
-    note: "Decorative only — rings, active indicators, hearts. No text.",
+    note: "Vivid rose. Rings and indicators by default, but text is allowed on it via brand-foreground.",
     token: "--wearly-brand",
   },
-  { className: "bg-ring", hex: "#C54B75", token: "--wearly-ring" },
+  {
+    className: "bg-ring",
+    foregroundClassName: "text-primary-foreground",
+    hex: "#C54B75",
+    token: "--wearly-ring",
+  },
 ];
 
+/**
+ * The text tones are themselves filled surfaces here, and they invert between
+ * themes, so each one pairs with `text-background` — which inverts with them and
+ * stays readable in both.
+ */
 export const text: Swatch[] = [
   {
     className: "bg-foreground",
+    foregroundClassName: "text-background",
     hex: "#272126",
     token: "--wearly-foreground",
   },
   {
     className: "bg-muted-foreground",
+    foregroundClassName: "text-background",
     hex: "#7E7178",
     token: "--wearly-muted-foreground",
   },
   {
     className: "bg-secondary-foreground",
+    foregroundClassName: "text-background",
     hex: "#5E4851",
     token: "--wearly-secondary-foreground",
   },
   {
     className: "bg-accent-foreground",
+    foregroundClassName: "text-background",
     hex: "#7A304D",
     token: "--wearly-accent-foreground",
   },
