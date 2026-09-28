@@ -2,25 +2,132 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* 2. Wearly tokens, then the Tailwind theme mapping built from them. */
-@import "@wearly/design-tokens/tokens.css";
+/* 2. Satoshi @font-face. Before the token layer, so the stack resolves. */
+@import "./fonts.css";
+
+/* 2. HeroUI's base + default theme. Its variables are overridden in step 4. */
+@import "@heroui/styles";
+
+/* 3. Wearly tokens, then the Tailwind utility mapping built from them.
+      `theme.css` must follow the token files it references. */
+@import "@wearly/design-tokens/colors.css";
+@import "@wearly/design-tokens/radius.css";
+@import "@wearly/design-tokens/spacing.css";
+@import "@wearly/design-tokens/typography.css";
+@import "@wearly/design-tokens/shadows.css";
+@import "@wearly/design-tokens/motion.css";
 @import "@wearly/design-tokens/theme.css";
 
-/* 3. HeroUI web. Its tokens are overridden below by our palette. */
-@import "@heroui/styles";
+/* 4. HeroUI bridges. Imported last and left unlayered so these declarations
+      outrank the `@layer base` variables HeroUI ships with. */
 @import "@wearly/design-tokens/heroui.css";
 
-/* shadcn/ui dark mode is class-based, matching HeroUI and our tokens. */
+/* `packages/ui` holds the shadcn components this app renders, but it lives
+   outside `apps/web`. Tailwind's automatic source detection only walks up from
+   this file to the app root, so without this every class inside a shadcn
+   component — including the `cva` variant strings — is missing from the build
+   and those components render unstyled. */
+@source "../../../../packages/ui/src";
+
+/* `dark` is class-based, matching next-themes and our tokens.
+   `light` is declared too because `colors.css` wraps each palette in an
+   `@variant` block; without it Tailwind cannot resolve `@variant light`. */
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant light (&:where(.light, .light *));
+
+/* Tell the browser which scheme is active so form controls, scrollbars and the
+   canvas background match, instead of rendering light-on-light. */
+:root {
+  color-scheme: light;
+}
+
+:root:where(.dark, .dark *) {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not(.light, .light *, .dark, .dark *)) {
+    color-scheme: dark;
+  }
+}
 
 @layer base {
-  * {
+  *,
+  ::before,
+  ::after {
     border-color: var(--wearly-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
     font-family: var(--wearly-font-sans);
+    font-synthesis-weight: none;
     color: var(--wearly-foreground);
     background-color: var(--wearly-background);
+    text-rendering: optimizeLegibility;
+  }
+
+  /* A soft brand-tinted selection, so dragging to highlight text feels part of
+     the product rather than like the operating system. */
+  ::selection {
+    color: var(--wearly-primary-foreground);
+    background-color: var(--wearly-primary);
+  }
+
+  /* One visible focus treatment for everything that is not a control. Interactive
+     elements style their own ring, so they opt out via :focus-visible rules. */
+  :focus-visible {
+    outline: 2px solid var(--wearly-ring);
+    outline-offset: 2px;
+  }
+
+  /* Respect the OS reduced-motion setting; `theme.css` also collapses the
+     duration tokens. Both are needed — the tokens cover transitions, this
+     covers scroll behaviour and third-party animation. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      scroll-behavior: auto !important;
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Keep the scrollbar from painting a hard grey slab over the soft palette. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--wearly-border);
+    background-clip: content-box;
+    border: 3px solid transparent;
+    border-radius: var(--wearly-radius-pill);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--wearly-muted-foreground);
+  }
+
+  /* Hides the scrollbar without disabling scrolling — used on horizontal
+     filter chip rails. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
