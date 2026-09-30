@@ -65,22 +65,30 @@ export function ThemeToggle() {
     // layout. Nothing reflows when it appears, and no screen has to know about
     // it. `toast.tsx` and the sticky bar on the product page are the other two
     // places Wearly does this.
+    //
+    // The small size and the `insets.top + 4` offset are load-bearing. Screens
+    // start at `pt-safe` and add their own `pt-6`, so there is a 24px band
+    // between the status bar and the first line of any header. A 32px pill
+    // dropped in at `+4` ends 12px into that band and clears the text, where the
+    // 36px version this started as overlapped the heading. `min-h-8` is 32px —
+    // still above the 24px minimum, and this is a dev control, not a
+    // user-reachable action.
     <View
       className="absolute top-0 right-0 z-50"
       pointerEvents="box-none"
-      style={{ paddingRight: insets.right + 12, paddingTop: insets.top + 8 }}
+      style={{ paddingRight: insets.right + 12, paddingTop: insets.top + 4 }}
     >
       <AnimatedPressable
-        accessibilityHint="Switches between following the system, light and dark"
+        accessibilityHint="Switches between light, dark and following the system"
         accessibilityLabel={`Theme: ${current}, currently ${theme}`}
         accessibilityRole="button"
-        className="min-h-9 flex-row items-center rounded-pill border border-border bg-card px-3 active:bg-muted"
+        className="min-h-8 flex-row items-center rounded-pill border border-border bg-card px-2.5 active:bg-muted"
         onPress={cycle}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         style={animatedStyle}
       >
-        <Text tone="muted-foreground" variant="label">
+        <Text tone="muted-foreground" variant="caption">
           {current}
         </Text>
       </AnimatedPressable>

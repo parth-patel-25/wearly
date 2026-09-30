@@ -107,7 +107,7 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-background pt-safe">
       <ScrollView
         className="flex flex-col"
         contentContainerClassName="flex flex-col gap-8 pb-8"

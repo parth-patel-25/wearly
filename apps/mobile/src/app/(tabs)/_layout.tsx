@@ -4,6 +4,7 @@ import { TabBar } from "@wearly/ui-native/tab-bar";
 import { Tabs, useRouter } from "expo-router";
 import type { ComponentProps } from "react";
 import { useMemo } from "react";
+import { View } from "react-native";
 
 /**
  * The tab shell.
@@ -69,16 +70,26 @@ function TabBarRenderer({ state }: Parameters<TabBarProps>[0]) {
 
 export default function TabsLayout() {
   return (
-    <Tabs
-      screenOptions={{ headerShown: false }}
-      tabBar={(props) => <TabBarRenderer {...props} />}
-    >
-      <Tabs.Screen name="index" />
-      <Tabs.Screen name="home-v2" />
-      <Tabs.Screen name="discover" />
-      <Tabs.Screen name="list" />
-      <Tabs.Screen name="rentals" />
-      <Tabs.Screen name="profile" />
-    </Tabs>
+    // The one place the tab screens get their top safe-area inset, rather than
+    // each of the six guessing a `pt-*` number that is wrong on a notched phone.
+    // `pt-safe` is the raw inset, so a screen's own `pt-6` becomes the *gap*
+    // between the status bar and its header instead of doubling as the inset.
+    //
+    // `bg-background` on the strip matters: without it the inset area would be
+    // whatever the navigator defaults to, and the top of the app would change
+    // colour between themes.
+    <View className="flex-1 bg-background pt-safe">
+      <Tabs
+        screenOptions={{ headerShown: false }}
+        tabBar={(props) => <TabBarRenderer {...props} />}
+      >
+        <Tabs.Screen name="index" />
+        <Tabs.Screen name="home-v2" />
+        <Tabs.Screen name="discover" />
+        <Tabs.Screen name="list" />
+        <Tabs.Screen name="rentals" />
+        <Tabs.Screen name="profile" />
+      </Tabs>
+    </View>
   );
 }

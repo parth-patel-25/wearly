@@ -94,7 +94,7 @@ function ConfirmationBody() {
   const total = rental + cleaning + delivery;
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-background pt-safe">
       <View className="flex-1 gap-10 px-page-inline pt-16 pb-8">
         <Animated.View className="items-center gap-5" style={headlineStyle}>
           <DrawingCheck />

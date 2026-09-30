@@ -104,7 +104,7 @@ function DatesBody({ piece }: DatesBodyProps) {
   };
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-background pt-safe">
       <View className="flex-1 gap-8 px-page-inline pt-4">
         <View className="flex-row items-center justify-between">
           <IconButton

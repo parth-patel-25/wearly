@@ -471,6 +471,14 @@ stays the focus. On mobile, prefer a bottom sheet at 32px.
   in-memory, so it resets to light on reload; persistence is the open piece.
 - Mobile app frames sit above the system status bar, so `Screen` insets with
   `edges={["top", "left", "right"]}` rather than padding by a guessed number.
+- **The top inset is applied in two places, and nowhere else.** Screens that use
+  `Screen` get it for free. Everything else gets `pt-safe` on its root — the tab
+  screens through the wrapper in `apps/mobile/src/app/(tabs)/_layout.tsx`, and the
+  product and rental screens on their own `flex-1` root. `pt-safe` is the *raw*
+  inset, so a screen's own `pt-4`/`pt-6` becomes the gap between the status bar
+  and its header instead of doing double duty as the inset. A screen must never
+  combine `pt-safe` with its own hard-coded top padding: that is how a header ends
+  up jammed against the notch on one device and marooned on another.
 
 ### Absolute positioning: overlays only
 
@@ -683,6 +691,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-09-30 | Mobile top safe-area: no screen outside `splash`/`welcome` applied the status-bar inset — nine of them guessed a fixed `pt-4`/`pt-6`/`pt-16`, so headers sat under the notch. Applied `pt-safe` in two places: the tab wrapper in `(tabs)/_layout.tsx` (covers all six tab screens) and the root of the product and three rental screens. Documented the split in §10 — the inset is `pt-safe`, and a screen's own `pt-*` is the gap below it. |
 | 2026-09-30 | Mobile Home: added the story-first `/(tabs)/home-v2` variant (masthead, lead story, occasion rail, lender note, grid last) and moved `ProductCard`'s favourite heart inside the media block, bottom-right. Floated the tab bar as a shadowed pill inset from the screen edges, and added filled twins for the four tab glyphs so the active tab reads as filled rather than just recoloured. Made light the mobile launch theme instead of the OS scheme, and added a `__DEV__`-gated three-state theme toggle. Rewrote §10's absolute-positioning rule, which claimed a single exception while five sanctioned overlays already existed. |
 | 2026-09-29 | Fixed the native `@source` path in `apps/mobile/src/global.css` (it pointed one level too high, so nothing in `packages/ui-native` was ever scanned and every shared component rendered unstyled). Made `Screen` content `grow`. Replaced all five `entering=` usages with `useFadeIn`. Replaced the three stock Expo brand assets with renders of the Wearly mark and deleted `assets/expo.icon`. Added a dev-only `EXPO_PUBLIC_WEARLY_THEME` override.
 | 2026-09-29 | Mobile Phase 1: recorded the `ui-native` component inventory (§9), the hero-overlay exception and native motion tokens (§10), and the HeroUI Native situation (§16). Added `--wearly-height-sheet`, `--wearly-tracking-brand` and a `bg-backdrop` utility. Removed the orphaned `src/tokens.css`, which carried a conflicting violet palette and the `.dark {}` pattern §2 forbids. |

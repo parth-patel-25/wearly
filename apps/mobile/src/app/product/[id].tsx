@@ -63,7 +63,10 @@ function ProductDetail({ piece }: ProductDetailProps) {
   const summary = rentalSummary(piece, RENTAL_DAYS);
 
   return (
-    <View className="flex-1 bg-background">
+    // `pt-safe` is the status-bar inset; the header row's own `pt-4` is the gap
+    // below it. Splitting the two is what stops the back button from sitting
+    // under the notch on a device that has one.
+    <View className="flex-1 bg-background pt-safe">
       <ScrollView
         className="flex flex-col"
         contentContainerClassName="flex flex-col gap-10 pb-44"
