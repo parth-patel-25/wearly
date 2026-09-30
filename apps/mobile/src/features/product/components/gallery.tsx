@@ -29,13 +29,13 @@ export function Gallery({ onSelect, piece }: GalleryProps) {
     onSelect?.(position);
   };
 
-  // Tones are unique per slot in the generated data, so they make better keys
-  // than the position: a key derived from the index silently reorders itself if
-  // the array is ever rebuilt differently.
-  const frames = piece.gallery.map((tone, position) => ({
-    key: `${piece.id}-${tone}`,
+  // Frames are keyed by URL rather than position: a key derived from the index
+  // silently reorders itself if the array is ever rebuilt differently, and every
+  // angle is a distinct photograph here.
+  const frames = piece.images.map((src, position) => ({
+    key: `${piece.id}-${position}-${src}`,
     position,
-    tone,
+    src,
   }));
   const activeFrame = frames.find((frame) => frame.position === index);
 
@@ -51,7 +51,7 @@ export function Gallery({ onSelect, piece }: GalleryProps) {
             key={frame.key}
             onPress={() => select(frame.position)}
           >
-            <Media aspect="1/1" tone={frame.tone} />
+            <Media aspect="1/1" src={frame.src} tone={piece.gallery[0]} />
           </Pressable>
         ))}
       </View>
@@ -67,8 +67,8 @@ export function Gallery({ onSelect, piece }: GalleryProps) {
         </View>
         <Text tone="muted-foreground" variant="caption">
           {activeFrame === undefined
-            ? "Prototype imagery"
-            : `Image ${index + 1} · prototype`}
+            ? "Photo"
+            : `Photo ${index + 1} of ${frames.length}`}
         </Text>
       </View>
     </View>

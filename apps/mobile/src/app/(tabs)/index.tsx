@@ -136,6 +136,7 @@ function FeaturedCard({ onPress }: FeaturedCardProps) {
       <Media
         aspect="16/9"
         icon="sparkles"
+        src={FEATURED.images[0]}
         tone={FEATURED.gallery[0] as PlaceholderTone}
       />
       <View className="gap-1 p-5">

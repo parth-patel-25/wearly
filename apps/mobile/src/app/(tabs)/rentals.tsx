@@ -80,7 +80,7 @@ function RentalCard({ rental }: RentalCardProps) {
   return (
     <Card className="gap-4 p-4">
       <View className="w-full overflow-hidden rounded-media">
-        <Media aspect="16/9" tone={piece.gallery[0]} />
+        <Media aspect="16/9" src={piece.images[0]} tone={piece.gallery[0]} />
       </View>
 
       <View className="flex-row items-start justify-between gap-3">

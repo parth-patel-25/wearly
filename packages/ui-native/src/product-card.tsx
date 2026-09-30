@@ -50,6 +50,8 @@ export interface ProductCardProps {
   onPress: (frame: ProductCardFrame) => void;
   placeholderTone: PlaceholderTone;
   price: string;
+  /** Product photograph. Absent falls back to the tone block. */
+  src?: string;
 }
 
 export function ProductCard({
@@ -60,6 +62,7 @@ export function ProductCard({
   onPress,
   price,
   placeholderTone,
+  src,
 }: ProductCardProps) {
   const { animatedStyle, onPressIn, onPressOut } = usePressScale(0.985);
   const heart = useHeartPop();
@@ -95,7 +98,7 @@ export function ProductCard({
     >
       <View className="overflow-hidden rounded-media">
         <View ref={media}>
-          <Media aspect="4/5" tone={placeholderTone} />
+          <Media aspect="4/5" src={src} tone={placeholderTone} />
         </View>
 
         <AnimatedPressable

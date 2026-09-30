@@ -124,7 +124,7 @@ export default function CheckoutScreen() {
 
         <Card className="mx-page-inline flex-row items-center gap-4 p-4">
           <View className="w-20 overflow-hidden rounded-media">
-            <Media aspect="1/1" tone={piece.gallery[0]} />
+            <Media aspect="1/1" src={piece.images[0]} tone={piece.gallery[0]} />
           </View>
           <View className="flex-1 gap-1">
             <Text numberOfLines={2} variant="bodyMd">

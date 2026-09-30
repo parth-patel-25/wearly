@@ -45,5 +45,6 @@ export function toCardItem(piece: Piece): ProductGridItem {
     name: piece.name,
     placeholderTone: piece.gallery[0],
     price: rentalSummary(piece, 3),
+    src: piece.images[0],
   };
 }

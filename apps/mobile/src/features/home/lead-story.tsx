@@ -48,7 +48,12 @@ export function LeadStory({ onPress, piece }: LeadStoryProps) {
       onPressOut={onPressOut}
       style={animatedStyle}
     >
-      <Media aspect="3/4" icon="sparkles" tone={piece.gallery[0]} />
+      <Media
+        aspect="3/4"
+        icon="sparkles"
+        src={piece.images[0]}
+        tone={piece.gallery[0]}
+      />
 
       <View className="gap-3 p-5">
         <Badge variant="neutral">{piece.category}</Badge>

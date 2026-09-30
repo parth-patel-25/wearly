@@ -36,7 +36,9 @@ export function useOpenProduct(): (
       const [tone] = piece?.gallery ?? [];
 
       if (piece && tone && frame.width > 0 && frame.height > 0) {
-        begin(id, frame, () => <Media aspect="4/5" tone={tone} />);
+        begin(id, frame, () => (
+          <Media aspect="4/5" src={piece.images[0]} tone={tone} />
+        ));
       }
 
       router.push(ROUTES.product(id));
