@@ -72,6 +72,13 @@
       // Biome 2.5 removed this rule's options, so there is no narrower way to
       // allow the arrow form only. The rule stays fully on for the web app.
       "includes": ["apps/mobile/**", "packages/ui-native/**"],
+      "javascript": {
+        // `__DEV__` is a Metro/React Native global, not a web one. It is declared
+        // here rather than globally so that a stray `__DEV__` in the web app is
+        // still an error, and so the dev-only theme toggle can gate itself on it
+        // without a `biome-ignore`.
+        "globals": ["__DEV__"]
+      },
       "linter": {
         "rules": {
           "performance": {

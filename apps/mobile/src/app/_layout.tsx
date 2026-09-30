@@ -1,4 +1,5 @@
 import { SessionProvider } from "@core/providers/session-provider";
+import { ThemeToggle } from "@core/theme/theme-toggle";
 import { useThemeOverride } from "@core/theme/use-theme-override";
 import { RentalDraftProvider } from "@features/rental/providers/rental-draft-provider";
 import { HeroLayer } from "@wearly/ui-native/hero-layer";
@@ -10,7 +11,7 @@ import { Stack } from "expo-router";
 import { hideAsync, preventAutoHideAsync } from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { useCSSVariable } from "uniwind";
+import { useCSSVariable, useUniwind } from "uniwind";
 
 import { useSatoshi } from "../lib/fonts";
 import "../global.css";
@@ -29,6 +30,10 @@ export default function RootLayout() {
   // A JS style object cannot hold a CSS custom property, so the navigator's
   // background has to be resolved through Uniwind rather than written as one.
   const background = String(useCSSVariable("--wearly-background") ?? "");
+  // Not `style="auto"`: auto follows the *device*, which is exactly the mismatch
+  // the theme toggle exists to create. Reading Uniwind's resolved theme keeps the
+  // status bar legible against a forced palette instead of the OS one.
+  const { theme } = useUniwind();
 
   useEffect(() => {
     // Hide on error too. A missing font is a visual regression, not a reason to
@@ -53,7 +58,7 @@ export default function RootLayout() {
         <RentalDraftProvider>
           <ToastProvider>
             <HeroProvider>
-              <StatusBar style="auto" />
+              <StatusBar style={theme === "dark" ? "light" : "dark"} />
               <Stack
                 screenOptions={{
                   // The hero expansion is the transition. A slide underneath it
@@ -82,6 +87,9 @@ export default function RootLayout() {
               </Stack>
               {/* Above every screen, so the expansion is not clipped by a route. */}
               <HeroLayer />
+              {/* Dev-only, and above every screen so the palette can be checked
+                  from anywhere without navigating to a settings screen. */}
+              <ThemeToggle />
             </HeroProvider>
           </ToastProvider>
         </RentalDraftProvider>

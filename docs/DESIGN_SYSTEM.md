@@ -460,21 +460,39 @@ stays the focus. On mobile, prefer a bottom sheet at 32px.
 - No hover. Pressed states carry the feedback that hover does on the web.
 - Mobile must not be a copy of the desktop layout. Share colour, type, radius,
   spacing and iconography — not structure.
-- Dark mode follows the OS. There is no in-app switch yet; adding one means
-  Uniwind's `setTheme` plus persistence.
+- **The app launches light.** `apps/mobile/src/core/theme/use-theme-override.ts`
+  sets the initial preference to `light`, not to the OS scheme, so the palette
+  being reviewed does not change with whichever phone is on the desk. Light is the
+  reference render — the soft rose and warm off-white the colour system is tuned
+  around. `EXPO_PUBLIC_WEARLY_THEME` still forces a theme for a specific run.
+- **A dev-only three-state toggle** (`theme-toggle.tsx`, `__DEV__`-gated) floats at
+  the top right and cycles light → dark → follow the system. It is the one control
+  in the product that exists to be looked at rather than used. Its state is
+  in-memory, so it resets to light on reload; persistence is the open piece.
 - Mobile app frames sit above the system status bar, so `Screen` insets with
   `edges={["top", "left", "right"]}` rather than padding by a guessed number.
 
-### The one absolute exception
+### Absolute positioning: overlays only
 
-`hero-layer.tsx` positions its expanding surface. That is the **only**
-absolutely-positioned surface in the product, and it is a transient animation
-layer rather than layout — an overlay does not participate in the flexbox flow,
-and there is no way to interpolate a card's rectangle to full-bleed without one.
+Absolute positioning is for surfaces that float **above** the app and do not
+participate in layout. It is never a way to arrange things inside a screen — a
+flexbox row or column is the answer there, always.
 
-It is not precedent. Nothing else in `apps/mobile` or `packages/ui-native`
-positions anything, and a second absolute surface is a design decision that has
-to earn its place rather than a default.
+The sanctioned list, and each earns its place for a different reason:
+
+| Surface | Why it cannot be laid out |
+|---|---|
+| `hero-layer.tsx` | Interpolates a card's measured rectangle to full-bleed. A transient animation layer; there is no flexbox way to interpolate between two positions. |
+| `product/[id].tsx` sticky bar | Sits on top of a scrolling list, so content passes beneath it. |
+| `toast.tsx` | Overlays the navigator, above every route, without any screen knowing. |
+| `ProductCard`'s favourite heart | Anchored to the image it belongs to, not to the card's flow. |
+| `theme-toggle.tsx` | Dev-only, and above every screen by definition. |
+
+`bottom-sheet.tsx`'s scrim is a fifth: `absolute inset-0` over the modal.
+
+Anything that is not in this table is not an overlay, and a second absolute
+surface in a screen layout is a design decision that has to earn its place rather
+than a default.
 
 ### Motion on native
 
@@ -665,5 +683,6 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-09-30 | Mobile Home: added the story-first `/(tabs)/home-v2` variant (masthead, lead story, occasion rail, lender note, grid last) and moved `ProductCard`'s favourite heart inside the media block, bottom-right. Floated the tab bar as a shadowed pill inset from the screen edges, and added filled twins for the four tab glyphs so the active tab reads as filled rather than just recoloured. Made light the mobile launch theme instead of the OS scheme, and added a `__DEV__`-gated three-state theme toggle. Rewrote §10's absolute-positioning rule, which claimed a single exception while five sanctioned overlays already existed. |
 | 2026-09-29 | Fixed the native `@source` path in `apps/mobile/src/global.css` (it pointed one level too high, so nothing in `packages/ui-native` was ever scanned and every shared component rendered unstyled). Made `Screen` content `grow`. Replaced all five `entering=` usages with `useFadeIn`. Replaced the three stock Expo brand assets with renders of the Wearly mark and deleted `assets/expo.icon`. Added a dev-only `EXPO_PUBLIC_WEARLY_THEME` override.
 | 2026-09-29 | Mobile Phase 1: recorded the `ui-native` component inventory (§9), the hero-overlay exception and native motion tokens (§10), and the HeroUI Native situation (§16). Added `--wearly-height-sheet`, `--wearly-tracking-brand` and a `bg-backdrop` utility. Removed the orphaned `src/tokens.css`, which carried a conflicting violet palette and the `.dark {}` pattern §2 forbids. |
