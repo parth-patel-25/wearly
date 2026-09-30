@@ -495,7 +495,7 @@ The sanctioned list, and each earns its place for a different reason:
 | `toast.tsx` | Overlays the navigator, above every route, without any screen knowing. |
 | `ProductCard`'s favourite heart | Anchored to the image it belongs to, not to the card's flow. |
 | `tab-bar-indicator.tsx` | Slides behind the tabs, anchored to its siblings' measured positions rather than to the row's own flow. |
-| `use-tab-item-motion.ts` icon and label wrappers | Scale and lift a tab's contents inside its own slot. Contained, and needed so activation reads as more than a recolour. |
+| `use-tab-frames.ts` / `use-tab-item-motion.ts` wrappers | Scale and lift a tab's contents inside its own slot. Contained, and needed so activation reads as more than a recolour. |
 | `theme-toggle.tsx` | Dev-only, and above every screen by definition. |
 
 `bottom-sheet.tsx`'s scrim is a fifth: `absolute inset-0` over the modal.
@@ -519,15 +519,34 @@ cannot shift surrounding layout.
 ### The tab bar has one sliding indicator, and everything inside it is
 ### still, small motion
 
-`TabBarIndicator` is the third sanctioned transform. It translates and resizes to
-the active tab's **measured** `onLayout` frame, so it moves to where the tab
-actually is rather than to where a `width / 5` calculation guesses it is.
+`TabBarIndicator` is the third sanctioned transform. It translates to the active
+tab's **measured** position and resizes to that tab's **measured content** width,
+so it moves to where the tab actually is rather than to where a `width / 5`
+calculation guesses it is.
 
 There is exactly **one** of them. A per-tab background that fades in and out
 would draw the same information and lose the thing that makes a good bottom bar
 feel good: the sense that you never left the control, only moved within it. One
 object crossing the bar says that. Five independently-lit backgrounds say the old
 tab died and a new one was born.
+
+**The pill is sized from content, not from slot.** Five equal `flex-1` slots all
+measure the same, so a slot-sized pill is a fixed-width bar sliding side to side
+and the horizontal resize is never exercised at all. `useTabFrames` takes two
+layout passes per tab — the slot for the centre, the icon-and-label column for
+the width — and the pill becomes genuinely wider under "Discover" than under
+"Home", clamped to its own slot so a long translation can never reach the next
+tab's icon. The pill's *height* is still the slot's height: the resize is
+horizontal, and nothing about it should move the bar vertically.
+
+**The width is a `scaleX`, not an animated `width`.** `width` is a layout
+property: animating it re-measures the view every frame, so the resize drags
+while the `translateX` alongside it stays smooth, and the bar reads as fighting
+itself. So the layout `width` jumps straight to the target — one layout pass, on
+the frame the press lands — and the visual change rides on a `scaleX` springing
+from `previousWidth / targetWidth` to `1`, with `transformOrigin: "left"` keeping
+the leading edge glued to its translation. A transform is pure paint, so both now
+run at display frame rate and cannot desynchronise.
 
 It runs on `SPRING.tabIndicator`, not on the product's default timing curve. A
 pill travelling the width of the bar is a physical object, and a decelerating
@@ -541,8 +560,8 @@ lifts 2px, the label fades to full strength, scales `0.96 → 1` and lifts 1.5px
 The icon's press scale is composed into the same transform rather than applied to
 the pressable, so a tap never shifts the label relative to the pill.
 
-The magnitudes are small on purpose. A tab is 18px of icon beside an 11px caption
-in a ~56px pill; past about 6% and 2px the motion stops reading as "this one is
+The magnitudes are small on purpose. A tab is 18px of icon beside a 12px caption
+in a ~52px pill; past about 6% and 2px the motion stops reading as "this one is
 active" and starts reading as a pop animation. Subtle is the whole brief.
 
 Under reduced motion, and on the very first measurement, the indicator assigns
@@ -727,6 +746,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-09-30 | Tab bar, second pass: sized the pill from each tab's **content** rather than its slot. With five equal `flex-1` slots every frame measured the same, so the pill was a fixed-width bar and the horizontal resize the design is built around never happened; it now hugs "Discover" and "Home" differently, clamped to its own slot. Rebuilt the resize as a `scaleX` spring over an instantly-set layout `width`, because animating `width` re-measures the view every frame and was the actual source of the drag. Extracted `use-tab-frames.ts` once the second measurement pass pushed `tab-bar.tsx` over budget. Separately, fixed a Uniwind warning in `fields.tsx`: `selectionColorClassName`/`placeholderTextColorClassName` need `accent-*` utilities, not `text-*` — the text form resolved to nothing, warned, and silently left the cursor colour at the platform default. |
 | 2026-09-30 | Tab bar: removed the centre `+` action. It was a fixed 48px filled circle with no label, which made it a button wearing a nav item's clothes — and it meant the bar's geometry depended on one tab being a different shape from its neighbours. All five tabs are now equal `flex-1` slots, so "the listing screen" is `List`, the third destination, with a hanger glyph and its filled twin. Gave the pill a spring (`SPRING.tabIndicator`) instead of `DURATION.base`/`EASE_OUT`, added `useTabItemMotion` so the icon and label settle into the pill on one shared value, and relaxed the rule that forbade a spring here. |
 | 2026-09-30 | Tab bar: added a sliding active indicator that travels to the active tab's measured `onLayout` frame, animating `translateX` and `width` on `DURATION.base`/`EASE_OUT` rather than a spring. Extracted `tab-bar-item.tsx` and `tab-bar-indicator.tsx` from a now-over-budget `tab-bar.tsx`, and gave the four destination tabs the press scale they were already calling `usePressScale` for but discarding. Recorded the indicator as the third sanctioned transform in §10. |
 | 2026-09-30 | Mobile top safe-area: no screen outside `splash`/`welcome` applied the status-bar inset — nine of them guessed a fixed `pt-4`/`pt-6`/`pt-16`, so headers sat under the notch. Applied `pt-safe` in two places: the tab wrapper in `(tabs)/_layout.tsx` (covers all six tab screens) and the root of the product and three rental screens. Documented the split in §10 — the inset is `pt-safe`, and a screen's own `pt-*` is the gap below it. |

@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
-import type { LayoutChangeEvent } from "react-native";
 import { View } from "react-native";
 import type { IconName } from "./icon-glyphs";
 import type { TabFrame } from "./tab-bar-indicator";
 import { TabBarIndicator } from "./tab-bar-indicator";
 import { TabItem } from "./tab-bar-item";
+import type { TabMetrics } from "./use-tab-frames";
+import { useTabFrames } from "./use-tab-frames";
 
 /**
  * The bottom navigation.
@@ -25,6 +25,11 @@ import { TabItem } from "./tab-bar-item";
  *   container that already applies `insets.bottom`, so adding `pb-safe-*` would
  *   double the gap on a device with a home indicator. The fixed `pb-3` below is
  *   the *design* gap above that inset, not a substitute for it.
+ *
+ * The horizontal and vertical padding below is the bar's own proportion. It is
+ * not a lever on the active pill: the pill fills its tab's slot exactly, because
+ * a capsule inset inside every slot reads as five separate compartments rather
+ * than as one bar with one object in it.
  *
  * The centre action used to be a fixed 48px filled circle with no label, wedged
  * between the other four. It is gone: listing a piece is a destination, not
@@ -87,56 +92,46 @@ export interface TabBarProps {
   onSelect: (tab: TabKey) => void;
 }
 
-interface TabFrames {
-  frames: Partial<Record<TabKey, TabFrame>>;
-  onLayoutFor: Record<TabKey, (event: LayoutChangeEvent) => void>;
-}
+/**
+ * The pill's width, in pixels of breathing room either side of a tab's own
+ * content.
+ *
+ * The reason the pill is sized from the content rather than the slot is that a
+ * slot-sized pill cannot change width at all: five equal `flex-1` slots all
+ * measure the same, so a pill that fills its slot is a fixed-width bar sliding
+ * side to side, and the horizontal resize is never actually exercised. Hugging
+ * the content is what makes the pill genuinely wider under "Discover" than under
+ * "Home", so the width change is real and the travel distance varies the way a
+ * hand-sized thing would vary.
+ *
+ * 10pt either side is roughly a `space-2` plus a hair — enough that the label
+ * never crowds the curve of the end cap, while still leaving a visible gap
+ * between neighbouring pills.
+ */
+const PILL_PADDING = 10;
 
 /**
- * Where every tab sits inside the bar.
+ * The pill's target for a tab: the content's width plus padding, centred on the
+ * slot.
  *
- * Measured, not computed. Five equal `flex-1` slots would *usually* put the pill
- * at `index × width / 5`, but "usually" is doing real work in that sentence: a
- * label in another language can be wider than its slot's minimum, flex
- * distribution is not guaranteed to be uniform once anything is measured in
- * pixels, and a rotation re-lays-out the row. Asking each item where it landed
- * is the only version that stays true at every width and in every language.
- *
- * `onLayout` reports relative to the row, which is precisely the space the
- * indicator animates in, so no second measuring pass is needed.
+ * Clamped to the slot so it can never reach a neighbour's. On a narrow phone
+ * that clamp is what stops a long translated label pushing the pill over the
+ * next tab's icon — the pill gives up its padding rather than its boundary.
  */
-function useTabFrames(): TabFrames {
-  const [frames, setFrames] = useState<Partial<Record<TabKey, TabFrame>>>({});
-
-  const measure = useCallback((tab: TabKey, frame: TabFrame) => {
-    setFrames((previous) => {
-      const existing = previous[tab];
-      // Layout fires on every parent re-render, rotation and keyboard show. Only a
-      // real change is a state update, or the indicator would re-animate forever.
-      if (existing?.width === frame.width && existing.x === frame.x) {
-        return previous;
-      }
-      return { ...previous, [tab]: frame };
-    });
-  }, []);
-
-  // One stable handler per tab, built once. A fresh `onLayout` identity each
-  // render re-fires layout each render, and each firing is a potential update.
-  const onLayoutFor = useMemo(
-    () =>
-      Object.fromEntries(
-        TAB_KEYS.map((tab) => [
-          tab,
-          ({ nativeEvent }: LayoutChangeEvent) => {
-            const { width, x } = nativeEvent.layout;
-            measure(tab, { width, x });
-          },
-        ])
-      ) as Record<TabKey, (event: LayoutChangeEvent) => void>,
-    [measure]
+function pillFrameFor(metrics: TabMetrics | undefined): TabFrame | undefined {
+  if (
+    metrics === undefined ||
+    metrics.contentWidth <= 0 ||
+    metrics.slotWidth <= 0
+  ) {
+    return undefined;
+  }
+  const width = Math.min(
+    metrics.contentWidth + PILL_PADDING * 2,
+    metrics.slotWidth
   );
-
-  return { frames, onLayoutFor };
+  const centre = metrics.slotX + metrics.slotWidth / 2;
+  return { width, x: centre - width / 2 };
 }
 
 /** Inset from the screen edges, and the gap between the pill and the bottom. */
@@ -144,13 +139,17 @@ const GUTTER = "px-4";
 const LIFT = "pt-2 pb-3";
 
 export function TabBar({ active, onSelect }: TabBarProps) {
-  const { frames, onLayoutFor } = useTabFrames();
+  const { metrics, onContentLayoutFor, onLayoutFor } =
+    useTabFrames<TabKey>(TAB_KEYS);
 
   return (
     <View className={`bg-background ${GUTTER} ${LIFT}`}>
+      {/* `px-1.5` / `py-1.5` is the bar's own proportion. The pill's *height* is
+          the slot's height; only its width comes from the tab's content, so it
+          varies per tab and the horizontal resize is real. */}
       <View className="flex-row items-center rounded-pill border border-border bg-card px-1.5 py-1.5 shadow-float">
         {/* First child, so the indicator paints behind every tab. */}
-        <TabBarIndicator frame={frames[active]} />
+        <TabBarIndicator frame={pillFrameFor(metrics[active])} />
 
         {TAB_KEYS.map((key) => (
           <TabItem
@@ -159,6 +158,7 @@ export function TabBar({ active, onSelect }: TabBarProps) {
             icon={ICONS[key]}
             key={key}
             label={LABELS[key]}
+            onContentLayout={onContentLayoutFor[key]}
             onLayout={onLayoutFor[key]}
             onPress={() => onSelect(key)}
           />

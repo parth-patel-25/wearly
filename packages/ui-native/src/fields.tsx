@@ -14,6 +14,14 @@ import { Text } from "./text";
  * `--wearly-muted-foreground` like everything else. Each field owns its label
  * and its error text, so a field cannot ship without a visible name or without
  * a way for the user to find out what went wrong.
+ *
+ * The cursor and placeholder colours are passed as `accent-*` utilities, not
+ * `text-*` ones, and that is not interchangeable. Uniwind extracts a native
+ * colour out of a `*ColorClassName` prop by looking for an **accent** utility in
+ * it; hand it `text-primary` and it finds no accent colour, resolves nothing,
+ * and warns that the className "included no color utility" — while silently
+ * falling back to the platform default. `accent-primary` is the same colour,
+ * spelled the one way the extractor understands.
  */
 
 const FIELD_IDLE = "border-border";
@@ -84,8 +92,8 @@ export function TextField({
         accessibilityLabel={label}
         aria-invalid={Boolean(error)}
         className={`${FIELD} ${error ? FIELD_INVALID : FIELD_IDLE}`}
-        placeholderTextColorClassName="text-muted-foreground"
-        selectionColorClassName="text-primary"
+        placeholderTextColorClassName="accent-muted-foreground"
+        selectionColorClassName="accent-primary"
         {...rest}
       />
     </FieldShell>
@@ -117,9 +125,9 @@ export function SearchField({
         onChangeText={onChange}
         onSubmitEditing={onSubmit}
         placeholder="Try “linen dress”"
-        placeholderTextColorClassName="text-muted-foreground"
+        placeholderTextColorClassName="accent-muted-foreground"
         returnKeyType="search"
-        selectionColorClassName="text-primary"
+        selectionColorClassName="accent-primary"
         value={value}
         {...rest}
       />
