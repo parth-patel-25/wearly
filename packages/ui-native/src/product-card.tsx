@@ -16,8 +16,12 @@ import { Text } from "./text";
  *    most one more fact. A card that shows everything communicates nothing, so
  *    low-value facts are omitted rather than shrunk.
  *
- * 2. **The favourite button never covers the garment.** It sits above the image
- *    in its own 44px row rather than floating over the photograph.
+ * 2. **The favourite button lives inside the media block.** It is a translucent
+ *    pill in the bottom-right corner of the image area, clipped by the media's own
+ *    radius, so the card's picture and its one control read as a single object
+ *    instead of two stacked blocks. This is the one place the card uses absolute
+ *    positioning, and it is an overlay rather than a layout strategy: the
+ *    position is anchored to the image, not used to arrange anything.
  *
  * 3. **The card measures itself.** On press it reports where its media actually
  *    is, in window coordinates. That rectangle is the origin of the hero
@@ -89,30 +93,28 @@ export function ProductCard({
       onPressOut={onPressOut}
       style={animatedStyle}
     >
-      <View className="gap-2">
-        <View className="flex-row justify-end">
-          <AnimatedPressable
-            accessibilityLabel={
-              isFavourite ? `Remove ${name} from saved` : `Save ${name}`
-            }
-            accessibilityRole="button"
-            accessibilityState={{ selected: isFavourite }}
-            className={`size-11 items-center justify-center rounded-pill ${isFavourite ? "bg-card" : "bg-card/90"}`}
-            hitSlop={6}
-            onPress={handleFavourite}
-            style={heart.animatedStyle}
-          >
-            <Icon
-              name={isFavourite ? "heart-filled" : "heart"}
-              size="sm"
-              tone={isFavourite ? "primary" : "foreground"}
-            />
-          </AnimatedPressable>
-        </View>
-
+      <View className="overflow-hidden rounded-media">
         <View ref={media}>
           <Media aspect="4/5" tone={placeholderTone} />
         </View>
+
+        <AnimatedPressable
+          accessibilityLabel={
+            isFavourite ? `Remove ${name} from saved` : `Save ${name}`
+          }
+          accessibilityRole="button"
+          accessibilityState={{ selected: isFavourite }}
+          className={`absolute right-2 bottom-2 size-11 items-center justify-center rounded-pill ${isFavourite ? "bg-card" : "bg-card/90"}`}
+          hitSlop={6}
+          onPress={handleFavourite}
+          style={heart.animatedStyle}
+        >
+          <Icon
+            name={isFavourite ? "heart-filled" : "heart"}
+            size="sm"
+            tone={isFavourite ? "primary" : "foreground"}
+          />
+        </AnimatedPressable>
       </View>
 
       <View className="flex-col gap-0.5">

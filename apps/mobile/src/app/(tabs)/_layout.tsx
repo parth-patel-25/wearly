@@ -25,6 +25,12 @@ type TabBarProps = NonNullable<ComponentProps<typeof Tabs>["tabBar"]>;
 
 const TAB_ROUTE: Record<string, TabKey> = {
   discover: "discover",
+  /**
+   * The editorial Home variant shares the Home tab. Mapping it here is what
+   * keeps the tab highlighted while `home-v2` is open, instead of falling back
+   * to the first tab and implying the user had navigated away.
+   */
+  "home-v2": "home",
   index: "home",
   list: "list",
   profile: "profile",
@@ -68,6 +74,7 @@ export default function TabsLayout() {
       tabBar={(props) => <TabBarRenderer {...props} />}
     >
       <Tabs.Screen name="index" />
+      <Tabs.Screen name="home-v2" />
       <Tabs.Screen name="discover" />
       <Tabs.Screen name="list" />
       <Tabs.Screen name="rentals" />

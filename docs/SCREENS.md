@@ -12,6 +12,7 @@ Proves the design language and the hero-expansion interaction end to end.
 
 - [x] 01 Splash / onboarding — animated brand moment
 - [x] 02 Home — editorial, curated
+- [x] 02b Home (variant) — story-first, at `/(tabs)/home-v2`
 - [x] 03 Search — in Discover
 - [x] 04 Categories — in Discover (chip rail)
 - [x] 05 Product grid — FlatList grid in Home and Discover
@@ -31,6 +32,17 @@ Proves the design language and the hero-expansion interaction end to end.
 - [x] Bottom tab bar (Home · Discover · List · Rentals · Profile)
 - [x] Explain-first authentication gate (§6.1 "no forced login")
 - [x] Native component foundation in `packages/ui-native`
+
+**Two Homes, on purpose.** `02` is product-first: a display line, one featured
+piece with a price, a mood row, then six curated cards. `02b` is the opposite
+bet — masthead, one lead piece written up as an article with the price demoted to
+a footnote, a note about the lender, a horizontal rail, and the grid pushed to the
+bottom. It lives at `ROUTES.homeV2` (`/(tabs)/home-v2`) and shares the Home tab,
+so it never appears in the tab bar. `ROUTES.home` currently points at it; swap
+`home` and `homeLegacy` in `apps/mobile/src/core/routing/routes.ts` to compare,
+and delete the loser once one of them wins. The two are meant to be compared side
+by side before either is deleted. `02b` also moves the card's favourite button
+inside the media block, bottom-right.
 
 ## Phase 2 — The rest of the rental journey
 

@@ -17,7 +17,14 @@ export const ROUTES = {
   confirmed: "/rent/confirmed",
   dates: "/rent/dates",
   discover: "/(tabs)/discover",
-  home: "/(tabs)",
+  /**
+   * Which Home the tab opens. `homeV2` is the editorial reworking (story-first,
+   * price demoted to a footnote). Swap these two values to compare — the other
+   * route stays registered either way, so nothing is lost.
+   */
+  home: "/(tabs)/home-v2",
+  homeLegacy: "/(tabs)",
+  homeV2: "/(tabs)/home-v2",
   list: "/(tabs)/list",
   product: (pieceId: string): `/product/${string}` => `/product/${pieceId}`,
   profile: "/(tabs)/profile",
