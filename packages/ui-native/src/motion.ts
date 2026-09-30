@@ -7,8 +7,10 @@
  *
  * The rule from the design system is that controls animate **colour** only, so
  * press feedback never nudges the surrounding layout. A transform is allowed in
- * exactly two places: the press scale below, which stays inside the control's own
- * bounds, and the hero-expansion overlay.
+ * exactly three places: the press scale below, which stays inside the control's
+ * own bounds; the hero-expansion overlay; and the tab bar's active indicator,
+ * which translates to a *measured* sibling position and so never displaces the
+ * tabs themselves.
  */
 
 import { DURATION, EASE_OUT, SPRING } from "@wearly/design-tokens/motion";

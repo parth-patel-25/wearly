@@ -494,6 +494,7 @@ The sanctioned list, and each earns its place for a different reason:
 | `product/[id].tsx` sticky bar | Sits on top of a scrolling list, so content passes beneath it. |
 | `toast.tsx` | Overlays the navigator, above every route, without any screen knowing. |
 | `ProductCard`'s favourite heart | Anchored to the image it belongs to, not to the card's flow. |
+| `tab-bar-indicator.tsx` | Slides behind the tabs, anchored to its siblings' measured positions rather than to the row's own flow. |
 | `theme-toggle.tsx` | Dev-only, and above every screen by definition. |
 
 `bottom-sheet.tsx`'s scrim is a fifth: `absolute inset-0` over the modal.
@@ -513,6 +514,18 @@ native file, because CSS has no equivalent.
 heart pops via `useHeartPop`. Both are the documented exceptions to "buttons
 animate colour only" — they are contained inside their own control's bounds and
 cannot shift surrounding layout.
+
+### The tab bar's active indicator slides; everything else recolours
+
+`TabBarIndicator` is the third sanctioned transform. It translates and resizes to
+the active tab's **measured** `onLayout` frame, so it moves to where the tab
+actually is rather than to where a `width / 5` calculation guesses it is. It
+animates with `DURATION.base` and `EASE_OUT` — the product's calm curve — and
+**not** a spring, because a sliding pill with overshoot wobbles. Springs stay
+reserved for `press`, `pop` and `hero`.
+
+Under reduced motion, and on the very first measurement, it assigns the value
+directly: animating either would show a transition that is not one.
 
 ### Never use `entering=` for content that has to be readable
 
@@ -691,6 +704,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-09-30 | Tab bar: added a sliding active indicator that travels to the active tab's measured `onLayout` frame, animating `translateX` and `width` on `DURATION.base`/`EASE_OUT` rather than a spring. Extracted `tab-bar-item.tsx` and `tab-bar-indicator.tsx` from a now-over-budget `tab-bar.tsx`, and gave the four destination tabs the press scale they were already calling `usePressScale` for but discarding. Recorded the indicator as the third sanctioned transform in §10. |
 | 2026-09-30 | Mobile top safe-area: no screen outside `splash`/`welcome` applied the status-bar inset — nine of them guessed a fixed `pt-4`/`pt-6`/`pt-16`, so headers sat under the notch. Applied `pt-safe` in two places: the tab wrapper in `(tabs)/_layout.tsx` (covers all six tab screens) and the root of the product and three rental screens. Documented the split in §10 — the inset is `pt-safe`, and a screen's own `pt-*` is the gap below it. |
 | 2026-09-30 | Mobile Home: added the story-first `/(tabs)/home-v2` variant (masthead, lead story, occasion rail, lender note, grid last) and moved `ProductCard`'s favourite heart inside the media block, bottom-right. Floated the tab bar as a shadowed pill inset from the screen edges, and added filled twins for the four tab glyphs so the active tab reads as filled rather than just recoloured. Made light the mobile launch theme instead of the OS scheme, and added a `__DEV__`-gated three-state theme toggle. Rewrote §10's absolute-positioning rule, which claimed a single exception while five sanctioned overlays already existed. |
 | 2026-09-29 | Fixed the native `@source` path in `apps/mobile/src/global.css` (it pointed one level too high, so nothing in `packages/ui-native` was ever scanned and every shared component rendered unstyled). Made `Screen` content `grow`. Replaced all five `entering=` usages with `useFadeIn`. Replaced the three stock Expo brand assets with renders of the Wearly mark and deleted `assets/expo.icon`. Added a dev-only `EXPO_PUBLIC_WEARLY_THEME` override.
