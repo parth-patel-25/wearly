@@ -13,9 +13,13 @@ import { View } from "react-native";
 /**
  * List a piece.
  *
- * Wearly is two-sided, so the centre action of the bottom bar is this. The
- * guided listing flow is Phase 3 and is not built yet, so this screen shows the
- * shape of it — five calm steps and what each one asks — rather than pretending
+ * Wearly is two-sided, so this screen is a first-class destination: the third
+ * tab, a hanger in the bar, and an ordinary entry in the tab navigator. It used
+ * to be reached through a centre `+` that was a button rather than a place, which
+ * meant it had no tab of its own and the bar's slots were not the same width.
+ *
+ * The guided listing flow is Phase 3 and is not built yet, so this screen shows
+ * the shape of it — five calm steps and what each one asks — rather than pretending
  * to be a working form.
  *
  * A half-built form that accepts input and then throws it away is worse than an

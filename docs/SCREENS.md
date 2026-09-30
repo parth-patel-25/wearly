@@ -44,6 +44,12 @@ and delete the loser once one of them wins. The two are meant to be compared sid
 by side before either is deleted. `02b` also moves the card's favourite button
 inside the media block, bottom-right.
 
+**The `List` tab replaced the centre `+`.** Listing used to be a fixed 48px filled
+circle wedged between Discover and Rentals — a button, not a destination, and the
+reason the bar's tabs were not all the same width. It is now the third tab, a
+hanger glyph, and `/(tabs)/list` is reached the same way as every other screen.
+The bar keeps one sliding pill across all five; see `DESIGN_SYSTEM.md` §10.
+
 ## Phase 2 — The rest of the rental journey
 
 - [ ] 09 Size selection

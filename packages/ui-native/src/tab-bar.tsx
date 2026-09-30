@@ -26,10 +26,11 @@ import { TabItem } from "./tab-bar-item";
  *   double the gap on a device with a home indicator. The fixed `pb-3` below is
  *   the *design* gap above that inset, not a substitute for it.
  *
- * The centre action is emphasised because publishing clothing is a first-class
- * thing you can do on Wearly, not a hidden menu item; the emphasis is a filled
- * rose pill, which is the strongest signal available without adding a floating
- * action button on top of a bar.
+ * The centre action used to be a fixed 48px filled circle with no label, wedged
+ * between the other four. It is gone: listing a piece is a destination, not
+ * something you do from wherever you happen to be standing, so it is a tab like
+ * the other four. All five are `flex-1` slots now, which means the bar's geometry
+ * no longer depends on one tab being a different shape from its neighbours.
  *
  * `accessibilityState.selected` carries the active tab, so the current location is
  * never communicated by colour alone.
@@ -44,17 +45,16 @@ export const TAB_KEYS = [
 ] as const;
 export type TabKey = (typeof TAB_KEYS)[number];
 
-/**
- * The one tab that is an action rather than a destination. Named here rather than
- * inlined at the call site so "which tab is special" has a single answer, and so
- * `TabItem` can stay presentational.
- */
-const EMPHASISED: TabKey = "list";
-
 const ICONS: Record<TabKey, IconName> = {
   discover: "compass",
   home: "home",
-  list: "plus",
+  /**
+   * A hanger, not a plus. The old centre action said "add"; this one says
+   * "clothing on a rail", which is what the screen is actually about — and it is
+   * the same register as the other four, rather than a button wearing a nav
+   * item's clothes.
+   */
+  list: "hanger",
   profile: "user",
   rentals: "bag",
 };
@@ -65,14 +65,11 @@ const ICONS: Record<TabKey, IconName> = {
  * bar has to communicate. It survives at 18px in a way that a bolder stroke does
  * not, and it does not lean on colour alone — `accessibilityState.selected`
  * still carries the same fact to assistive technology.
- *
- * `list` is the emphasised centre action rather than a destination, so it has no
- * filled twin and never changes.
  */
 const ICONS_ACTIVE: Record<TabKey, IconName> = {
   discover: "compass-filled",
   home: "home-filled",
-  list: "plus",
+  list: "hanger-filled",
   profile: "user-filled",
   rentals: "bag-filled",
 };
@@ -98,12 +95,12 @@ interface TabFrames {
 /**
  * Where every tab sits inside the bar.
  *
- * Measured, not computed. The five tabs are deliberately not equal width — the
- * centre action is a fixed 48px circle plus margins, and the other four share
- * whatever is left — so "tab index times width divided by five" is wrong for at
- * least one tab, and wrong in a way that only appears at one screen width or in
- * one language. Asking each item where it landed is the only version that stays
- * true.
+ * Measured, not computed. Five equal `flex-1` slots would *usually* put the pill
+ * at `index × width / 5`, but "usually" is doing real work in that sentence: a
+ * label in another language can be wider than its slot's minimum, flex
+ * distribution is not guaranteed to be uniform once anything is measured in
+ * pixels, and a rotation re-lays-out the row. Asking each item where it landed
+ * is the only version that stays true at every width and in every language.
  *
  * `onLayout` reports relative to the row, which is precisely the space the
  * indicator animates in, so no second measuring pass is needed.
@@ -151,7 +148,7 @@ export function TabBar({ active, onSelect }: TabBarProps) {
 
   return (
     <View className={`bg-background ${GUTTER} ${LIFT}`}>
-      <View className="flex-row items-center gap-1 rounded-pill border border-border bg-card px-2 py-2 shadow-float">
+      <View className="flex-row items-center rounded-pill border border-border bg-card px-1.5 py-1.5 shadow-float">
         {/* First child, so the indicator paints behind every tab. */}
         <TabBarIndicator frame={frames[active]} />
 
@@ -159,7 +156,6 @@ export function TabBar({ active, onSelect }: TabBarProps) {
           <TabItem
             active={active === key}
             activeIcon={ICONS_ACTIVE[key]}
-            emphasised={key === EMPHASISED}
             icon={ICONS[key]}
             key={key}
             label={LABELS[key]}

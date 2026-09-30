@@ -139,11 +139,22 @@ A modern bottom navigation: rounded, comfortable, minimal, slightly elevated,
 easy to read. Consistent across the whole app.
 
 ```
-Home · Discover · List(+) · Rentals · Profile
+Home · Discover · List · Rentals · Profile
 ```
 
-The centre listing action may be visually emphasised, but must not distract.
-The exact structure is allowed to change if the UX reasoning is better.
+**Five equal destinations.** No centre button, no special case. Listing a piece
+is somewhere you go, not something you trigger from wherever you happen to be, so
+it is a tab like the other four — the third slot, with the same weight as its
+neighbours.
+
+**One active indicator that travels.** Exactly one pill, which *slides* to the
+destination you tapped. Never one background per tab fading in and out: that
+reads as "the old tab disappeared and a new one appeared", whereas a single pill
+crossing the bar reads as "this is the same control, and this is where I am now".
+
+The movement is short and soft — roughly 250–350ms, easing into rest, with at
+most a whisper of overshoot. It must not delay the navigation: the screen changes
+as the pill starts moving, not after it lands.
 
 ---
 

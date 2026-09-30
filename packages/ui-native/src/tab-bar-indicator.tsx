@@ -1,11 +1,10 @@
-import { DURATION, EASE_OUT } from "@wearly/design-tokens/motion";
+import { SPRING } from "@wearly/design-tokens/motion";
 import { useEffect, useRef } from "react";
 import Animated, {
-  Easing,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
-  withTiming,
+  withSpring,
 } from "react-native-reanimated";
 
 /**
@@ -15,24 +14,31 @@ import Animated, {
  * moved, and the movement is the part that reads as polished. So the pill
  * travels to the active tab rather than blinking on and off in place.
  *
+ * **One** indicator, not five backgrounds. That is the whole point: a bar where
+ * each tab lights up independently reads as "the old tab went away and a new tab
+ * appeared", while a single pill crossing the bar reads as "I am still in the
+ * same control, this is where I am now". Everything the user needs to know about
+ * continuity comes from this one object moving.
+ *
  * Position is **measured, never computed** — see `useTabFrames` in `./tab-bar`,
  * which is where the numbers come from.
  *
- * It animates `width` as well as position, because the centre action is genuinely
- * a different width from its neighbours. One `Animated.View` with a UI-thread
- * animation is cheap enough at five tabs that the layout prop is not worth
- * contorting into a scale transform.
+ * It animates `width` as well as position, because a tab's frame is measured
+ * rather than assumed: equal slots today, but a longer label in another
+ * language, a rotation, or a future per-tab badge would all change it. One
+ * `Animated.View` with a UI-thread animation is cheap enough at five tabs that
+ * the layout prop is not worth contorting into a scale transform.
+ *
+ * `SPRING.tabIndicator` rather than the product's default timing curve: a pill
+ * crossing the bar is a physical object, and a decelerating curve stops it dead
+ * on arrival in a way that reads as a state change. The spring's overshoot is
+ * under 1% — enough to soften the landing, not enough to wobble.
  */
 
 export interface TabFrame {
   width: number;
   x: number;
 }
-
-/** `cubic-bezier(0.16, 1, 0.3, 1)` from the token, not a curve re-typed here. */
-const EASE = Easing.bezier(...EASE_OUT);
-
-const TIMING = { duration: DURATION.base, easing: EASE } as const;
 
 export interface TabBarIndicatorProps {
   /** The active tab's frame, or `undefined` before anything has been measured. */
@@ -64,8 +70,12 @@ export function TabBarIndicator({ frame }: TabBarIndicatorProps) {
       return;
     }
 
-    x.value = withTiming(frame.x, TIMING);
-    width.value = withTiming(frame.width, TIMING);
+    // Assigning a new animation to a shared value that is already in flight
+    // restarts it from wherever it currently is, rather than from the old
+    // target. That is what makes rapid tapping between tabs track the finger
+    // instead of queueing a backlog of transitions.
+    x.value = withSpring(frame.x, SPRING.tabIndicator);
+    width.value = withSpring(frame.width, SPRING.tabIndicator);
   }, [frame, reduceMotion, width, x]);
 
   const animatedStyle = useAnimatedStyle(() => ({

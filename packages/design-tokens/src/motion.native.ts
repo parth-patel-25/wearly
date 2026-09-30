@@ -46,6 +46,18 @@ export const SPRING = {
   pop: { damping: 12, mass: 0.5, stiffness: 320 },
   /** Press feedback: 1.0 → 0.97 → 1.0. Tight, almost no overshoot. */
   press: { damping: 26, mass: 0.6, stiffness: 420 },
+  /**
+   * A tab's icon and label settling as it becomes active. Damping ratio ~0.83,
+   * so it overshoots by about 1% and settles in ~230ms — enough to read as
+   * arriving rather than snapping, far short of a bounce.
+   */
+  tab: { damping: 24, mass: 0.7, stiffness: 300 },
+  /**
+   * The bottom bar's sliding active pill. Softer than `press` and slower, and
+   * still only ~1% overshoot: the pill travels the width of the bar, so any
+   * real overshoot reads as wobble rather than as life. Settles in ~290ms.
+   */
+  tabIndicator: { damping: 22, mass: 0.8, stiffness: 200 },
 } as const;
 
 export type SpringName = keyof typeof SPRING;

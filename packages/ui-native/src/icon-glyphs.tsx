@@ -7,7 +7,7 @@ import { Circle, Path, Polyline, Rect } from "react-native-svg";
  * filled, so a single set reads at every size without a second weight.
  *
  * Filled twins are the exception, and only where a control has to read as *on*:
- * the favourite heart, and the four tab-bar glyphs, where "which tab am I in" has
+ * the favourite heart, and the five tab-bar glyphs, where "which tab am I in" has
  * to survive at 18px. A filled twin is the `<name>-filled` of the same shape, so a
  * caller switches state by swapping the name rather than by restyling the icon —
  * `Icon` has no `filled` prop, and adding one would put a fill decision in every
@@ -116,6 +116,30 @@ export const GLYPHS = {
       d="M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18ZM15.8 8.2l-2 5.6-5.6 2 2-5.6 5.6-2Z"
       {...filled(c)}
     />
+  ),
+  hanger: (c) => (
+    <>
+      {/* The hook, then the shoulder line. A hanger is the one glyph that says
+          "rental" rather than "clothes" — a shirt reads as a category, a hanger
+          reads as something on a rail waiting for a renter. */}
+      <Path d="M12 8.4V6.75a1.75 1.75 0 1 1 1.75-1.75" {...stroke(c)} />
+      <Path
+        d="m12 8.4-8.8 6.8a1 1 0 0 0 .62 1.76h16.36a1 1 0 0 0 .62-1.76L12 8.4Z"
+        {...stroke(c)}
+      />
+    </>
+  ),
+  "hanger-filled": (c) => (
+    /* Solid shoulder with the hook left as a wire, exactly as `bag-filled` does
+       with its handle: the hook sits above the body, so a stroke still reads
+       there, and the part that overlaps the body is the same colour. */
+    <>
+      <Path
+        d="m12 8.4-8.8 6.8a1 1 0 0 0 .62 1.76h16.36a1 1 0 0 0 .62-1.76L12 8.4Z"
+        {...filled(c)}
+      />
+      <Path d="M12 8.4V6.75a1.75 1.75 0 1 1 1.75-1.75" {...stroke(c)} />
+    </>
   ),
   heart: (c) => (
     <Path

@@ -1,32 +1,40 @@
 import type { LayoutChangeEvent } from "react-native";
+import Animated from "react-native-reanimated";
 import { Icon } from "./icon";
 import type { IconName } from "./icon-glyphs";
-import { AnimatedPressable, usePressScale } from "./motion";
+import { AnimatedPressable } from "./motion";
 import { Text } from "./text";
+import { useTabItemMotion } from "./use-tab-item-motion";
 
 /**
  * One tab.
  *
  * Deliberately presentational: it is told which icon to draw in each state and
- * whether it is the emphasised centre action, and it knows nothing about tabs,
- * routes or what "list" means. The policy lives in `./tab-bar`, and the only reason
- * this is a separate file is that the bar outgrew its line budget once the sliding
- * indicator and the measurement hooks moved in.
+ * whether that tab is the active one, and it knows nothing about tabs, routes or
+ * what "list" means. The policy lives in `./tab-bar`.
+ *
+ * Every tab is the same shape: an icon over a caption, `flex-1` so the five share
+ * the bar evenly. There is no special tab — the old centre action was a 48px
+ * filled circle with no label, which made it a button sitting inside a
+ * navigation bar rather than a destination in it. Listing a piece is somewhere
+ * you go, so it is a destination now, and the bar is five identical slots with
+ * one pill travelling between them.
  *
  * `onLayout` is how the indicator finds this tab. It reports relative to the row,
  * which is exactly the coordinate space the indicator slides in.
+ *
+ * The icon swaps to its filled twin at the moment it becomes active rather than
+ * crossfading the two. Stacking both glyphs and fading between them needs one of
+ * them out of flow, and the only way to do that here is a second absolute surface
+ * per tab — five more overlays for an 18px change. The swap is covered by the
+ * scale and lift, and the active state is carried to assistive technology by
+ * `accessibilityState.selected` regardless.
  */
 
 export interface TabItemProps {
   active: boolean;
   /** The filled twin, drawn only while this tab is active. */
   activeIcon: IconName;
-  /**
-   * The centre action is a *button*, not a destination — publishing clothing is
-   * something you do, not somewhere you go — so it renders as a filled circle with
-   * no label and never changes icon.
-   */
-  emphasised?: boolean;
   icon: IconName;
   label: string;
   onLayout: (event: LayoutChangeEvent) => void;
@@ -36,51 +44,41 @@ export interface TabItemProps {
 export function TabItem({
   active,
   activeIcon,
-  emphasised = false,
   icon,
   label,
   onLayout,
   onPress,
 }: TabItemProps) {
-  const { animatedStyle, onPressIn, onPressOut } = usePressScale(0.9);
-
-  if (emphasised) {
-    return (
-      <AnimatedPressable
-        accessibilityLabel={label}
-        accessibilityRole="button"
-        className="mx-1 size-12 items-center justify-center self-center rounded-pill bg-primary"
-        onLayout={onLayout}
-        onPress={onPress}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}
-        style={animatedStyle}
-      >
-        <Icon name={icon} size="md" tone="primary-foreground" />
-      </AnimatedPressable>
-    );
-  }
+  const { iconStyle, labelStyle, onPressIn, onPressOut } =
+    useTabItemMotion(active);
 
   return (
     <AnimatedPressable
       accessibilityLabel={label}
       accessibilityRole="tab"
       accessibilityState={{ selected: active }}
-      className="flex-1 items-center gap-1 py-1"
+      className="flex-1 items-center gap-1 py-1.5"
       onLayout={onLayout}
       onPress={onPress}
       onPressIn={onPressIn}
       onPressOut={onPressOut}
-      style={animatedStyle}
     >
-      <Icon
-        name={active ? activeIcon : icon}
-        size="sm"
-        tone={active ? "primary" : "muted-foreground"}
-      />
-      <Text tone={active ? "primary" : "muted-foreground"} variant="caption">
-        {label}
-      </Text>
+      <Animated.View style={iconStyle}>
+        <Icon
+          name={active ? activeIcon : icon}
+          size="sm"
+          tone={active ? "primary" : "muted-foreground"}
+        />
+      </Animated.View>
+      {/* The caption animates inside a wrapper rather than as an animated
+          `Text`: Reanimated can style a host text node, but the Wearly `Text` is
+          a wrapper that resolves its own tone, and animating the wrapper keeps
+          the class-based type scale as the single source of size and colour. */}
+      <Animated.View style={labelStyle}>
+        <Text tone={active ? "primary" : "muted-foreground"} variant="caption">
+          {label}
+        </Text>
+      </Animated.View>
     </AnimatedPressable>
   );
 }
