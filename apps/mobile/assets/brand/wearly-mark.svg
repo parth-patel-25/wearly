@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <!--
+    The Wearly mark, as a standalone asset.
+
+    Identical geometry to `BrandMark` in packages/ui-native/src/brand-mark.tsx —
+    a wardrobe rail seen head-on: a rounded arch for the shoulder line of a
+    hanging garment, a hook rising from its centre, and a single rose drop.
+
+    The artwork is inset to 78% and centred, because iOS and Android both mask
+    app icons to a circle or squircle and crop roughly the outer fifth. Drawing to
+    the edges means the shoulders of the arch get clipped off.
+
+    Colours are the light-theme tokens: background #FFFBFC, primary #C54B75.
+    Regenerate the PNGs with:
+
+      rsvg-convert -w 1024 -h 1024 assets/brand/wearly-mark.svg \
+        -o assets/images/icon.png
+  -->
+  <rect width="96" height="96" fill="#FFFBFC"/>
+  <g transform="translate(48 48) scale(0.78) translate(-48 -48)">
+    <g
+      fill="none"
+      stroke="#C54B75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M48 14c5 0 8 3.4 8 7.6 0 3.4-2 5.6-4.6 6.6" stroke-width="4"/>
+      <path
+        d="M16 44c0-7 5-12 12-14 8-2.3 16-3.4 20-3.4s12 1.1 20 3.4c7 2 12 7 12 14v22a6 6 0 0 1-6 6H22a6 6 0 0 1-6-6V44Z"
+        stroke-width="4.5"
+      />
+    </g>
+    <path
+      d="M48 56c2.6 0 4.7 2 4.7 4.5 0 2.7-2.4 4.6-4.7 6.6-2.3-2-4.7-3.9-4.7-6.6 0-2.5 2.1-4.5 4.7-4.5Z"
+      fill="#C54B75"
+    />
+  </g>
+</svg>

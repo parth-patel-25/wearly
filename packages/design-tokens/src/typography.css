@@ -31,6 +31,8 @@
     --wearly-tracking-tight: -0.02em;
     --wearly-tracking-normal: 0;
     --wearly-tracking-wide: 0.01em;
+    /* The wordmark only. A name needs air around the letters; body copy does not. */
+    --wearly-tracking-brand: 0.14em;
 
     --wearly-leading-tight: 1.15;
     --wearly-leading-snug: 1.3;

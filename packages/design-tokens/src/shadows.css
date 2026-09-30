@@ -20,6 +20,7 @@
     --wearly-height-control: 2.75rem; /* 44px */
     --wearly-height-control-lg: 3rem; /* 48px */
     --wearly-height-touch: 3.25rem; /* 52px — mobile primary action */
+    --wearly-height-sheet: 85%; /* Bottom sheets never take the whole screen. */
 
     --wearly-padding-control-inline: 1.25rem; /* 20px */
     --wearly-padding-control-inline-lg: 1.5rem; /* 24px */

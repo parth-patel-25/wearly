@@ -42,6 +42,9 @@
   --color-border: var(--wearly-border);
   --color-input: var(--wearly-input);
   --color-ring: var(--wearly-ring);
+  /* Scrim behind dialogs and sheets. The token already carries its own alpha and
+     differs per theme, so components must not add an opacity modifier. */
+  --color-backdrop: var(--wearly-backdrop);
 
   --color-success: var(--wearly-success);
   --color-success-foreground: var(--wearly-success-foreground);
@@ -98,6 +101,7 @@
   --tracking-tight: var(--wearly-tracking-tight);
   --tracking-normal: var(--wearly-tracking-normal);
   --tracking-wide: var(--wearly-tracking-wide);
+  --tracking-brand: var(--wearly-tracking-brand);
 
   --leading-tight: var(--wearly-leading-tight);
   --leading-snug: var(--wearly-leading-snug);
@@ -209,6 +213,13 @@
   --spacing-gutter: var(--wearly-space-gutter);
   --spacing-section: var(--wearly-space-section);
   --spacing-page-inline: var(--wearly-space-page-inline);
+
+  /* Control and surface heights. Touch target size is an accessibility
+     requirement, so it lives here rather than being re-derived per component. */
+  --height-control: var(--wearly-height-control);
+  --height-control-lg: var(--wearly-height-control-lg);
+  --height-touch: var(--wearly-height-touch);
+  --height-sheet: var(--wearly-height-sheet);
 }
 
 /**

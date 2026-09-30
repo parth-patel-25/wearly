@@ -940,11 +940,19 @@ Keep commits small and focused. Never commit secrets or API keys.
 Before implementing any change, update:
 
 1. **README.md** - If adding new features or changing tech stack
-2. **docs/features.md** - For new features or feature changes
-3. **docs/components.md** - For new components
-4. **docs/hooks.md** - For new hooks
-5. **docs/api.md** - For API changes
-6. **AGENTS.md** - For new coding rules
+2. **docs/WEARLY_UI_UX_SPEC.md** - For any UI work. The product spec.
+3. **docs/DESIGN_SYSTEM.md** - For tokens, components or styling changes
+4. **docs/SCREENS.md** - When a screen is implemented
+5. **AGENTS.md** - For new coding rules
+
+> `docs/features.md`, `docs/components.md`, `docs/hooks.md` and `docs/api.md` are
+> not part of this repository. The real documentation set is `README.md`,
+> `docs/WEARLY_UI_UX_SPEC.md`, `docs/DESIGN_SYSTEM.md`, `docs/SCREENS.md` and
+> `docs/auth-and-database.md`.
+
+> **Any UI change must read `docs/WEARLY_UI_UX_SPEC.md` and
+> `docs/DESIGN_SYSTEM.md` first.** The rule is also enforced by
+> `.agents/rules/wearly-ui-first.md`.
 
 ### Implementation Flow
 ```

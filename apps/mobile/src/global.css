@@ -27,6 +27,12 @@
       correctly when the OS theme changes. */
 @import "@wearly/design-tokens/heroui-native.css";
 
-/* Shared native components live outside this app, so Tailwind must scan them
-   explicitly — Uniwind only scans upward from this file's directory. */
-@source "../../packages/ui-native/src";
+/* Shared native components live outside this app, so Uniwind must scan them
+   explicitly — it only scans upward from this file's directory, and
+   `packages/ui-native` is a sibling of the app rather than a child of it.
+
+   The path is relative to THIS file (`apps/mobile/src/global.css`), so it needs
+   three `..` to reach the repo root: src -> mobile -> apps -> root. Getting this
+   wrong does not fail loudly — the classes are simply never generated, and every
+   component in the shared package renders unstyled. */
+@source "../../../packages/ui-native/src";

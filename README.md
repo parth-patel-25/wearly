@@ -63,9 +63,67 @@ bun run dev --filter=@wearly/api      # http://localhost:4000/api
 bun run dev --filter=@wearly/mobile   # Expo dev server
 ```
 
+### Running the mobile prototype
+
+`apps/mobile` holds a working Phase 1 prototype of the Wearly app: splash,
+welcome, home, discover with filters, product detail with the hero expansion,
+date selection, checkout, the explain-first account gate, confirmation, rentals
+and profile.
+
+```bash
+bun run dev --filter=@wearly/mobile
+```
+
+Press `a` for an Android device or emulator, or scan the QR code with Expo Go.
+Note that `expo start --web` does **not** currently work in this repository:
+`react-native-web@0.21.3` and `uniwind@1.12.0` disagree about
+`uniwind/components/InputAccessoryView`, and `expo-router` pulls that in through
+`react-native-web/dist/index`. This predates the mobile UI work. To validate a
+bundle without a device:
+
+```bash
+cd apps/mobile && bunx expo export --platform ios --output-dir /tmp/wearly
+```
+
+All catalogue data, lenders, prices and reviews in the prototype are invented.
+The app says so on the screens where it matters.
+
+#### Reviewing the light palette
+
+The app follows the OS colour scheme, which is correct — but a dark phone shows
+you the dark palette, and most of what you want to judge (is the blush warm
+enough, does the type hierarchy work, does the card breathe) is a question about
+the light theme. Two options:
+
+- Switch the phone to light mode.
+- Force it for one run, dev only:
+
+  ```bash
+  cd apps/mobile && EXPO_PUBLIC_WEARLY_THEME=light bunx expo start --clear
+  ```
+
+  `EXPO_PUBLIC_WEARLY_THEME` is inlined at build time, so `--clear` is required.
+  It is not present in production builds.
+
+#### Regenerating the brand assets
+
+The icon, Android adaptive layers and native splash image are all rendered from
+one SVG so they cannot drift apart:
+
+```bash
+cd apps/mobile/assets/brand
+rsvg-convert -w 1024 -h 1024 wearly-mark.svg -o ../images/icon.png
+```
+
+The geometry matches `BrandMark` in `packages/ui-native/src/brand-mark.tsx`.
+Update both together, or the launcher icon and the in-app mark stop matching.
+
 ## Design tokens and cross-platform consistency
 
-**Start with [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md).** It documents the
+**Start with [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)** for how the product
+is built, and [`docs/WEARLY_UI_UX_SPEC.md`](docs/WEARLY_UI_UX_SPEC.md) for what
+it is and why it should feel the way it does. Read both before touching UI. It
+documents the
 palette, type scale, radius, spacing, elevation, component rules and the do/don't
 list, and `/design-system` in the web app renders every token live in both themes.
 

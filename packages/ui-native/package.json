@@ -4,13 +4,37 @@
   "private": true,
   "exports": {
     "./providers": "./src/providers.tsx",
-    "./screen": "./src/screen.tsx"
+    "./screen": "./src/screen.tsx",
+    "./text": "./src/text.tsx",
+    "./tone": "./src/tone.ts",
+    "./motion": "./src/motion.ts",
+    "./icon": "./src/icon.tsx",
+    "./icon-glyphs": "./src/icon-glyphs.tsx",
+    "./button": "./src/button.tsx",
+    "./card": "./src/card.tsx",
+    "./badge": "./src/badge.tsx",
+    "./avatar": "./src/avatar.tsx",
+    "./media": "./src/media.tsx",
+    "./fields": "./src/fields.tsx",
+    "./display": "./src/display.tsx",
+    "./status": "./src/status.tsx",
+    "./bottom-sheet": "./src/bottom-sheet.tsx",
+    "./toast": "./src/toast.tsx",
+    "./product-card": "./src/product-card.tsx",
+    "./product-grid": "./src/product-grid.tsx",
+    "./calendar": "./src/calendar.tsx",
+    "./calendar-cell": "./src/calendar-cell.tsx",
+    "./tab-bar": "./src/tab-bar.tsx",
+    "./brand-mark": "./src/brand-mark.tsx",
+    "./hero-provider": "./src/hero-provider.tsx",
+    "./hero-layer": "./src/hero-layer.tsx"
   },
   "scripts": {
     "clean": "rm -rf .turbo *.tsbuildinfo",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@wearly/design-tokens": "workspace:*",
     "react-native-gesture-handler": "~2.32.0",
     "react-native-safe-area-context": "~5.7.0",
     "uniwind": "^1.12.0"
@@ -21,11 +45,15 @@
     "heroui-native": "^1.0.10",
     "react": "19.2.3",
     "react-native": "0.86.3",
+    "react-native-reanimated": "4.5.1",
+    "react-native-svg": "^15.15.5",
     "typescript": "6.0.3"
   },
   "peerDependencies": {
     "heroui-native": "^1.0.0",
     "react": "^19.2.0",
-    "react-native": ">=0.86.0"
+    "react-native": ">=0.86.0",
+    "react-native-reanimated": ">=4.0.0",
+    "react-native-svg": ">=15.0.0"
   }
 }

@@ -11,11 +11,17 @@ export interface ScreenProps {
   children: ReactNode;
   /** Classes for the outer safe-area container. */
   className?: string;
-  /** Classes for the inner content wrapper. */
+  /**
+   * Classes for the inner content wrapper. Defaults to a full-height column —
+   * `grow` is what lets a `flex-1` child centre itself. Pass your own only if
+   * you intend to own the height, and keep `grow` in it.
+   */
   contentClassName?: string;
   /** Wrap content in a ScrollView. Disable for screens that own their own list. */
   scrollable?: boolean;
 }
+
+const DEFAULT_CONTENT = "flex grow flex-col gap-4 p-4";
 
 /**
  * Base screen layout. Flexbox only — no absolute positioning — so it scales
@@ -28,20 +34,18 @@ export function Screen({
   contentClassName,
 }: ScreenProps) {
   const container = (
-    <View className={contentClassName ?? "flex flex-col gap-4 p-4"}>
-      {children}
-    </View>
+    <View className={contentClassName ?? DEFAULT_CONTENT}>{children}</View>
   );
 
   return (
     <StyledSafeAreaView
-      className={className ?? "flex flex-1 bg-background"}
+      className={className ?? "flex-1 bg-background"}
       edges={["top", "left", "right"]}
     >
       {scrollable ? (
         <ScrollView
-          className="flex flex-col"
-          contentContainerClassName="flex flex-col grow"
+          className="flex grow flex-col"
+          contentContainerClassName="flex grow flex-col"
         >
           {container}
         </ScrollView>

@@ -377,6 +377,33 @@ match, because platform-native UX wins over symmetry.
 `BottomSheet` · `Tabs` · `SegmentedControl` · `Dropdown` · `Toast` · `Alert` ·
 `EmptyState` · `LoadingState` · `ErrorState` · `ProductCard`
 
+### What exists on native
+
+`packages/ui-native` is the mobile implementation. One export subpath per module,
+matching the existing `./screen` and `./providers` convention.
+
+| Area | Modules |
+| --- | --- |
+| Primitives | `text` `button` `card` `badge` `chip` `avatar` `media` `fields` |
+| Composition | `product-card` `product-grid` `calendar` `tab-bar` `display` `status` |
+| Overlays | `bottom-sheet` `toast` |
+| Brand | `brand-mark` |
+| Motion | `motion` `tone` `icon` `icon-glyphs` |
+| Hero transition | `hero-provider` `hero-layer` |
+| Layout | `screen` `providers` |
+
+`ProductGrid` wraps `FlatList`, not `ScrollView`. The catalogue is expected to
+grow past fifty pieces, and a grid that renders every cell up front is how a
+marketplace app starts dropping frames.
+
+### Tones
+
+`tone.ts` is the only place a semantic colour name is spelled out. Every tone
+exposes two things: the Tailwind utility (so the element gets styled and Uniwind
+bundles the variable) and the raw CSS variable (so SVG, which cannot take a
+`className`, resolves the same colour at runtime). Reach for it rather than
+repeating `text-muted-foreground` in twenty components.
+
 ### Buttons
 
 Pill-shaped, 44px default, animated on colour only. Variants: `default`
@@ -429,7 +456,7 @@ stays the focus. On mobile, prefer a bottom sheet at 32px.
 
 - **Flexbox only. Never absolute positioning.** It breaks across screen sizes,
   densities, notches and platforms.
-- Minimum 44px touch targets; `h-13` (52px) for primary actions.
+- Minimum 44px touch targets (`h-control`); `h-touch` (52px) for primary actions.
 - No hover. Pressed states carry the feedback that hover does on the web.
 - Mobile must not be a copy of the desktop layout. Share colour, type, radius,
   spacing and iconography — not structure.
@@ -437,6 +464,48 @@ stays the focus. On mobile, prefer a bottom sheet at 32px.
   Uniwind's `setTheme` plus persistence.
 - Mobile app frames sit above the system status bar, so `Screen` insets with
   `edges={["top", "left", "right"]}` rather than padding by a guessed number.
+
+### The one absolute exception
+
+`hero-layer.tsx` positions its expanding surface. That is the **only**
+absolutely-positioned surface in the product, and it is a transient animation
+layer rather than layout — an overlay does not participate in the flexbox flow,
+and there is no way to interpolate a card's rectangle to full-bleed without one.
+
+It is not precedent. Nothing else in `apps/mobile` or `packages/ui-native`
+positions anything, and a second absolute surface is a design decision that has
+to earn its place rather than a default.
+
+### Motion on native
+
+`motion.css` holds durations for CSS transitions; `motion.native.ts` holds the
+same numbers for Reanimated, which cannot read a CSS custom property. They must
+change in the same commit. Springs (`press`, `pop`, `hero`) live only in the
+native file, because CSS has no equivalent.
+
+### Press feedback is `1.0 → 0.97 → 1.0` via `usePressScale`, and the favourite
+heart pops via `useHeartPop`. Both are the documented exceptions to "buttons
+animate colour only" — they are contained inside their own control's bounds and
+cannot shift surrounding layout.
+
+### Never use `entering=` for content that has to be readable
+
+`entering={FadeIn}` starts at `opacity: 0` and depends on a layout animation
+running. If it does not — a reduced-motion path, a worklet that has not attached,
+a fast refresh mid-transition — the content stays at zero and the screen is
+blank. That failure is invisible in review and obvious to a user.
+
+Use `useFadeIn()` from `@wearly/ui-native/motion` instead. It animates shared
+values from an effect, so under reduced motion both start at their final value
+and the end state is always reachable.
+
+### `Screen` content must `grow`
+
+`Screen` defaults its content wrapper to `flex grow flex-col`. Without `grow` the
+wrapper sizes to its content, and a `flex-1` child inside it has no height to
+centre against — which renders as everything jammed into the top-left corner.
+Any custom `contentClassName` has to keep `grow` unless it deliberately owns the
+height.
 
 ## 11. Admin rules
 
@@ -574,8 +643,27 @@ cd apps/web && bunx shadcn@latest add <component>
 Components are written to `packages/ui/src/components/ui`. Restyle them onto the
 tokens after adding; the generated markup is plain shadcn, not Wearly.
 
-**Mobile** — HeroUI Native, in `packages/ui-native/src`. It picks up the palette
-automatically through `heroui-native.css`.
+**Mobile** — hand-written, in `packages/ui-native/src`, on the token layer.
+
+`heroui-native` stays a devDependency and `heroui-native.css` stays imported, but
+its components are **not** used at runtime. Its barrel re-exports `BottomSheet`,
+`Popover`, `Select` and `GlassView`, all of which import `@gorhom/bottom-sheet`
+and `expo-blur` as peer dependencies this workspace does not install — so
+importing the provider at all fails to resolve. The components Wearly needs are
+built on the token layer instead, which also means full control over the radius
+and border treatment rather than restyling generated markup afterwards.
+
+If HeroUI Native is adopted later, the peers have to be installed *first* and the
+`heroui-native.css` bridge already in place will pick the palette up.
 
 **Both** — if a token is missing, add it to `packages/design-tokens` first.
 Never introduce a second styling system, and never add a component library.
+
+---
+
+## 17. Change log
+
+| Date | Change |
+| --- | --- |
+| 2026-09-29 | Fixed the native `@source` path in `apps/mobile/src/global.css` (it pointed one level too high, so nothing in `packages/ui-native` was ever scanned and every shared component rendered unstyled). Made `Screen` content `grow`. Replaced all five `entering=` usages with `useFadeIn`. Replaced the three stock Expo brand assets with renders of the Wearly mark and deleted `assets/expo.icon`. Added a dev-only `EXPO_PUBLIC_WEARLY_THEME` override.
+| 2026-09-29 | Mobile Phase 1: recorded the `ui-native` component inventory (§9), the hero-overlay exception and native motion tokens (§10), and the HeroUI Native situation (§16). Added `--wearly-height-sheet`, `--wearly-tracking-brand` and a `bg-backdrop` utility. Removed the orphaned `src/tokens.css`, which carried a conflicting violet palette and the `.dark {}` pattern §2 forbids. |

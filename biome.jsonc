@@ -57,6 +57,28 @@
           }
         }
       }
+    },
+    {
+      // React Native: allow inline arrow functions in JSX props.
+      //
+      // The rule exists so a stable callback is not recreated on every render,
+      // which matters when the child is memoised. In React Native neither
+      // condition holds the way they do on the web: `Pressable` does not
+      // memoise on function identity, and the list case — `items.map(item =>
+      // <Row onPress={() => f(item)} />)` — cannot be satisfied at all without
+      // either a hooks call inside a loop or a wrapper component per row, both
+      // of which are worse than the arrow they replace.
+      //
+      // Biome 2.5 removed this rule's options, so there is no narrower way to
+      // allow the arrow form only. The rule stays fully on for the web app.
+      "includes": ["apps/mobile/**", "packages/ui-native/**"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noJsxPropsBind": "off"
+          }
+        }
+      }
     }
   ],
   "assist": {

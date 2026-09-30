@@ -12,10 +12,15 @@
     "./motion.css": "./src/motion.css",
     "./theme.css": "./src/theme.css",
     "./heroui.css": "./src/heroui.css",
-    "./heroui-native.css": "./src/heroui-native.css"
+    "./heroui-native.css": "./src/heroui-native.css",
+    "./motion": "./src/motion.native.ts"
   },
   "scripts": {
     "clean": "rm -rf .turbo",
-    "typecheck": "echo \"no TypeScript in design-tokens\""
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@wearly/tsconfig": "workspace:*",
+    "typescript": "6.0.3"
   }
 }
