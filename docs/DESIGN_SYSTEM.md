@@ -494,8 +494,8 @@ The sanctioned list, and each earns its place for a different reason:
 | `product/[id].tsx` sticky bar | Sits on top of a scrolling list, so content passes beneath it. |
 | `toast.tsx` | Overlays the navigator, above every route, without any screen knowing. |
 | `ProductCard`'s favourite heart | Anchored to the image it belongs to, not to the card's flow. |
-| `tab-bar-indicator.tsx` | Slides behind the tabs, anchored to its siblings' measured positions rather than to the row's own flow. |
-| `use-tab-frames.ts` / `use-tab-item-motion.ts` wrappers | Scale and lift a tab's contents inside its own slot. Contained, and needed so activation reads as more than a recolour. |
+| `tab-bar-active-circle.tsx` | Floats above the bar's top edge, anchored to its sibling's measured slot centre. There is no flexbox way to place a surface outside its parent's bounds, which is the entire point of it. |
+| `use-tab-item-motion.ts` wrappers | Scale a tab's contents inside its own slot. Contained, and needed so activation reads as more than a recolour. |
 | `theme-toggle.tsx` | Dev-only, and above every screen by definition. |
 
 `bottom-sheet.tsx`'s scrim is a fifth: `absolute inset-0` over the modal.
@@ -508,66 +508,121 @@ than a default.
 
 `motion.css` holds durations for CSS transitions; `motion.native.ts` holds the
 same numbers for Reanimated, which cannot read a CSS custom property. They must
-change in the same commit. Springs (`press`, `pop`, `hero`, `tab`,
-`tabIndicator`) live only in the native file, because CSS has no equivalent.
+change in the same commit. Springs (`press`, `pop`, `hero`, `tab`) live only in
+the native file, because CSS has no equivalent.
 
 ### Press feedback is `1.0 → 0.97 → 1.0` via `usePressScale`, and the favourite
 heart pops via `useHeartPop`. Both are the documented exceptions to "buttons
 animate colour only" — they are contained inside their own control's bounds and
 cannot shift surrounding layout.
 
-### The tab bar has one sliding indicator, and everything inside it is
-### still, small motion
+### The tab bar's active state is one travelling circle, and it carries the icon
 
-`TabBarIndicator` is the third sanctioned transform. It translates to the active
-tab's **measured** position and resizes to that tab's **measured content** width,
-so it moves to where the tab actually is rather than to where a `width / 5`
-calculation guesses it is.
+`TabBarActiveCircle` is the third sanctioned transform. It translates to the
+active tab's **measured** slot centre, so it moves to where the tab actually is
+rather than to where a `width / 4` calculation guesses it is.
 
 There is exactly **one** of them. A per-tab background that fades in and out
 would draw the same information and lose the thing that makes a good bottom bar
 feel good: the sense that you never left the control, only moved within it. One
-object crossing the bar says that. Five independently-lit backgrounds say the old
-tab died and a new one was born.
+object crossing the bar says that. Four independently-lit backgrounds say the old
+tab died and a new tab was born.
 
-**The pill is sized from content, not from slot.** Five equal `flex-1` slots all
-measure the same, so a slot-sized pill is a fixed-width bar sliding side to side
-and the horizontal resize is never exercised at all. `useTabFrames` takes two
-layout passes per tab — the slot for the centre, the icon-and-label column for
-the width — and the pill becomes genuinely wider under "Discover" than under
-"Home", clamped to its own slot so a long translation can never reach the next
-tab's icon. The pill's *height* is still the slot's height: the resize is
-horizontal, and nothing about it should move the bar vertically.
+**The circle carries the active glyph, and that is the load-bearing decision.**
+The filled icon is drawn *inside* the circle, so the disc and its glyph are one
+object crossing the bar. The alternative — leaving the glyph in the tab and having
+it chase a circle that travels separately — needs two animations locked together
+across two axes, and any drift between them reads as the exact bug the single
+indicator exists to prevent.
 
-**The width is a `scaleX`, not an animated `width`.** `width` is a layout
-property: animating it re-measures the view every frame, so the resize drags
-while the `translateX` alongside it stays smooth, and the bar reads as fighting
-itself. So the layout `width` jumps straight to the target — one layout pass, on
-the frame the press lands — and the visual change rides on a `scaleX` springing
-from `previousWidth / targetWidth` to `1`, with `transformOrigin: "left"` keeping
-the leading edge glued to its translation. A transform is pure paint, so both now
-run at display frame rate and cannot desynchronise.
+It follows that an inactive tab renders its own outline icon, and the active tab
+renders an `opacity-0` placeholder of the same size. The space is held rather than
+collapsed so the row's height is identical in both states and the bar cannot
+change height mid-travel.
 
-It runs on `SPRING.tabIndicator`, not on the product's default timing curve. A
-pill travelling the width of the bar is a physical object, and a decelerating
-curve halts it on arrival in a way that reads as a state change. The overshoot is
-under 1% — enough to take the hard edge off the landing, far short of a wobble.
+### A circle is `rounded-pill` on a square box, and here that is correct
 
-`useTabItemMotion` covers what is *inside* the pill, from one shared
-`progress` value so the icon, the label and the glyph swap are the same event
-rather than three animations that drift apart: the icon scales `1 → 1.06` and
-lifts 2px, the label fades to full strength, scales `0.96 → 1` and lifts 1.5px.
-The icon's press scale is composed into the same transform rather than applied to
-the pressable, so a tap never shifts the label relative to the pill.
+An earlier version of the bar used a *rounded rectangle* capsule, and three passes
+moved its size around while it kept rendering as a circular selected button. The
+width was never the problem. **The radius was.**
 
-The magnitudes are small on purpose. A tab is 18px of icon beside a 12px caption
-in a ~52px pill; past about 6% and 2px the motion stops reading as "this one is
-active" and starts reading as a pop animation. Subtle is the whole brief.
+| Radius | Capsule | Straight vertical edge | Reads as |
+|---|---|---|---|
+| `rounded-pill` (9999px) | any | **none** — always half the height | stadium, so a near-square stadium is a circle |
+| `rounded-lg` (20px) | 50×56 | `56 − 2×20` = 16px, but on the 44px version `44 − 2×20` = **4px** | squircle |
+| `rounded-sm` (12px) | 58×48 | **24px**, and ~34px horizontally | rounded rectangle ✓ |
 
-Under reduced motion, and on the very first measurement, the indicator assigns
-the value directly: animating either would show a transition that is not one. The
-tab's own motion is dropped the same way — the state still changes, only the
-travel is lost.
+`rounded-pill` is the wrong tool for a rounded *rectangle*: it is exactly half the
+height on any box, so it forces a shape with no straight edges, and no amount of
+width makes that read as one. `rounded-lg` was a half-measure — 91% of
+half-height leaves 4px, which is not visible.
+
+**The diagnostic still holds, and it is the thing to check first next time
+something renders as a blob:** a rounded rectangle needs visible straight edges or
+it *is* a circle. What changed is the intent. The old bar wanted a rectangle and
+kept getting a circle; this one wants the circle, so `rounded-pill` on a square box
+is now the correct answer rather than the first thing to reach for and debug away.
+The table above documents a trap, not a rule to keep applying.
+
+Dropping the capsule also dissolves the arithmetic that constrained it. The circle
+is square and fixed at `CIRCLE` (48pt), so it no longer fights its own width — the
+bar went from five slots to **four**, which on a 360pt phone puts ~78pt behind
+each tab rather than ~58pt. Nothing about the circle's aspect ratio is negotiated
+against the content around it, because it contains none of the content.
+
+**Position is measured, never computed** — see `useTabFrames`, which is where the
+numbers come from. `CIRCLE_OVERHANG` is applied as a static `translateY` rather
+than animated, so the circle cannot drift vertically against a spring that is
+running on the horizontal.
+
+**The circle springs; the contents do not.** It runs on `SPRING.tab`, damped
+close to critical. The argument is not "springs are better" — it is that the
+circle is an *object* with a centre of mass the eye can follow, where the old
+capsule was a shape that was merely being resized across a bar. The
+`SPRING.tabIndicator` that preceded it was removed for reading as wobble on a 50px
+capsule, and that reasoning does not transfer: a 48pt disc reads as a disc
+travelling, not as a shape wobbling. It is tighter than `hero` on purpose, since
+the bar is re-tapped constantly and anything slower reads as lag.
+
+`useTabItemMotion` is now only the label. It fades from 85% to full and scales
+`1 → 1.02`, from one shared `progress` value so there is a single clock rather than
+two animations that drift apart. It does not drive the icon at all — the circle
+owns that.
+
+**Nothing inside a tab moves vertically, and the circle moves for all of them.**
+An earlier version lifted the icon 2px and the label 1.5px as they became active,
+to make them "settle into the pill". In practice it made the active tab the only
+tab in the bar whose icon and label were not centred in its own slot — a permanent
+half-pixel of misalignment on precisely the tab being looked at. The active state
+reads from the circle, the glyph swap, the tone and the label's weight
+(`font-medium` active, `font-normal` inactive). The press scale comes from
+`usePressScale` and is applied to the pressable.
+
+The bar's own geometry is named constants in `tab-bar.tsx`: `SLOT` (`h-14`) on
+the tab, `CIRCLE`, `CIRCLE_OVERHANG`, and the container's `pb-safe-or-4`.
+
+### Four destinations, and `rentals` is no longer one of them
+
+The bar is **Home, Discover, List, Profile**. Rentals left the bar; its screen is
+still registered in `apps/mobile/src/app/(tabs)/_layout.tsx` and stays
+deep-linkable, but it has no in-bar entry point and must be reached from Home or a
+product card. A wardrobe list is a place you visit deliberately, not one of the
+four things you bounce between all day, and dropping it is what buys the circle
+the slot width it needs.
+
+`ROUTES.TABS` in `apps/mobile/src/core/routing/routes.ts` still lists five. It is
+exported but unused by the bar, so it is stale rather than wrong — but it is a
+trap for the next person who reaches for it, and should be reconciled or deleted.
+
+### The bar's bottom padding is `max(inset, 1rem)`
+
+`pb-safe-or-4` expands to `max(env(safe-area-inset-bottom), 1rem)`. This is the
+form the bar needs, and the reason is that neither half of it is sufficient on its
+own: the raw inset alone leaves the bar flush to the screen edge on any device
+that reports no inset, and a fixed padding over-pads a device with a home
+indicator. Taking the larger of the two covers gesture nav, three-button nav and
+iPhones with no per-platform constant anywhere. The bar's top inset is the plain
+`pt-2`; it is a *gap*, not a safe-area inset.
 
 ### Never use `entering=` for content that has to be readable
 
@@ -746,7 +801,9 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
-| 2026-09-30 | Tab bar, second pass: sized the pill from each tab's **content** rather than its slot. With five equal `flex-1` slots every frame measured the same, so the pill was a fixed-width bar and the horizontal resize the design is built around never happened; it now hugs "Discover" and "Home" differently, clamped to its own slot. Rebuilt the resize as a `scaleX` spring over an instantly-set layout `width`, because animating `width` re-measures the view every frame and was the actual source of the drag. Extracted `use-tab-frames.ts` once the second measurement pass pushed `tab-bar.tsx` over budget. Separately, fixed a Uniwind warning in `fields.tsx`: `selectionColorClassName`/`placeholderTextColorClassName` need `accent-*` utilities, not `text-*` — the text form resolved to nothing, warned, and silently left the cursor colour at the platform default. |
+| 2026-09-30 | Tab bar, fourth pass — **the active background was still a circle, and the radius was the reason.** Three prior passes had moved the *size* of the capsule around; the width was never the fault. `rounded-pill` (9999px) is exactly half the height on any box, so it forces a shape with no straight edges — and no amount of width makes a near-square stadium read as a rectangle. The half-measure `rounded-lg` (20px) was no better: on a 44pt capsule it left a 4pt straight vertical edge, a radius at 91% of half-height, i.e. a squircle. Now `rounded-sm` (12px) on a 48pt capsule, which leaves a 24pt straight vertical edge and ~34pt horizontally. **A rounded rectangle needs visible straight edges or it is a circle — check the radius first, before touching size.** To make the capsule *landscape* the content had to shrink: `--leading-normal` is 1.5, so a 12pt caption sat in an 18pt line box with 3pt of dead space above and below every label; `leading-tight` (1.15 → 14pt) takes the content column from ~45pt to ~40pt, which is what buys the aspect ratio. Icon `sm` (18) → `md` (22), gap 6pt → 4pt. Final capsule ~58×48 inside a ~66pt slot. Recorded in §10 that 48pt is the ceiling: a capsule that is both 64pt tall and `100% - 16pt` of the slot would be 50×64 — *more* portrait — and a 2:1 capsule around stacked content needs ~90pt of width that a 66pt slot does not have. The capsule's width is the slot's width less `PILL_INSET` (4pt) and is structurally incapable of depending on a label: no intrinsic sizing, no per-label measurement pass. Third pass had used `inset-y-1.5`, which **silently failed to resolve under Uniwind** — no warning, no error, the capsule reverted to stretching the full slot while the source read as fixed; `useTabFrames` now reports `slotHeight` and the box is arithmetic on measured values. |
+| 2026-09-30 | Tab bar, third pass: content-sized the width `+20px` and replaced `rounded-pill` with `rounded-lg`; removed the 2px icon / 1.5px label lift, which made the active tab the only tab not optically centred in its slot; moved press scale to the pressable via `usePressScale`; indicator and tab contents now share `DURATION.base`/`EASE_OUT` (200ms, ease-out) instead of two springs, deleting `SPRING.tab` and `SPRING.tabIndicator`; slot became a fixed `h-14`; container gutter `px-4`→`px-3`. **Fixed a real safe-area bug**: `tab-bar.tsx` carried a comment claiming the navigator already applied `insets.bottom`, and no such code existed — the wrapping `View` in `/(tabs)/_layout.tsx` only has `pt-safe`, so on a device with a home indicator the bar sat flush to the screen edge on a fixed `pb-3`. Now `pb-safe-or-4` = `max(inset, 1rem)`. **(Superseded: the size changes above did not fix the circle; the fourth pass identified the radius.)** |
+| 2026-09-30 | Tab bar, second pass: sized the pill from each tab's **content** rather than its slot. With five equal `flex-1` slots every frame measured the same, so the pill was a fixed-width bar and the horizontal resize the design is built around never happened; it now hugs "Discover" and "Home" differently, clamped to its own slot. Rebuilt the resize as a `scaleX` spring over an instantly-set layout `width`, because animating `width` re-measures the view every frame and was the actual source of the drag. Extracted `use-tab-frames.ts` once the second measurement pass pushed `tab-bar.tsx` over budget. Separately, fixed a Uniwind warning in `fields.tsx`: `selectionColorClassName`/`placeholderTextColorClassName` need `accent-*` utilities, not `text-*` — the text form resolved to nothing, warned, and silently left the cursor colour at the platform default. **(Superseded by the third pass above.)** |
 | 2026-09-30 | Tab bar: removed the centre `+` action. It was a fixed 48px filled circle with no label, which made it a button wearing a nav item's clothes — and it meant the bar's geometry depended on one tab being a different shape from its neighbours. All five tabs are now equal `flex-1` slots, so "the listing screen" is `List`, the third destination, with a hanger glyph and its filled twin. Gave the pill a spring (`SPRING.tabIndicator`) instead of `DURATION.base`/`EASE_OUT`, added `useTabItemMotion` so the icon and label settle into the pill on one shared value, and relaxed the rule that forbade a spring here. |
 | 2026-09-30 | Tab bar: added a sliding active indicator that travels to the active tab's measured `onLayout` frame, animating `translateX` and `width` on `DURATION.base`/`EASE_OUT` rather than a spring. Extracted `tab-bar-item.tsx` and `tab-bar-indicator.tsx` from a now-over-budget `tab-bar.tsx`, and gave the four destination tabs the press scale they were already calling `usePressScale` for but discarding. Recorded the indicator as the third sanctioned transform in §10. |
 | 2026-09-30 | Mobile top safe-area: no screen outside `splash`/`welcome` applied the status-bar inset — nine of them guessed a fixed `pt-4`/`pt-6`/`pt-16`, so headers sat under the notch. Applied `pt-safe` in two places: the tab wrapper in `(tabs)/_layout.tsx` (covers all six tab screens) and the root of the product and three rental screens. Documented the split in §10 — the inset is `pt-safe`, and a screen's own `pt-*` is the gap below it. |

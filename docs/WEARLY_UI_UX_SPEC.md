@@ -139,22 +139,30 @@ A modern bottom navigation: rounded, comfortable, minimal, slightly elevated,
 easy to read. Consistent across the whole app.
 
 ```
-Home · Discover · List · Rentals · Profile
+Home · Discover · List · Profile
 ```
 
-**Five equal destinations.** No centre button, no special case. Listing a piece
-is somewhere you go, not something you trigger from wherever you happen to be, so
-it is a tab like the other four — the third slot, with the same weight as its
-neighbours.
+**Four equal destinations.** No centre button, no special case.
 
-**One active indicator that travels.** Exactly one pill, which *slides* to the
-destination you tapped. Never one background per tab fading in and out: that
-reads as "the old tab disappeared and a new one appeared", whereas a single pill
-crossing the bar reads as "this is the same control, and this is where I am now".
+Rentals is no longer one of them. Its screen stays registered and deep-linkable,
+but a wardrobe list is somewhere you visit deliberately rather than one of the four
+things you bounce between all day, so it is reached from Home or a product card.
+Dropping it is also what gives the bar's slot enough width for the active circle
+below. See `DESIGN_SYSTEM.md` §10.
 
-The movement is short and soft — roughly 250–350ms, easing into rest, with at
-most a whisper of overshoot. It must not delay the navigation: the screen changes
-as the pill starts moving, not after it lands.
+**One active circle that travels.** Exactly one white circle, carrying the filled
+glyph of the destination you tapped, which *slides* across the bar and sits raised
+above its top edge. Never one background per tab fading in and out: that reads as
+"the old tab disappeared and a new one appeared", whereas a single object crossing
+the bar reads as "this is the same control, and this is where I am now".
+
+The circle and its glyph are one object. An inactive destination shows its outline
+icon in place; the active one's icon is drawn inside the circle, with its slot held
+at the same size so the bar cannot change height mid-travel.
+
+The movement is short and soft — roughly 250–350ms on `SPRING.tab`, easing into
+rest, with at most a whisper of overshoot. It must not delay the navigation: the
+screen changes as the circle starts moving, not after it lands.
 
 ---
 

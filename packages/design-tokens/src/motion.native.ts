@@ -47,17 +47,23 @@ export const SPRING = {
   /** Press feedback: 1.0 → 0.97 → 1.0. Tight, almost no overshoot. */
   press: { damping: 26, mass: 0.6, stiffness: 420 },
   /**
-   * A tab's icon and label settling as it becomes active. Damping ratio ~0.83,
-   * so it overshoots by about 1% and settles in ~230ms — enough to read as
-   * arriving rather than snapping, far short of a bounce.
+   * The tab bar's travelling active circle. Damped to the point of being nearly
+   * critical — the overshoot is there to take the hard edge off the landing, not
+   * to be seen.
+   *
+   * This is a different argument from the one that removed `tab` and
+   * `tabIndicator`. Those described a *rounded rectangle* sliding the width of the
+   * bar: a decelerating curve is right for a shape that is not an object, and a
+   * capsule's overshoot reads as wobble because a capsule has no centre of mass
+   * for the eye to follow. The circle that replaced it is an object — a discrete
+   * disc with a glyph in it that lifts clear of the bar — so it gets the same
+   * treatment as the favourite heart rather than a timing curve.
+   *
+   * Tighter than `hero` deliberately: a hero expansion happens once and can be
+   * watched, while the bar is a control that gets re-tapped constantly. Anything
+   * slower than this reads as lag on the fourth tap of a session.
    */
-  tab: { damping: 24, mass: 0.7, stiffness: 300 },
-  /**
-   * The bottom bar's sliding active pill. Softer than `press` and slower, and
-   * still only ~1% overshoot: the pill travels the width of the bar, so any
-   * real overshoot reads as wobble rather than as life. Settles in ~290ms.
-   */
-  tabIndicator: { damping: 22, mass: 0.8, stiffness: 200 },
+  tab: { damping: 26, mass: 0.7, stiffness: 260 },
 } as const;
 
 export type SpringName = keyof typeof SPRING;
