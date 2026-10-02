@@ -10,7 +10,7 @@ import {
   sizeOf,
 } from "@shared/data/catalogue";
 import { Avatar } from "@wearly/ui-native/avatar";
-import { Badge, Chip } from "@wearly/ui-native/badge";
+import { Badge } from "@wearly/ui-native/badge";
 import { Button, IconButton } from "@wearly/ui-native/button";
 import { Card, Panel } from "@wearly/ui-native/card";
 import { ProgressBar } from "@wearly/ui-native/display";
@@ -149,9 +149,11 @@ function ProductDetail({ piece }: ProductDetailProps) {
                 </Text>
               </View>
             </View>
-            <Chip>
-              {piece.lender.verified ? "ID verified" : "Not verified"}
-            </Chip>
+            {piece.lender.verified ? (
+              <Badge variant="success">ID verified</Badge>
+            ) : (
+              <Badge>Not verified</Badge>
+            )}
           </Card>
         </Section>
 

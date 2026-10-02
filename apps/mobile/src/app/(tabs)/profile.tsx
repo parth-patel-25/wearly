@@ -3,7 +3,7 @@ import { ROUTES } from "@core/routing/routes";
 import { CATALOGUE } from "@shared/data/catalogue";
 import { useCatalogueGrid } from "@shared/hooks/use-catalogue-grid";
 import { Avatar } from "@wearly/ui-native/avatar";
-import { Badge, Chip } from "@wearly/ui-native/badge";
+import { Badge } from "@wearly/ui-native/badge";
 import { Button } from "@wearly/ui-native/button";
 import { Card, Panel } from "@wearly/ui-native/card";
 import { EmptyState, ProgressBar } from "@wearly/ui-native/display";
@@ -154,9 +154,13 @@ function ProfileHeader({ completed, percent }: ProfileHeaderProps) {
           <Text variant="headingSm">Your style</Text>
           <View className="flex-row flex-wrap gap-2">
             {state.stylingFor ? (
-              <Chip>{`Styling for ${state.stylingFor}`}</Chip>
+              <Badge variant="primary">
+                {`Styling for ${state.stylingFor}`}
+              </Badge>
             ) : null}
-            {state.wears ? <Chip>{state.wears}</Chip> : null}
+            {state.wears ? (
+              <Badge variant="primary">{state.wears}</Badge>
+            ) : null}
           </View>
         </View>
       ) : null}
