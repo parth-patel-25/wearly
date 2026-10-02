@@ -95,7 +95,7 @@ export default function ListScreen() {
         <EmptyState
           action={
             <Button onPress={() => router.push(ROUTES.discover)} size="md">
-              Keep browsing instead
+              Keep browsing
             </Button>
           }
           body="Listing needs an account, so the lender can be paid and so renters know who they are dealing with. You can do that in a moment."

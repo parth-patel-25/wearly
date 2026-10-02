@@ -48,7 +48,7 @@ export default function RentalsScreen() {
         <EmptyState
           action={
             <Button onPress={() => router.push(ROUTES.discover)} size="md">
-              Find something to wear
+              Browse pieces
             </Button>
           }
           body="Nothing is booked yet. When you rent something it will live here, with its dates and its return."

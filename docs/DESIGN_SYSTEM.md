@@ -419,6 +419,20 @@ keeping the label mounted so the button does not resize mid-request.
 <Button className="rounded-[27px] bg-[#E86A93]" />
 ```
 
+**Do** keep a control label to one line. `Button` is `w-full`, and a button
+nested in a card inside a page carries padding at all three levels — roughly 96px
+of a 390px phone is gone before a single letter is drawn. Long enough and the
+label wraps, which reads as a mistake even though the lines are now centred.
+
+```tsx
+<Button>Keep browsing</Button>   // ✅ one line at any font scale
+<Button>Keep browsing instead</Button> // ⚠️ wraps on a narrow phone
+```
+
+The app should say the same thing the same way in two places: `Keep browsing`
+appears on both the List and the rental confirmation screen, because one action
+should not have two names.
+
 ### Badges and chips
 
 Two small pills, deliberately not merged. A **badge** states something about the

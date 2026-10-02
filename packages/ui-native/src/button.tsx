@@ -18,6 +18,13 @@ import type { Tone } from "./tone";
  * The design system says controls animate colour only, so a press never shifts
  * the layout around it. The scale below is the one exception, and it stays
  * inside the control's own bounds.
+ *
+ * Labels are centred twice over: `justify-center` on the row places the text
+ * element, and `text-center` on the text centres the *lines inside it*. The
+ * second one only matters when a label wraps, but that is exactly when it is
+ * needed — a wrapped element fills the row and its lines would otherwise hang
+ * off the left. Keep labels to one line where you can: `w-full` plus three
+ * layers of padding leaves a button roughly 96px narrower than its container.
  */
 
 const BASE = "flex-row items-center justify-center gap-2 rounded-button";
@@ -102,6 +109,7 @@ export function Button({
         />
       ) : null}
       <Text
+        className="text-center"
         tone={VARIANT_TONE[variant]}
         variant={SIZE[size].text as TextVariant}
       >
