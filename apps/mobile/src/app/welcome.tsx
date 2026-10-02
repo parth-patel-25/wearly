@@ -17,6 +17,11 @@ import { View } from "react-native";
  * skippable, because the first thing a new user should feel is that they are
  * welcome, not that they are being onboarded.
  *
+ * Picking an answer and moving on are deliberately **two** taps. Advancing in
+ * the press handler would unmount the chip on the same frame it was chosen, so
+ * the selected state would never be seen — a choice that does not visibly
+ * register is a choice the user is not sure they made, and they tap again.
+ *
  * The answers are stored but never used to gate anything. A prototype that
  * pretended to personalise a ranking it does not have would be exactly the fake
  * social proof the product spec forbids.
@@ -46,18 +51,29 @@ export default function WelcomeScreen() {
   const [step, setStep] = useState<Step>("intro");
 
   const isIntro = step === "intro";
+  const isWears = step === "wears";
+  const answer = isWears ? state.wears : state.stylingFor;
+  const canAdvance = answer !== null;
+
+  /** Records the answer and nothing else. Advancing is a separate, later tap. */
+  const pick = (style: string) => {
+    dispatch({
+      field: isWears ? "wears" : "stylingFor",
+      style,
+      type: "personalise",
+    });
+  };
+
   const finish = () => {
     router.replace(ROUTES.home);
   };
 
-  const chooseStylingFor = (style: string) => {
-    dispatch({ field: "stylingFor", style, type: "personalise" });
+  const advance = () => {
+    if (isWears) {
+      finish();
+      return;
+    }
     setStep("wears");
-  };
-
-  const chooseWears = (style: string) => {
-    dispatch({ field: "wears", style, type: "personalise" });
-    finish();
   };
 
   return (
@@ -74,15 +90,17 @@ export default function WelcomeScreen() {
           {isIntro ? <Intro /> : null}
           {step === "stylingFor" ? (
             <Question
-              onPick={chooseStylingFor}
+              onPick={pick}
               options={STYLING_FOR}
+              selected={state.stylingFor}
               title="Who are we styling for?"
             />
           ) : null}
           {step === "wears" ? (
             <Question
-              onPick={chooseWears}
+              onPick={pick}
               options={WEARS}
+              selected={state.wears}
               title="What do you usually wear?"
             />
           ) : null}
@@ -98,7 +116,11 @@ export default function WelcomeScreen() {
             <Button onPress={() => setStep("stylingFor")} size="lg">
               Show me around
             </Button>
-          ) : null}
+          ) : (
+            <Button disabled={!canAdvance} onPress={advance} size="lg">
+              {isWears ? "Start browsing" : "Next"}
+            </Button>
+          )}
           <Text
             className="text-center"
             tone="muted-foreground"
@@ -131,16 +153,22 @@ function Intro() {
 interface QuestionProps {
   onPick: (option: string) => void;
   options: readonly string[];
+  /** Answers already given, so a picked option can show as selected. */
+  selected: string | null;
   title: string;
 }
 
-function Question({ onPick, options, title }: QuestionProps) {
+function Question({ selected, onPick, options, title }: QuestionProps) {
   return (
     <View className="gap-6">
       <Text variant="headingXl">{title}</Text>
       <View className="flex-row flex-wrap gap-3">
         {options.map((option) => (
-          <Chip key={option} onPress={() => onPick(option)}>
+          <Chip
+            key={option}
+            onPress={() => onPick(option)}
+            selected={selected === option}
+          >
             {option}
           </Chip>
         ))}

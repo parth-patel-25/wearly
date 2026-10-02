@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { PressableProps } from "react-native";
-
+import { CONTROL_PRIMARY } from "./control-tokens";
 import { Icon } from "./icon";
 import type { IconName } from "./icon-glyphs";
 import { AnimatedPressable, usePressScale } from "./motion";
@@ -27,7 +27,7 @@ const VARIANT = {
   destructive: "bg-destructive active:bg-destructive/85",
   ghost: "bg-transparent active:bg-accent",
   outline: "border border-border bg-card active:bg-muted",
-  primary: "bg-primary active:bg-primary/85",
+  primary: `${CONTROL_PRIMARY.surface} ${CONTROL_PRIMARY.pressed}`,
   secondary: "bg-secondary active:bg-secondary/70",
   soft: "bg-accent active:bg-accent/70",
 } as const;
@@ -36,7 +36,7 @@ const VARIANT_TONE = {
   destructive: "primary-foreground",
   ghost: "foreground",
   outline: "foreground",
-  primary: "primary-foreground",
+  primary: CONTROL_PRIMARY.tone,
   secondary: "secondary-foreground",
   soft: "accent-foreground",
 } as const;

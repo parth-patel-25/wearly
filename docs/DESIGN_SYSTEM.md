@@ -388,7 +388,7 @@ matching the existing `./screen` and `./providers` convention.
 | Composition | `product-card` `product-grid` `calendar` `tab-bar` `display` `status` |
 | Overlays | `bottom-sheet` `toast` |
 | Brand | `brand-mark` |
-| Motion | `motion` `tone` `icon` `icon-glyphs` |
+| Motion | `motion` `tone` `icon` `icon-glyphs` `control-tokens` |
 | Hero transition | `hero-provider` `hero-layer` |
 | Layout | `screen` `providers` |
 
@@ -418,6 +418,47 @@ keeping the label mounted so the button does not resize mid-request.
 // ❌ brand values inline
 <Button className="rounded-[27px] bg-[#E86A93]" />
 ```
+
+### Badges and chips
+
+Two small pills, deliberately not merged. A **badge** states something about the
+world — a condition, a status, a size — and is not interactive. A **chip** is a
+choice: a filter, a category, an answer.
+
+The brand rose is the single "this is the one you picked or the one that matters"
+signal, and it is the *same* rose a primary button is filled with:
+
+| State | Surface | Text | Icon |
+| --- | --- | --- | --- |
+| `Chip` selected | `bg-primary` (`active:bg-primary/85`) | `primary-foreground` | `primary-foreground` |
+| `Chip` default | `border-border bg-card` (`active:bg-muted`) | `foreground` | `foreground` |
+| `Badge variant="primary"` | `bg-primary` | `primary-foreground` | — |
+
+```tsx
+// ✅ the primary rose comes from the shared pair, never a literal
+<Button variant="primary" />   // bg-primary
+<Chip selected>Women</Chip>    // bg-primary — identical to the button above
+<Badge variant="primary" />    // bg-primary
+
+// ❌ hardcoded brand hex
+<Chip selected className="bg-[#E86A93]" />
+```
+
+Three things follow from that table.
+
+**Do** tint a chip's icon with the state tone. An untinted icon sits on
+`bg-primary` at its own contrast and loses the pairing.
+
+**Don't** use `bg-accent` for a selected chip or a primary badge. `--wearly-accent`
+is the soft `#FCE7EF` wash — it reads as *disabled*. Reach for it when you want a
+quiet rose surface, not a chosen one.
+
+**Don't** put a mid status tone behind text. That rule at §3 still holds: status
+badges stay `bg-*-background text-*-foreground`. `primary` is the one exception,
+because it is deepened for white text in both themes.
+
+The selected chip is never carried by colour alone — `accessibilityState.selected`
+is set, so a screen reader announces the choice.
 
 ### Product cards
 
@@ -729,6 +770,10 @@ Accessibility is a hard requirement, not a pass at the end.
 
 **Don't** put white text on `bg-success` — 2.75:1 on white.
 
+`bg-primary` is the deliberate exception to the rule above. It is deepened to
+`#C54B75` in **both** themes precisely so white text clears AA on it, which is
+what lets a selected chip and a primary badge share the primary button's fill.
+
 ---
 
 ## 14. Changing the system
@@ -737,7 +782,7 @@ A developer should be able to change the product's look from one file.
 
 | Goal | Edit | Propagates to |
 | --- | --- | --- |
-| Brand colour | `--wearly-primary` in `colors.css` | Buttons, links, rings, active nav, tabs, badges, HeroUI both platforms |
+| Brand colour | `--wearly-primary` in `colors.css` | Buttons, links, rings, active nav, tabs, selected chips, primary badges, HeroUI both platforms |
 | Decorative pink | `--wearly-brand` | Hearts, indicators |
 | Text on decorative pink | `--wearly-brand-foreground` | Filled `brand` cards |
 | Global roundness | `--wearly-radius-*` | Every button, input, card, dialog, sheet |
