@@ -22,6 +22,13 @@ import { View } from "react-native";
  * the selected state would never be seen — a choice that does not visibly
  * register is a choice the user is not sure they made, and they tap again.
  *
+ * Each question opens with one chip already selected, so the flow can be
+ * answered by simply moving on. That default is a *display* default only: it is
+ * shown as chosen but never written to the session, so a user who taps straight
+ * through has answered nothing and the footer keeps saying so. `Everyone` is the
+ * default for the styling question because presuming a gender would be a worse
+ * first impression than asking.
+ *
  * The answers are stored but never used to gate anything. A prototype that
  * pretended to personalise a ranking it does not have would be exactly the fake
  * social proof the product spec forbids.
@@ -39,10 +46,17 @@ const WEARS = [
 
 type Step = "intro" | "stylingFor" | "wears";
 
+type QuestionStep = Exclude<Step, "intro">;
+
 const STEP_NUMBER: Record<Step, number> = {
   intro: 1,
   stylingFor: 2,
   wears: 3,
+};
+
+const DEFAULT_ANSWER: Record<QuestionStep, string> = {
+  stylingFor: "Everyone",
+  wears: "Casual",
 };
 
 export default function WelcomeScreen() {
@@ -52,16 +66,17 @@ export default function WelcomeScreen() {
 
   const isIntro = step === "intro";
   const isWears = step === "wears";
-  const answer = isWears ? state.wears : state.stylingFor;
-  const canAdvance = answer !== null;
+  const field: QuestionStep = isWears ? "wears" : "stylingFor";
+
+  /**
+   * What the chip row highlights. A default stands in until the user picks for
+   * themselves, so the screen is never in a state where nothing is selected.
+   */
+  const selected = state[field] ?? DEFAULT_ANSWER[field];
 
   /** Records the answer and nothing else. Advancing is a separate, later tap. */
   const pick = (style: string) => {
-    dispatch({
-      field: isWears ? "wears" : "stylingFor",
-      style,
-      type: "personalise",
-    });
+    dispatch({ field, style, type: "personalise" });
   };
 
   const finish = () => {
@@ -92,7 +107,7 @@ export default function WelcomeScreen() {
             <Question
               onPick={pick}
               options={STYLING_FOR}
-              selected={state.stylingFor}
+              selected={selected}
               title="Who are we styling for?"
             />
           ) : null}
@@ -100,7 +115,7 @@ export default function WelcomeScreen() {
             <Question
               onPick={pick}
               options={WEARS}
-              selected={state.wears}
+              selected={selected}
               title="What do you usually wear?"
             />
           ) : null}
@@ -117,7 +132,7 @@ export default function WelcomeScreen() {
               Show me around
             </Button>
           ) : (
-            <Button disabled={!canAdvance} onPress={advance} size="lg">
+            <Button onPress={advance} size="lg">
               {isWears ? "Start browsing" : "Next"}
             </Button>
           )}
