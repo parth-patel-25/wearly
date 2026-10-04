@@ -103,13 +103,13 @@ export function OnboardingHero({
 function Pill({ onLayout }: { onLayout: (event: LayoutChangeEvent) => void }) {
   return (
     <View
-      className="absolute left-0 self-center rounded-pill bg-accent px-4 py-1"
+      className="absolute left-0 self-center rounded-pill bg-primary px-4 py-1"
       onLayout={onLayout}
       style={{ transform: [{ rotate: PILL_TILT }] }}
     >
       <Text
         className="text-center"
-        tone="accent-foreground"
+        tone="primary-foreground"
         variant="displayXs"
       >
         Fashion
@@ -136,7 +136,7 @@ function Pager({ current, total }: { current: number; total: number }) {
         <View
           className={[
             "h-2 rounded-pill",
-            index === current ? "w-5 bg-accent" : "w-2 bg-muted",
+            index === current ? "w-5 bg-primary" : "w-2 bg-muted",
           ].join(" ")}
           key={dot}
         />

@@ -916,6 +916,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-04 | Onboarding hero: Fashion pill `accent` → `primary` fill with `primary-foreground` (white) text; pager active dot `accent` → `primary`. |
 | 2026-10-04 | `buttonXl` control token (20px) added; `SwipeToContinue` thumb label `buttonLg` → `buttonXl`, inner `px-3` → `px-2`. |
 | 2026-10-04 | `buttonLg` native token (`text-native-button-lg`, 16px) added; `SwipeToContinue` thumb label `label` → `buttonLg`, inner `px-5` → `px-3`. |
 | 2026-10-04 | Headline `displaySm` (32px) token added (`typography` + `theme` + `Text` variant); onboarding hero headline + Fashion pill moved `display` → `displaySm`. |
