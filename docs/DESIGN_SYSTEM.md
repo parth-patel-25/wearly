@@ -916,6 +916,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-04 | `Media` accepts bundled `require()` + `fallbackSrc` (remote on `onError`, tone block last); onboarding hero uses local `onboarding-hero.png` with the Unsplash hoodie as fallback. |
 | 2026-10-04 | Onboarding hero: Fashion pill `accent` → `primary` fill with `primary-foreground` (white) text; pager active dot `accent` → `primary`. |
 | 2026-10-04 | `buttonXl` control token (20px) added; `SwipeToContinue` thumb label `buttonLg` → `buttonXl`, inner `px-3` → `px-2`. |
 | 2026-10-04 | `buttonLg` native token (`text-native-button-lg`, 16px) added; `SwipeToContinue` thumb label `label` → `buttonLg`, inner `px-5` → `px-3`. |

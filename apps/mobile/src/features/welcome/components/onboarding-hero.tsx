@@ -18,13 +18,15 @@ import { SwipeToContinue } from "./swipe-to-continue";
  * with its own shape, so the emphasis survives at any width and reads as
  * editorial rather than shouted.
  *
- * The photography is a **remote placeholder**. It is a stand-in for the real
- * campaign shoot, not an asset, and `Media` falls back to a garment block if it
- * cannot load — so the screen is never blank, only less good.
+ * The photography is a **bundled placeholder** (a red-carpet shot standing in
+ * for the real campaign shoot — swap it for licensed imagery before release).
+ * The remote Unsplash hoodie stays as the `onError` fallback via `fallbackSrc`,
+ * and `Media` falls back to a garment block if both fail — so the screen is
+ * never blank, only less good.
  */
 
-/** Placeholder photography — cyan hoodie on a cool ground. */
-const HERO_SRC =
+/** Remote fallback — cyan hoodie on a cool ground. */
+const HERO_FALLBACK_SRC =
   "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1200&q=80";
 
 const PILL_TILT = "-12deg";
@@ -59,7 +61,13 @@ export function OnboardingHero({
 
   return (
     <View className="flex-1 justify-between gap-6">
-      <Media aspect="3/4" className="flex-1" src={HERO_SRC} tone="accent" />
+      <Media
+        aspect="3/4"
+        className="flex-1"
+        fallbackSrc={HERO_FALLBACK_SRC}
+        src={require("../../../../assets/images/onboarding-hero.png")}
+        tone="accent"
+      />
 
       <View className="gap-4">
         {/* Three forced centered lines. Row 2 is a shrink-wrapped relative unit

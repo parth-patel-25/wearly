@@ -1,4 +1,5 @@
 import { Image } from "expo-image";
+import { useState } from "react";
 import type { ViewProps } from "react-native";
 import { View } from "react-native";
 import { withUniwind } from "uniwind";
@@ -52,12 +53,19 @@ export type PlaceholderTone = keyof typeof PLACEHOLDER_TONE;
 export interface MediaProps extends ViewProps {
   /** 4:5 is the product-card ratio; 1:1 for avatars; 16/9 for editorial blocks. */
   aspect?: "1/1" | "3/4" | "4/5" | "16/9";
+  /**
+   * Remote fallback photograph, used when a bundled `src` fails to load.
+   * Ignored for remote `src` — a second remote URL buys nothing over the tone
+   * block if the device is offline.
+   */
+  fallbackSrc?: string;
   icon?: IconName;
   /**
-   * Remote photograph. Omit it and the tone block stands in, so a screen that
-   * has no imagery yet still renders correctly instead of collapsing.
+   * Photograph: a remote URL or a bundled `require()`. Omit it and the tone
+   * block stands in, so a screen that has no imagery yet still renders
+   * correctly instead of collapsing.
    */
-  src?: string;
+  src?: string | number;
   tone?: PlaceholderTone;
 }
 
@@ -72,30 +80,39 @@ const ASPECT = {
 export function Media({
   aspect = "4/5",
   className,
+  fallbackSrc,
   icon = "shirt",
   src,
   tone = "muted",
   ...rest
 }: MediaProps) {
+  // A bundled asset that fails to decode falls back to the remote URL once;
+  // the tone block is the final fallback if both are missing.
+  const [failed, setFailed] = useState(false);
+  const effective = failed ? fallbackSrc : src;
+
   return (
     <View
       className={[
         "w-full items-center justify-center overflow-hidden rounded-media",
         ASPECT[aspect],
-        src === undefined ? PLACEHOLDER_TONE[tone] : undefined,
+        effective === undefined ? PLACEHOLDER_TONE[tone] : undefined,
         className,
       ]
         .filter(Boolean)
         .join(" ")}
       {...rest}
     >
-      {src === undefined ? (
+      {effective === undefined ? (
         <Icon name={icon} size="xl" tone={PLACEHOLDER_ICON[tone]} />
       ) : (
         <StyledImage
           className="h-full w-full"
           contentFit="cover"
-          source={{ uri: src }}
+          onError={() => setFailed(true)}
+          source={
+            typeof effective === "number" ? effective : { uri: effective }
+          }
           transition={200}
         />
       )}
