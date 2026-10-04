@@ -28,10 +28,20 @@ Proves the design language and the hero-expansion interaction end to end.
 
 **Connective tissue, not signature screens:**
 
-- [x] Splash → welcome personalisation (pre-auth, 2 questions)
+- [x] Splash → welcome personalisation (pre-auth, 3 steps: fashion moment, then 2 questions)
 - [x] Bottom tab bar (Home · Discover · List · Rentals · Profile)
 - [x] Explain-first authentication gate (§6.1 "no forced login")
 - [x] Native component foundation in `packages/ui-native`
+
+**Step 1 is a swipe, steps 2 and 3 are buttons.** Welcome opens on the fashion
+moment — hero photograph, headline with a rotated accent pill, and a
+swipe-to-continue track where the Next button used to be. The two question steps
+are unchanged and stay tap-driven, because a drag gate on a screen offering four
+answers is hostile. The three-dot pager marks the position; the hero photography
+is a remote placeholder pending final assets. The swipe is a custom `PanResponder`
+control with explicit geometry (no runtime measurement — see `DESIGN_SYSTEM.md`
+§10 for why) and swipe-only costs a screen-reader user a tap path, which is
+accepted on this step alone.
 
 **Two Homes, on purpose.** `02` is product-first: a display line, one featured
 piece with a price, a mood row, then six curated cards. `02b` is the opposite

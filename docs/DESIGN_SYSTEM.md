@@ -595,6 +595,55 @@ renders an `opacity-0` placeholder of the same size. The space is held rather th
 collapsed so the row's height is identical in both states and the bar cannot
 change height mid-travel.
 
+### The swipe-to-continue track is a `PanResponder` control, not a gesture
+
+`SwipeToContinue` (welcome step 1) is a hand-built drag on `PanResponder` and
+the classic `Animated` API. Travel is the visible track's own reported width
+less a fixed thumb — no assumed numbers, no clipping mask, no UI thread. That
+constraint is the whole design, and it was earned three times over: a
+worklet-driven `Pan` froze on a travel value stuck at 0, an explicit-arithmetic
+pass overshot on a gutter assumption the device did not share, and a clipping
+mask hid the overshoot instead of fixing the stop. The track reporting itself
+removes all three failure modes at once.
+
+The rules that make it a control rather than a decoration:
+
+- **Travel comes from the track itself.** The visible track reports its own
+  width via `onLayout` and travel is that less the fixed `THUMB_WIDTH` — so the
+  thumb stops flush at the inner edge on any screen, with no clipping mask to
+  hide behind. Until the first layout lands, an explicit fallback (screen less
+  both page gutters) keeps the control usable on frame one. The one coupling: a
+  longer label needs a wider thumb in the same edit.
+- **Nothing runs on the UI thread.** No Reanimated, no gesture-handler, so the
+  swipe cannot regress with their major versions.
+- **The thumb stops flush, unclipped.** Travel ends exactly at the inner edge,
+  and the track carries no `overflow-hidden` — clipping would hide an overshoot
+  instead of preventing it. A thumb that grows while dragged would bulge past
+  the edges by definition, so grab feedback is haptic-only and the thumb never
+  scales.
+- **A partial drag springs back.** Below 60% the thumb returns to 0. A failed
+  swipe has to be visible — otherwise a user who does not quite reach the end is
+  left with a control that silently did nothing.
+- **Haptics mark the two moments that matter**: a light tick on grab (without
+  it the first pixels of drag read as dead travel) and a medium impact on
+  completion, fired fire-and-forget so neither delays the navigation.
+- **A vertical drag is not claimed.** The responder only takes horizontal
+  intent, so reusing this inside a scrolling parent stays safe.
+- **The thumb stops flush, unclipped.** Travel ends exactly at the inner edge,
+  and the track carries no `overflow-hidden` — clipping would hide an overshoot
+  instead of preventing it. A thumb that grows while dragged would bulge past
+  the edges by definition, so grab feedback is haptic-only and the thumb never
+  scales.
+
+**Accessibility, stated honestly.** This control is swipe-only by decision, so
+there is no `onPress` fallback. That is a real cost: a screen-reader or
+switch-control user reaches a `role="button"` element with no way to activate it,
+and a user who does not discover the drag has no visible "Next" anywhere on the
+screen. It is accepted because this is step 1 of 3 and the remaining steps are
+tap-driven, but it is **not** a pattern to extend. Any future gate must ship a
+tap path in the same commit, and the role/label/hint are the minimum, not a
+substitute for one.
+
 ### A circle is `rounded-pill` on a square box, and here that is correct
 
 An earlier version of the bar used a *rounded rectangle* capsule, and three passes
@@ -860,6 +909,10 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-04 | `SwipeToContinue`, seventh pass — exact end-stop, no clipping. Removed `overflow-hidden` (it hid overshoot instead of preventing it) and the grab scale (a growing thumb bulges past the edges by definition). The visible track now reports its own width via `onLayout` and travel is that less the fixed thumb, with the explicit screen-minus-gutters arithmetic kept as the pre-first-layout fallback. Rule: measure the node the user sees, stop flush, never mask. |
+| 2026-10-04 | `SwipeToContinue`, fifth pass — rebuilt the screenshot structure (wide pill thumb with the label inside, static `>>` chevrons) on `PanResponder` + classic `Animated` with fully explicit geometry, and removed `react-native-expo-swipe-button` + `expo-linear-gradient`. The library spike proved the technique drags smoothly where the worklet version stood still. (Superseded in part by the sixth and seventh passes: the grab scale bulged past the edges and was removed, and explicit arithmetic overshot on a gutter assumption — see above.) |
+| 2026-10-04 | `SwipeToContinue`, third pass — root-caused the frozen thumb. The drag math, gesture and animation pipeline were all proven working (grab-scale rendered, far-right release completed); the tap test (a tap with no drag advanced) proved `travel` was stuck at 0. Cause: the track was measured on the bare gesture host `Animated.View` instead of the visible track. Verified in the Reanimated 4.5 sources that the classic `createAnimatedComponent` path sets no `collapsable={false}` default, so a style-less animated node is eligible for view flattening — no native node, no real layout, `travel = max(0, 0 − thumb − 8) = 0` forever, and `0 >= 0` completed on any release. `onTrackLayout` now sits on the styled track `View` (which Uniwind forwards untouched and which can never flatten), the thumb height class is a static literal (Uniwind scans source statically; an interpolated class risks being missed), and `onEnd` refuses to complete when `travel <= 0` — a gate that completes without a drag is worse than one that visibly refuses. Rule: measure the node the user sees, never its wrapper. |
+| 2026-10-04 | Onboarding step 1 redesigned: full-bleed hero, a display headline with one word on a rotated accent pill, a three-dot pager, and `SwipeToContinue` in place of the Next button. Steps 2 and 3 keep their tap buttons — a drag gate on a screen that is *asking a question* is hostile. Recorded the swipe track as the fourth sanctioned transform in §10, with the three rules that make it a control (measured travel, spring-back on a partial drag, threshold completion that fires once) and an explicit note on what swipe-only costs a screen-reader user. |
 | 2026-09-30 | Tab bar, fourth pass — **the active background was still a circle, and the radius was the reason.** Three prior passes had moved the *size* of the capsule around; the width was never the fault. `rounded-pill` (9999px) is exactly half the height on any box, so it forces a shape with no straight edges — and no amount of width makes a near-square stadium read as a rectangle. The half-measure `rounded-lg` (20px) was no better: on a 44pt capsule it left a 4pt straight vertical edge, a radius at 91% of half-height, i.e. a squircle. Now `rounded-sm` (12px) on a 48pt capsule, which leaves a 24pt straight vertical edge and ~34pt horizontally. **A rounded rectangle needs visible straight edges or it is a circle — check the radius first, before touching size.** To make the capsule *landscape* the content had to shrink: `--leading-normal` is 1.5, so a 12pt caption sat in an 18pt line box with 3pt of dead space above and below every label; `leading-tight` (1.15 → 14pt) takes the content column from ~45pt to ~40pt, which is what buys the aspect ratio. Icon `sm` (18) → `md` (22), gap 6pt → 4pt. Final capsule ~58×48 inside a ~66pt slot. Recorded in §10 that 48pt is the ceiling: a capsule that is both 64pt tall and `100% - 16pt` of the slot would be 50×64 — *more* portrait — and a 2:1 capsule around stacked content needs ~90pt of width that a 66pt slot does not have. The capsule's width is the slot's width less `PILL_INSET` (4pt) and is structurally incapable of depending on a label: no intrinsic sizing, no per-label measurement pass. Third pass had used `inset-y-1.5`, which **silently failed to resolve under Uniwind** — no warning, no error, the capsule reverted to stretching the full slot while the source read as fixed; `useTabFrames` now reports `slotHeight` and the box is arithmetic on measured values. |
 | 2026-09-30 | Tab bar, third pass: content-sized the width `+20px` and replaced `rounded-pill` with `rounded-lg`; removed the 2px icon / 1.5px label lift, which made the active tab the only tab not optically centred in its slot; moved press scale to the pressable via `usePressScale`; indicator and tab contents now share `DURATION.base`/`EASE_OUT` (200ms, ease-out) instead of two springs, deleting `SPRING.tab` and `SPRING.tabIndicator`; slot became a fixed `h-14`; container gutter `px-4`→`px-3`. **Fixed a real safe-area bug**: `tab-bar.tsx` carried a comment claiming the navigator already applied `insets.bottom`, and no such code existed — the wrapping `View` in `/(tabs)/_layout.tsx` only has `pt-safe`, so on a device with a home indicator the bar sat flush to the screen edge on a fixed `pb-3`. Now `pb-safe-or-4` = `max(inset, 1rem)`. **(Superseded: the size changes above did not fix the circle; the fourth pass identified the radius.)** |
 | 2026-09-30 | Tab bar, second pass: sized the pill from each tab's **content** rather than its slot. With five equal `flex-1` slots every frame measured the same, so the pill was a fixed-width bar and the horizontal resize the design is built around never happened; it now hugs "Discover" and "Home" differently, clamped to its own slot. Rebuilt the resize as a `scaleX` spring over an instantly-set layout `width`, because animating `width` re-measures the view every frame and was the actual source of the drag. Extracted `use-tab-frames.ts` once the second measurement pass pushed `tab-bar.tsx` over budget. Separately, fixed a Uniwind warning in `fields.tsx`: `selectionColorClassName`/`placeholderTextColorClassName` need `accent-*` utilities, not `text-*` — the text form resolved to nothing, warned, and silently left the cursor colour at the platform default. **(Superseded by the third pass above.)** |

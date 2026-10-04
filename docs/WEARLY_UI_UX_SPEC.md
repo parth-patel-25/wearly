@@ -174,10 +174,39 @@ screen changes as the circle starts moving, not after it lands.
    subtle animation, smooth transition into the app. In the spirit of a warm
    emotional brand introduction, but with its own identity and assets. It must
    feel like *"Welcome to Wearly"*, not *"Please create an account"*.
-2. **Welcome / personalisation** — a friendly conversation, not a registration
-   form. Two questions maximum, e.g. "Who are we styling for?" (Women / Men /
-   Kids / Everyone) and "What do you usually wear?" (Casual / Traditional / Party
-   / Formal / Streetwear / Minimal). Collectable **before** authentication.
+2. **Welcome / personalisation** — three steps, pre-authentication. Never a
+   registration form; the questions are asked like a conversation.
+
+   **Step 1 — the fashion moment.** A full-bleed fashion photograph, then a
+   display headline in which one word sits on a rotated accent pill
+   (*"Get Ready For **Fashion** With Your Own Style"*), one supporting line, and a
+   **swipe-to-continue** track in place of a Next button. Three dots below mark
+   the position in the flow.
+
+   The swipe is deliberate and is the one control in the product that is not
+   tapped. Onboarding is the moment where a user is being *shown* something, and
+   a drag says "this moves, and so do you" in a way a tap does not — it is the
+   physical difference between being told and being shown. It also means the first
+   thing they learn about Wearly's gestures is that Wearly has gestures.
+
+   Two constraints on it, both load-bearing:
+
+   - **The track is a real control, not decoration.** Full travel is measured, not
+     assumed; the thumb snaps back on a partial drag so the failure to complete is
+     legible rather than silent; completion fires one haptic so success is felt as
+     well as seen.
+   - **Steps 2 and 3 keep their `Button`s.** A swipe gate on the step that asks a
+     *question* would be hostile — the user has just been offered four answers and
+     the only way forward is to discover a gesture. Swipe belongs to the screen
+     that is pure introduction.
+
+   Steps 2 and 3 are unchanged: "Who are we styling for?" (Women / Men / Kids /
+   Everyone) and "What do you usually wear?" (Casual / Traditional / Party /
+   Formal / Streetwear / Minimal), each a chip row with a Next / Start browsing
+   button and a Skip. Answers are collectable **before** authentication, and are
+   stored but never used to gate anything — a prototype that pretended to
+   personalise a ranking it does not have would be exactly the fake social proof
+   this spec forbids.
 3. **Home → Explore → Browse → Product detail.** Fully usable.
 
 ### 6.1 No forced login
@@ -389,4 +418,5 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-04 | Onboarding step 1 redesigned as the fashion moment (full-bleed hero, headline with a rotated accent pill, swipe-to-continue instead of Next). Steps 2 and 3 are untouched. §6. |
 | 2026-09-29 | Initial spec. Normalised from the original brief; added build phases (§11) and the deviations log (§12). |
