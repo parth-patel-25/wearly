@@ -112,7 +112,7 @@ export default function WelcomeScreen() {
 
   return (
     <Screen className="flex-1 bg-background" scrollable={false}>
-      <View className="flex-1 gap-6 px-page-inline pt-6 pb-8">
+      <View className="flex-1 gap-6 px-4 pt-4 pb-6">
         <View className="flex-row items-center justify-between">
           <BrandMark size={40} />
           <Text tone="muted-foreground" variant="caption">

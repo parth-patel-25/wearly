@@ -46,11 +46,11 @@ const TRACK_INSET = 4;
 const THRESHOLD = 0.6;
 
 /**
- * Both page gutters. Must agree with the `px-page-inline` on the welcome screen
- * (space-6, 24px a side) — the track is the screen less its insets rather than
+ * Both page gutters. Must agree with the `px-4` on the welcome screen
+ * (space-4, 16px a side) — the track is the screen less its insets rather than
  * a guessed percentage.
  */
-const PAGE_GUTTER = 48;
+const PAGE_GUTTER = 32;
 
 function fire(style: ImpactFeedbackStyle): void {
   // A haptic must never delay the interaction it accompanies, and a device
@@ -63,7 +63,7 @@ function fire(style: ImpactFeedbackStyle): void {
 export function SwipeToContinue({ label, onComplete }: SwipeToContinueProps) {
   const { width: screen } = useWindowDimensions();
   // The track reports its own width. Until the first layout lands, fall back
-  // to the explicit arithmetic (screen less both `px-page-inline` gutters) so
+  // to the explicit arithmetic (screen less both `px-4` gutters) so
   // the control is usable on its very first frame.
   const [trackWidth, setTrackWidth] = useState(0);
   const onTrackLayout = useCallback((event: LayoutChangeEvent) => {

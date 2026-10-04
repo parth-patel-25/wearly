@@ -62,12 +62,12 @@ export function OnboardingHero({
         </View>
 
         <Text
-          className="px-2 text-center"
+          className="px-2 text-center capitalize"
           tone="muted-foreground"
-          variant="bodyMd"
+          variant="caption"
         >
-          Embrace your individuality and express yourself through fashion —
-          whether you prefer classic, bold or anything in between.
+          Embrace your individuality and express {"\n"} yourself through fashion
+          — whether you prefer
         </Text>
 
         <View className="gap-5 pt-1">

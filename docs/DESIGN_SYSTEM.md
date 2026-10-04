@@ -327,6 +327,10 @@ the `md` breakpoint.
 Heights: `h-9` 36, `h-11` 44 (the WCAG 2.2 minimum target), `h-12` 48,
 `h-13` 52 for mobile primary actions.
 
+Mobile screens use `px-4` (16px) for the outer frame, matching `Screen`'s
+`p-4` and the Home rhythm — including `welcome` (all three steps). `px-page-inline`
+(24px) is web/marketing only.
+
 ---
 
 ## 7. Elevation
@@ -909,6 +913,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-04 | Welcome frame narrowed to `px-4 pt-4 pb-6` (16/16/24) to match Home/`Screen p-4`; `PAGE_GUTTER` 48→32 so the swipe fallback arithmetic agrees. `px-page-inline` (24px) is web-only. |
 | 2026-10-04 | `SwipeToContinue`, seventh pass — exact end-stop, no clipping. Removed `overflow-hidden` (it hid overshoot instead of preventing it) and the grab scale (a growing thumb bulges past the edges by definition). The visible track now reports its own width via `onLayout` and travel is that less the fixed thumb, with the explicit screen-minus-gutters arithmetic kept as the pre-first-layout fallback. Rule: measure the node the user sees, stop flush, never mask. |
 | 2026-10-04 | `SwipeToContinue`, fifth pass — rebuilt the screenshot structure (wide pill thumb with the label inside, static `>>` chevrons) on `PanResponder` + classic `Animated` with fully explicit geometry, and removed `react-native-expo-swipe-button` + `expo-linear-gradient`. The library spike proved the technique drags smoothly where the worklet version stood still. (Superseded in part by the sixth and seventh passes: the grab scale bulged past the edges and was removed, and explicit arithmetic overshot on a gutter assumption — see above.) |
 | 2026-10-04 | `SwipeToContinue`, third pass — root-caused the frozen thumb. The drag math, gesture and animation pipeline were all proven working (grab-scale rendered, far-right release completed); the tap test (a tap with no drag advanced) proved `travel` was stuck at 0. Cause: the track was measured on the bare gesture host `Animated.View` instead of the visible track. Verified in the Reanimated 4.5 sources that the classic `createAnimatedComponent` path sets no `collapsable={false}` default, so a style-less animated node is eligible for view flattening — no native node, no real layout, `travel = max(0, 0 − thumb − 8) = 0` forever, and `0 >= 0` completed on any release. `onTrackLayout` now sits on the styled track `View` (which Uniwind forwards untouched and which can never flatten), the thumb height class is a static literal (Uniwind scans source statically; an interpolated class risks being missed), and `onEnd` refuses to complete when `travel <= 0` — a gate that completes without a drag is worse than one that visibly refuses. Rule: measure the node the user sees, never its wrapper. |
