@@ -40,7 +40,7 @@ export interface SwipeToContinueProps {
   onComplete: () => void;
 }
 
-const THUMB_WIDTH = 160;
+const THUMB_WIDTH = 140;
 const THUMB_HEIGHT = 44;
 /** Must agree with the track's `p-1.5` (6px) — travel stops flush at it. */
 const TRACK_INSET = 6;
@@ -163,12 +163,14 @@ export function SwipeToContinue({ label, onComplete }: SwipeToContinueProps) {
       <Animated.View
         {...pan.panHandlers}
         style={{
+          elevation: 1,
           height: THUMB_HEIGHT,
           transform: [{ translateX: offset }],
           width: THUMB_WIDTH,
+          zIndex: 1,
         }}
       >
-        <View className="h-full w-full flex-row items-center justify-center rounded-pill bg-primary px-3">
+        <View className="h-full w-full flex-row items-center justify-center rounded-pill bg-primary px-1">
           <Text tone="primary-foreground" variant="buttonXl">
             {label}
           </Text>
@@ -181,7 +183,7 @@ export function SwipeToContinue({ label, onComplete }: SwipeToContinueProps) {
           fade carries the motion here, not the spacing. */}
       <Animated.View
         className="flex-1 flex-row items-center justify-end pr-3"
-        style={{ opacity: chevronOpacity }}
+        style={{ opacity: chevronOpacity, zIndex: 0 }}
       >
         <Icon name="chevron-right" size="sm" tone="muted-foreground" />
         <Icon name="chevron-right" size="sm" tone="muted-foreground" />
