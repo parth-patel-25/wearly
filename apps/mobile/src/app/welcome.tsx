@@ -2,7 +2,6 @@ import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
 import { OnboardingHero } from "@features/welcome/components/onboarding-hero";
 import { Chip } from "@wearly/ui-native/badge";
-import { BrandMark } from "@wearly/ui-native/brand-mark";
 import { Button } from "@wearly/ui-native/button";
 import { Screen } from "@wearly/ui-native/screen";
 import { Text } from "@wearly/ui-native/text";
@@ -54,16 +53,10 @@ type Step = "intro" | "stylingFor" | "wears";
 
 type QuestionStep = Exclude<Step, "intro">;
 
-/** Display order of the steps, for the pager and the header counter. */
+/** Display order of the steps, for the pager. */
 const STEPS: readonly Step[] = ["intro", "stylingFor", "wears"];
 
 const TOTAL_STEPS = STEPS.length;
-
-const STEP_NUMBER: Record<Step, number> = {
-  intro: 1,
-  stylingFor: 2,
-  wears: 3,
-};
 
 const DEFAULT_ANSWER: Record<QuestionStep, string> = {
   stylingFor: "Everyone",
@@ -113,13 +106,6 @@ export default function WelcomeScreen() {
   return (
     <Screen className="flex-1 bg-background" scrollable={false}>
       <View className="flex-1 gap-6 px-4 pt-4 pb-6">
-        <View className="flex-row items-center justify-between">
-          <BrandMark size={40} />
-          <Text tone="muted-foreground" variant="caption">
-            {`Step ${STEP_NUMBER[step]} of ${TOTAL_STEPS}`}
-          </Text>
-        </View>
-
         {isIntro ? (
           <OnboardingHero
             onSwipeComplete={goToStyling}
