@@ -67,8 +67,11 @@ export default function RootLayout() {
                   contentStyle: { backgroundColor: background },
                 }}
               >
-                <Stack.Screen name="splash" options={{ animation: "none" }} />
-                <Stack.Screen name="welcome" />
+                <Stack.Screen
+                  name="splash"
+                  options={{ animation: "none", headerShown: false }}
+                />
+                <Stack.Screen name="welcome" options={{ headerShown: false }} />
                 <Stack.Screen name="index" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen
