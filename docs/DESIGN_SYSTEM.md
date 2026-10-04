@@ -916,6 +916,8 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-04 | `buttonXl` control token (20px) added; `SwipeToContinue` thumb label `buttonLg` → `buttonXl`, inner `px-3` → `px-2`. |
+| 2026-10-04 | `buttonLg` native token (`text-native-button-lg`, 16px) added; `SwipeToContinue` thumb label `label` → `buttonLg`, inner `px-5` → `px-3`. |
 | 2026-10-04 | Headline `displaySm` (32px) token added (`typography` + `theme` + `Text` variant); onboarding hero headline + Fashion pill moved `display` → `displaySm`. |
 | 2026-10-04 | Onboarding hero headline: 3 forced centered lines (`Get Ready For` / pill + `With Your` / `Own Style`), Fashion pill absolute with measured reserve + 2px gap, row gap `gap-px` + `leading-tight` (1px line-height requested but impossible — 36px glyphs clip; 1.15 is the minimum). Recorded as §10 sanctioned overlay. |
 | 2026-10-04 | Welcome frame narrowed to `px-4 pt-4 pb-6` (16/16/24) to match Home/`Screen p-4`; `PAGE_GUTTER` 48→32 so the swipe fallback arithmetic agrees. `px-page-inline` (24px) is web-only. |

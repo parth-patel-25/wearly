@@ -15,6 +15,8 @@ const VARIANT = {
   bodyLg: "text-native-body-lg font-normal",
   bodyMd: "text-native-body-md font-normal",
   bodySm: "text-native-body-sm font-normal",
+  buttonLg: "text-native-button-lg font-medium",
+  buttonXl: "text-native-button-xl font-medium",
   caption: "text-native-caption font-normal",
   display: "text-native-display font-medium tracking-tight",
   displaySm: "text-native-display-sm font-medium tracking-tight",

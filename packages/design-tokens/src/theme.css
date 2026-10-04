@@ -186,6 +186,10 @@
   --text-button-lg--line-height: var(--wearly-text-button-lg--line-height);
   --text-button-lg--font-weight: var(--wearly-text-button-lg--font-weight);
 
+  --text-button-xl: var(--wearly-text-button-xl);
+  --text-button-xl--line-height: var(--wearly-text-button-xl--line-height);
+  --text-button-xl--font-weight: var(--wearly-text-button-xl--font-weight);
+
   /* Fixed counterparts for React Native, which cannot resolve `clamp()`. */
   --text-native-display: var(--wearly-text-native-display);
   --text-native-display-sm: var(--wearly-text-native-display-sm);
@@ -199,6 +203,8 @@
   --text-native-body-sm: var(--wearly-text-native-body-sm);
   --text-native-caption: var(--wearly-text-native-caption);
   --text-native-label: var(--wearly-text-native-label);
+  --text-native-button-lg: var(--wearly-text-native-button-lg);
+  --text-native-button-xl: var(--wearly-text-native-button-xl);
 
   /* ---------------------------------------------------------------------
    * Elevation — `soft` is the everyday one, `float` the rare one.

@@ -117,6 +117,9 @@
     --wearly-text-button-lg: 1rem;
     --wearly-text-button-lg--line-height: var(--wearly-leading-normal);
     --wearly-text-button-lg--font-weight: var(--wearly-weight-medium);
+    --wearly-text-button-xl: 1.25rem;
+    --wearly-text-button-xl--line-height: var(--wearly-leading-normal);
+    --wearly-text-button-xl--font-weight: var(--wearly-weight-medium);
   }
 }
 
@@ -139,5 +142,7 @@
     --wearly-text-native-body-sm: 0.875rem;
     --wearly-text-native-caption: 0.75rem;
     --wearly-text-native-label: 0.8125rem;
+    --wearly-text-native-button-lg: 1rem;
+    --wearly-text-native-button-xl: 1.25rem;
   }
 }

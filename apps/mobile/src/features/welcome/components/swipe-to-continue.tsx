@@ -167,8 +167,8 @@ export function SwipeToContinue({ label, onComplete }: SwipeToContinueProps) {
           width: THUMB_WIDTH,
         }}
       >
-        <View className="h-full w-full flex-row items-center justify-center rounded-pill bg-primary px-5">
-          <Text tone="primary-foreground" variant="label">
+        <View className="h-full w-full flex-row items-center justify-center rounded-pill bg-primary px-2">
+          <Text tone="primary-foreground" variant="buttonXl">
             {label}
           </Text>
         </View>
