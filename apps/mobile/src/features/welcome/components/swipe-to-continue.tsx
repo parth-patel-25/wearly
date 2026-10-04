@@ -40,9 +40,10 @@ export interface SwipeToContinueProps {
   onComplete: () => void;
 }
 
-const THUMB_WIDTH = 150;
+const THUMB_WIDTH = 160;
 const THUMB_HEIGHT = 44;
-const TRACK_INSET = 4;
+/** Must agree with the track's `p-1.5` (6px) — travel stops flush at it. */
+const TRACK_INSET = 6;
 const THRESHOLD = 0.6;
 
 /**
@@ -156,7 +157,7 @@ export function SwipeToContinue({ label, onComplete }: SwipeToContinueProps) {
       accessibilityHint="Swipe the handle to the right to continue"
       accessibilityLabel="Continue to the next step"
       accessibilityRole="button"
-      className="h-touch w-full flex-row items-center rounded-pill border border-border bg-card p-1"
+      className="w-full flex-row items-center rounded-pill border border-border bg-card p-1.5"
       onLayout={onTrackLayout}
     >
       <Animated.View
@@ -167,7 +168,7 @@ export function SwipeToContinue({ label, onComplete }: SwipeToContinueProps) {
           width: THUMB_WIDTH,
         }}
       >
-        <View className="h-full w-full flex-row items-center justify-center rounded-pill bg-primary px-2">
+        <View className="h-full w-full flex-row items-center justify-center rounded-pill bg-primary px-3">
           <Text tone="primary-foreground" variant="buttonXl">
             {label}
           </Text>
