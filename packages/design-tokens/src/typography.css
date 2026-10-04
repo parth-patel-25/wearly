@@ -55,6 +55,16 @@
     --wearly-text-display--font-weight: var(--wearly-weight-medium);
     --wearly-text-display--letter-spacing: var(--wearly-tracking-tight);
 
+    --wearly-text-display-sm: 2rem;
+    --wearly-text-display-sm--line-height: var(--wearly-leading-tight);
+    --wearly-text-display-sm--font-weight: var(--wearly-weight-medium);
+    --wearly-text-display-sm--letter-spacing: var(--wearly-tracking-tight);
+
+    --wearly-text-display-xs: 1.75rem;
+    --wearly-text-display-xs--line-height: var(--wearly-leading-tight);
+    --wearly-text-display-xs--font-weight: var(--wearly-weight-medium);
+    --wearly-text-display-xs--letter-spacing: var(--wearly-tracking-tight);
+
     --wearly-text-heading-xl: clamp(1.875rem, 1.65rem + 1.1vw, 2.25rem);
     --wearly-text-heading-xl--line-height: var(--wearly-leading-tight);
     --wearly-text-heading-xl--font-weight: var(--wearly-weight-medium);
@@ -118,6 +128,8 @@
 @layer theme {
   :root {
     --wearly-text-native-display: 2.25rem;
+    --wearly-text-native-display-sm: 2rem;
+    --wearly-text-native-display-xs: 1.75rem;
     --wearly-text-native-heading-xl: 1.875rem;
     --wearly-text-native-heading-lg: 1.5rem;
     --wearly-text-native-heading-md: 1.5rem;

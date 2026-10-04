@@ -17,6 +17,8 @@ const VARIANT = {
   bodySm: "text-native-body-sm font-normal",
   caption: "text-native-caption font-normal",
   display: "text-native-display font-medium tracking-tight",
+  displaySm: "text-native-display-sm font-medium tracking-tight",
+  displayXs: "text-native-display-xs font-medium tracking-tight",
   headingLg: "text-native-heading-lg font-medium tracking-tight",
   headingMd: "text-native-heading-md font-medium tracking-tight",
   headingSm: "text-native-heading-sm font-medium tracking-tight",

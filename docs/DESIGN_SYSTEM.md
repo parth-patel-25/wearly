@@ -257,6 +257,8 @@ more editorial than bold.
 | Token | Size | Weight | Use |
 | --- | --- | --- | --- |
 | `text-display` | 36–44px | 500 | Hero |
+| `text-display-sm` | 32px (native) | 500 | Hero, onboarding headline |
+| `text-display-xs` | 28px (native) | 500 | Fashion pill |
 | `text-heading-xl` | 30–36px | 500 | Page title |
 | `text-heading-lg` | 24–30px | 500 | Section title |
 | `text-heading-md` | 24px | 500 | Subsection |
@@ -556,6 +558,7 @@ The sanctioned list, and each earns its place for a different reason:
 | `tab-bar-active-circle.tsx` | Floats above the bar's top edge, anchored to its sibling's measured slot centre. There is no flexbox way to place a surface outside its parent's bounds, which is the entire point of it. |
 | `use-tab-item-motion.ts` wrappers | Scale a tab's contents inside its own slot. Contained, and needed so activation reads as more than a recolour. |
 | `theme-toggle.tsx` | Dev-only, and above every screen by definition. |
+| `onboarding-hero.tsx` Fashion pill | Floats absolute inside its own Row 2 relative unit (measured `onLayout` reserve + 2px gap) so the headline keeps a 2px gap with 1px row rhythm; text reserves the space so Rows 1/3 stay readable. Contained overlay, not layout. |
 
 `bottom-sheet.tsx`'s scrim is a fifth: `absolute inset-0` over the modal.
 
@@ -913,6 +916,8 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-04 | Headline `displaySm` (32px) token added (`typography` + `theme` + `Text` variant); onboarding hero headline + Fashion pill moved `display` → `displaySm`. |
+| 2026-10-04 | Onboarding hero headline: 3 forced centered lines (`Get Ready For` / pill + `With Your` / `Own Style`), Fashion pill absolute with measured reserve + 2px gap, row gap `gap-px` + `leading-tight` (1px line-height requested but impossible — 36px glyphs clip; 1.15 is the minimum). Recorded as §10 sanctioned overlay. |
 | 2026-10-04 | Welcome frame narrowed to `px-4 pt-4 pb-6` (16/16/24) to match Home/`Screen p-4`; `PAGE_GUTTER` 48→32 so the swipe fallback arithmetic agrees. `px-page-inline` (24px) is web-only. |
 | 2026-10-04 | `SwipeToContinue`, seventh pass — exact end-stop, no clipping. Removed `overflow-hidden` (it hid overshoot instead of preventing it) and the grab scale (a growing thumb bulges past the edges by definition). The visible track now reports its own width via `onLayout` and travel is that less the fixed thumb, with the explicit screen-minus-gutters arithmetic kept as the pre-first-layout fallback. Rule: measure the node the user sees, stop flush, never mask. |
 | 2026-10-04 | `SwipeToContinue`, fifth pass — rebuilt the screenshot structure (wide pill thumb with the label inside, static `>>` chevrons) on `PanResponder` + classic `Animated` with fully explicit geometry, and removed `react-native-expo-swipe-button` + `expo-linear-gradient`. The library spike proved the technique drags smoothly where the worklet version stood still. (Superseded in part by the sixth and seventh passes: the grab scale bulged past the edges and was removed, and explicit arithmetic overshot on a gutter assumption — see above.) |

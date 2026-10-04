@@ -1,5 +1,7 @@
 import { Media } from "@wearly/ui-native/media";
 import { Text } from "@wearly/ui-native/text";
+import { useCallback, useState } from "react";
+import type { LayoutChangeEvent } from "react-native";
 import { View } from "react-native";
 
 import { SwipeToContinue } from "./swipe-to-continue";
@@ -25,7 +27,10 @@ import { SwipeToContinue } from "./swipe-to-continue";
 const HERO_SRC =
   "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1200&q=80";
 
-const PILL_TILT = "-6deg";
+const PILL_TILT = "-12deg";
+
+/** Gap between the floating pill and "With Your" — 2px by request. */
+const PILL_GAP = 1;
 
 /** Stable pager dot keys — the flow has three steps and never grows silently. */
 const DOT_KEYS = ["one", "two", "three"] as const;
@@ -42,23 +47,39 @@ export function OnboardingHero({
   step,
   totalSteps,
 }: OnboardingHeroProps) {
+  // Measured pill width. The pill is absolute (takes no space), so the text
+  // reserves exactly pill + 2px of left padding — the visual gap stays 2px
+  // and Rows 1/3 can never slide under the pill.
+  const [pillWidth, setPillWidth] = useState(0);
+  const onPillLayout = useCallback((event: LayoutChangeEvent) => {
+    setPillWidth(event.nativeEvent.layout.width);
+  }, []);
+  // Pre-first-layout fallback so the text doesn't jump once measured.
+  const pillReserve = (pillWidth > 0 ? pillWidth : 130) + PILL_GAP;
+
   return (
     <View className="flex-1 justify-between gap-6">
       <Media aspect="3/4" className="flex-1" src={HERO_SRC} tone="accent" />
 
       <View className="gap-4">
-        {/* The lines are explicit rather than left to wrap. Three inline boxes in
-            a wrapping row break independently, so at a larger font scale the
-            lines interleave into a jumble; a column per line keeps the stack the
-            design is built on and lets only the last line reflow. */}
-        <View className="gap-1">
-          <Text className="text-center" variant="display">
+        {/* Three forced centered lines. Row 2 is a shrink-wrapped relative unit
+            (self-centered), so the absolute pill lives inside its own row's
+            bounds and Rows 1/3 stay full-width readable. */}
+        <View className="gap-0">
+          <Text className="text-center leading-tight" variant="displaySm">
             Get Ready For
           </Text>
-          <View className="flex-row flex-wrap items-center justify-center gap-x-2">
-            <Pill>Fashion</Pill>
-            <Text variant="display">With Your Own Style</Text>
+          <View className="mt-px flex-row justify-center">
+            <View className="relative flex-row items-center">
+              <Pill onLayout={onPillLayout} />
+              <Text style={{ paddingLeft: pillReserve }} variant="displaySm">
+                With Your
+              </Text>
+            </View>
           </View>
+          <Text className="text-center leading-tight" variant="displaySm">
+            Own Style
+          </Text>
         </View>
 
         <Text
@@ -79,18 +100,19 @@ export function OnboardingHero({
   );
 }
 
-function Pill({ children }: { children: string }) {
+function Pill({ onLayout }: { onLayout: (event: LayoutChangeEvent) => void }) {
   return (
     <View
-      className="self-center rounded-pill bg-accent px-4 py-1"
+      className="absolute left-0 self-center rounded-pill bg-accent px-4 py-1"
+      onLayout={onLayout}
       style={{ transform: [{ rotate: PILL_TILT }] }}
     >
       <Text
         className="text-center"
         tone="accent-foreground"
-        variant="headingLg"
+        variant="displayXs"
       >
-        {children}
+        Fashion
       </Text>
     </View>
   );

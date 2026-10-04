@@ -115,6 +115,20 @@
   --text-display--font-weight: var(--wearly-text-display--font-weight);
   --text-display--letter-spacing: var(--wearly-text-display--letter-spacing);
 
+  --text-display-sm: var(--wearly-text-display-sm);
+  --text-display-sm--line-height: var(--wearly-text-display-sm--line-height);
+  --text-display-sm--font-weight: var(--wearly-text-display-sm--font-weight);
+  --text-display-sm--letter-spacing: var(
+    --wearly-text-display-sm--letter-spacing
+  );
+
+  --text-display-xs: var(--wearly-text-display-xs);
+  --text-display-xs--line-height: var(--wearly-text-display-xs--line-height);
+  --text-display-xs--font-weight: var(--wearly-text-display-xs--font-weight);
+  --text-display-xs--letter-spacing: var(
+    --wearly-text-display-xs--letter-spacing
+  );
+
   --text-heading-xl: var(--wearly-text-heading-xl);
   --text-heading-xl--line-height: var(--wearly-text-heading-xl--line-height);
   --text-heading-xl--font-weight: var(--wearly-text-heading-xl--font-weight);
@@ -174,6 +188,8 @@
 
   /* Fixed counterparts for React Native, which cannot resolve `clamp()`. */
   --text-native-display: var(--wearly-text-native-display);
+  --text-native-display-sm: var(--wearly-text-native-display-sm);
+  --text-native-display-xs: var(--wearly-text-native-display-xs);
   --text-native-heading-xl: var(--wearly-text-native-heading-xl);
   --text-native-heading-lg: var(--wearly-text-native-heading-lg);
   --text-native-heading-md: var(--wearly-text-native-heading-md);
