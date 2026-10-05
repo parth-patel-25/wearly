@@ -295,6 +295,8 @@ Tailwind's 4px default.
 | `radius-xl` | 24px |
 | `radius-2xl` | 28px |
 | `radius-3xl` | 32px |
+| `radius-4xl` | 40px |
+| `radius-5xl` | 48px |
 | `radius-pill` | 9999px |
 
 **Prefer the component names** over the numeric scale — re-theming one component
@@ -916,6 +918,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-05 | Home header + content cards bumped to a new `--wearly-radius-5xl` (48px) token (`rounded-b-5xl` / `rounded-t-5xl`); search strip top padding reduced to a constant `pt-4`. |
 | 2026-10-05 | Home header greeting tightened (`gap-0.5`, `price` 17px medium, one line); docked search strip slims its top padding via scroll-measured header height (static class literals only). |
 | 2026-10-05 | Removed the dev-only floating theme toggle (`theme-toggle.tsx` deleted, root layout unmounted — dark is reviewed via `EXPO_PUBLIC_WEARLY_THEME=dark`); home header row is avatar-first with a larger avatar and a one-line greeting. |
 | 2026-10-05 | Home cards moved to a new `--wearly-radius-4xl` (40px) token; sheet top border removed (it traced outside the rounded corners); `HomeSearch` placeholder truncates via `flex-1` + `numberOfLines` so it never spills past the pill. |
