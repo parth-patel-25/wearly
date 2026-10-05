@@ -527,10 +527,9 @@ stays the focus. On mobile, prefer a bottom sheet at 32px.
   being reviewed does not change with whichever phone is on the desk. Light is the
   reference render — the soft rose and warm off-white the colour system is tuned
   around. `EXPO_PUBLIC_WEARLY_THEME` still forces a theme for a specific run.
-- **A dev-only three-state toggle** (`theme-toggle.tsx`, `__DEV__`-gated) floats at
-  the top right and cycles light → dark → follow the system. It is the one control
-  in the product that exists to be looked at rather than used. Its state is
-  in-memory, so it resets to light on reload; persistence is the open piece.
+- **No in-app theme switch.** Dark is reviewed with a forced run
+  (`EXPO_PUBLIC_WEARLY_THEME=dark`); the launch default stays light (see
+  above). The dev-only floating toggle was removed 2026-10-05.
 - Mobile app frames sit above the system status bar, so `Screen` insets with
   `edges={["top", "left", "right"]}` rather than padding by a guessed number.
 - **The top inset is applied in two places, and nowhere else.** Screens that use
@@ -917,6 +916,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-05 | Removed the dev-only floating theme toggle (`theme-toggle.tsx` deleted, root layout unmounted — dark is reviewed via `EXPO_PUBLIC_WEARLY_THEME=dark`); home header row is avatar-first with a larger avatar and a one-line greeting. |
 | 2026-10-05 | Home cards moved to a new `--wearly-radius-4xl` (40px) token; sheet top border removed (it traced outside the rounded corners); `HomeSearch` placeholder truncates via `flex-1` + `numberOfLines` so it never spills past the pill. |
 | 2026-10-05 | Home is two full-bleed white cards separated by a `bg-muted` gap: header card (greeting + search) rounded bottom-only, content sheet rounded top-only, both at the 32px sheet radius; search strip bottom padding (`pb-5`) matches the sheet's top inner padding. Greeting scrolls away while search stays pinned via `ScrollView stickyHeaderIndices`; recommended grid rendered as flex `flex-row` pairs (6 items need no virtualisation) so the screen keeps one vertical scroller. Tokens only, tab bar untouched. |
 | 2026-10-05 | Mobile screen gutters unified to reusable `px-gutter`/`mx-gutter` (16px): `Screen` `p-4` → `p-gutter`, `welcome` `px-4` → `px-gutter`, all tab/rent/product/grid/sheet/toast `px/mx-page-inline` → `px/mx-gutter`. Web `px-page-inline` unchanged. |

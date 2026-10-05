@@ -6,9 +6,10 @@ import { Pressable, View } from "react-native";
 /**
  * Personalised header.
  *
- * Light by design: a greeting, one contextual line, avatar and a single
- * notification action. Attention should fall through to the hero, not pool
- * here — so no background fill, no tabs, no second row.
+ * One row: avatar first, then the greeting with its contextual line, then a
+ * single notification action at the end. Attention should fall through to the
+ * content below, not pool here — so no background fill, no tabs, no second
+ * row, and the greeting stays a step down from hero type.
  */
 
 interface HomeHeaderProps {
@@ -39,28 +40,30 @@ export function HomeHeader({
     : `${greetingFor()} 👋`;
 
   return (
-    <View className="flex-row items-center justify-between gap-3">
+    <View className="flex-row items-center gap-3">
+      <Pressable
+        accessibilityLabel={name ? `${name}'s profile` : "Profile"}
+        accessibilityRole="button"
+        onPress={onProfile}
+      >
+        <Avatar name={name ?? undefined} size="lg" />
+      </Pressable>
       <View className="flex-1 gap-1">
-        <Text variant="headingLg">{greeting}</Text>
+        {/* bodyMd (15px) sits 1px over the bodySm description — the smallest
+            step the named scale allows without a one-off token. */}
+        <Text className="flex-1" numberOfLines={1} variant="bodyMd">
+          {greeting}
+        </Text>
         <Text tone="muted-foreground" variant="bodySm">
           What are you dressing for?
         </Text>
       </View>
-      <View className="flex-row items-center gap-2">
-        <IconButton
-          accessibilityLabel="Notifications"
-          icon="bell"
-          onPress={onNotifications}
-          variant="outline"
-        />
-        <Pressable
-          accessibilityLabel={name ? `${name}'s profile` : "Profile"}
-          accessibilityRole="button"
-          onPress={onProfile}
-        >
-          <Avatar name={name ?? undefined} size="md" />
-        </Pressable>
-      </View>
+      <IconButton
+        accessibilityLabel="Notifications"
+        icon="bell"
+        onPress={onNotifications}
+        variant="outline"
+      />
     </View>
   );
 }

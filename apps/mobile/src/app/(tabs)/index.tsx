@@ -88,10 +88,11 @@ export default function HomeScreen() {
           />
         </View>
         {/* The pinned strip: the white bottom half of the header card,
-            rounded on the bottom corners only. `pb-5` matches the sheet's
-            top inner padding so both cards breathe the same. Solid `bg-card`
-            so scrolled content slides underneath it. */}
-        <View className="rounded-b-4xl bg-card px-gutter pt-2 pb-5">
+            rounded on the bottom corners only. `pt-8` opens the gap between
+            the header row and the search row; `pb-5` matches the sheet's
+            inner padding. Solid `bg-card` so scrolled content slides
+            underneath it. */}
+        <View className="rounded-b-4xl bg-card px-gutter pt-8 pb-5">
           <HomeSearch onFilters={toDiscover} onPress={toDiscover} />
         </View>
         {/* The muted gap lives here: transparent `pt-3` over the page
