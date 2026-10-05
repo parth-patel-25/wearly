@@ -1,3 +1,4 @@
+import { Chip } from "@wearly/ui-native/badge";
 import { SectionHeader } from "@wearly/ui-native/display";
 import { ProductCard } from "@wearly/ui-native/product-card";
 import type { ProductGridItem } from "@wearly/ui-native/product-grid";
@@ -5,35 +6,34 @@ import type { ListRenderItem } from "react-native";
 import { FlatList, View } from "react-native";
 
 /**
- * The occasion rail.
+ * Horizontal product rail.
  *
- * A vertical grid forces a decision per row: you see two pieces and then you are
- * looking at a wall. A rail says "there is more this way" without asking for a
- * commitment, and it keeps the opening of the screen to one story instead of
- * twelve thumbnails.
- *
- * The rail is horizontal inside the vertical grid, so the two never scroll
- * together and there is no nested same-orientation list. The peek is deliberate —
- * a rail showing exactly one card at a time is a carousel, and a carousel hides
- * the fact that there is a choice to make.
+ * Shared by Trending, New-on-Wearly and Recommended: image-first `ProductCard`
+ * at a peek width so the rail reads as "more this way". The card owns its
+ * favourite heart and hero measurement — this rail only owns the layout.
  */
 
-/** Wide enough for a name on one line and half of the next card showing. */
-const RAIL_CARD = "w-48";
-
-export interface OccasionRailProps {
+interface ProductRailProps {
+  caption?: string;
   favourites: ReadonlySet<string>;
   items: readonly ProductGridItem[];
   onFavourite: (id: string) => void;
   onOpen: (id: string) => void;
+  onSeeAll: () => void;
+  title: string;
 }
 
-export function OccasionRail({
+const RAIL_CARD = "w-40";
+
+export function ProductRail({
+  caption,
   favourites,
   items,
   onFavourite,
   onOpen,
-}: OccasionRailProps) {
+  onSeeAll,
+  title,
+}: ProductRailProps) {
   const renderItem: ListRenderItem<ProductGridItem> = ({ item }) => (
     <View className={RAIL_CARD}>
       <ProductCard
@@ -47,8 +47,15 @@ export function OccasionRail({
 
   return (
     <View className="gap-4">
-      <SectionHeader caption="Four days, worn properly" title="On the rail" />
-
+      <SectionHeader
+        action={
+          <Chip onPress={onSeeAll} selected={false}>
+            See all
+          </Chip>
+        }
+        caption={caption}
+        title={title}
+      />
       <FlatList
         contentContainerClassName="gap-4"
         data={items}

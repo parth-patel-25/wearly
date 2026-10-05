@@ -11,8 +11,7 @@ The product intent behind each screen lives in `docs/WEARLY_UI_UX_SPEC.md`.
 Proves the design language and the hero-expansion interaction end to end.
 
 - [x] 01 Splash / onboarding — animated brand moment
-- [x] 02 Home — editorial, curated
-- [x] 02b Home (variant) — story-first, at `/(tabs)/home-v2`
+- [x] 02 Home — magazine marketplace at `/(tabs)` (single Home; v1/v2 variants removed 2026-10-05)
 - [x] 03 Search — in Discover
 - [x] 04 Categories — in Discover (chip rail)
 - [x] 05 Product grid — FlatList grid in Home and Discover
@@ -29,7 +28,7 @@ Proves the design language and the hero-expansion interaction end to end.
 **Connective tissue, not signature screens:**
 
 - [x] Splash → welcome personalisation (pre-auth, 3 steps: fashion moment, then 2 questions)
-- [x] Bottom tab bar (Home · Discover · List · Rentals · Profile)
+- [x] Bottom tab bar (Home · Discover · List · Profile)
 - [x] Explain-first authentication gate (§6.1 "no forced login")
 - [x] Native component foundation in `packages/ui-native`
 
@@ -43,22 +42,18 @@ control with explicit geometry (no runtime measurement — see `DESIGN_SYSTEM.md
 §10 for why) and swipe-only costs a screen-reader user a tap path, which is
 accepted on this step alone.
 
-**Two Homes, on purpose.** `02` is product-first: a display line, one featured
-piece with a price, a mood row, then six curated cards. `02b` is the opposite
-bet — masthead, one lead piece written up as an article with the price demoted to
-a footnote, a note about the lender, a horizontal rail, and the grid pushed to the
-bottom. It lives at `ROUTES.homeV2` (`/(tabs)/home-v2`) and shares the Home tab,
-so it never appears in the tab bar. `ROUTES.home` currently points at it; swap
-`home` and `homeLegacy` in `apps/mobile/src/core/routing/routes.ts` to compare,
-and delete the loser once one of them wins. The two are meant to be compared side
-by side before either is deleted. `02b` also moves the card's favourite button
-inside the media block, bottom-right.
+**One Home.** The v1 (product-first) and v2 (story-first) variants were removed
+once v3 won: v3 is the magazine marketplace at the tab root `/(tabs)` —
+personalised header, search handoff to Discover, occasion-led editorial hero,
+category + occasion rails, Trending / New / Looks rails, then a recommended
+grid. `ROUTES.home` is `/(tabs)`; the old `homeLegacy`/`homeV2`/`homeV3` keys
+and their screens are gone (git history preserves them).
 
 **The `List` tab replaced the centre `+`.** Listing used to be a fixed 48px filled
 circle wedged between Discover and Rentals — a button, not a destination, and the
 reason the bar's tabs were not all the same width. It is now the third tab, a
 hanger glyph, and `/(tabs)/list` is reached the same way as every other screen.
-The bar keeps one sliding pill across all five; see `DESIGN_SYSTEM.md` §10.
+The bar keeps one sliding pill across all four; see `DESIGN_SYSTEM.md` §10.
 
 ## Phase 2 — The rest of the rental journey
 

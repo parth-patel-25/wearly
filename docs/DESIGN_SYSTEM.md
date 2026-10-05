@@ -916,6 +916,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-05 | Home is a single screen again: v3 moved to the tab root `/(tabs)`, v1/v2 screens + `editorial-masthead`/`lead-story`/`occasion-rail` + `homeLegacy`/`homeV2`/`homeV3` route keys deleted, `TABS` fixed to the real 4 tabs. |
 | 2026-10-04 | `Media` accepts bundled `require()` + `fallbackSrc` (remote on `onError`, tone block last); onboarding hero uses local `onboarding-hero.png` with the Unsplash hoodie as fallback. |
 | 2026-10-04 | Onboarding hero: Fashion pill `accent` → `primary` fill with `primary-foreground` (white) text; pager active dot `accent` → `primary`. |
 | 2026-10-04 | `buttonXl` control token (20px) added; `SwipeToContinue` thumb label `buttonLg` → `buttonXl`, inner `px-3` → `px-2`. |

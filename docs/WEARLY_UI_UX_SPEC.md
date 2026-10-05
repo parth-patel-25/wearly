@@ -246,6 +246,24 @@ categories → curated clothing → trending/recommended.
 Large visual cards, real whitespace. The user should feel *"let me explore"*,
 not *"here is a giant product catalogue"*.
 
+### 7.1b Home v3 — magazine marketplace (2026-10-05)
+
+The third direction: Reference-2 editorial feeling + Reference-1 warmth and
+usability + rental behaviour. "A fashion magazine you can rent from."
+
+Rhythm (intentional, not banner → grid → grid):
+
+INSPIRE (editorial hero, occasion-led, never discount-led) →
+EXPLORE (categories, `✨ For You` first) →
+IDENTIFY NEED (occasions: Wedding, Date Night, Party, Vacation, Brunch, Work,
+Festival) → DISCOVER (Trending now rail) → RETURN (✨ New on Wearly rail) →
+GET INSPIRED (Looks people are loving) → Recommended grid.
+
+Rules: hero copy is editorial ("Wedding Season / Looks worth renting"), one CTA,
+pink is accent only (80/15/5), product cards image-first with rental price
+(`₹499 · 2 days`) + at most one social-proof fact, no fake counts, search on
+Home navigates to Discover with query passthrough (no local filtering).
+
 ### 7.2 Discovery
 
 Search, categories, filters, discovery, saving. Search stays visually simple.

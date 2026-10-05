@@ -72,6 +72,12 @@ export const GLYPHS = {
       <Path d="M9 10V6a3 3 0 0 1 6 0v4" {...stroke(c)} />
     </>
   ),
+  bell: (c) => (
+    <>
+      <Path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" {...stroke(c)} />
+      <Path d="M13.7 21a2 2 0 0 1-3.4 0" {...stroke(c)} />
+    </>
+  ),
   calendar: (c) => (
     <>
       <Rect height="17" rx="3" width="18" x="3" y="5" {...stroke(c)} />

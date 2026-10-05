@@ -15,8 +15,8 @@ import { EmptyState, SectionHeader } from "@wearly/ui-native/display";
 import { SearchField } from "@wearly/ui-native/fields";
 import { ProductGrid } from "@wearly/ui-native/product-grid";
 import { Text } from "@wearly/ui-native/text";
-import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 
 /**
@@ -34,9 +34,18 @@ import { View } from "react-native";
 export default function DiscoverScreen() {
   const router = useRouter();
   const { state } = useSession();
+  const { q } = useLocalSearchParams<{ q?: string }>();
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  // Home search hands off here: adopt the query once so the field shows what
+  // Home promised, then leave the field owned locally afterwards.
+  useEffect(() => {
+    if (typeof q === "string" && q.length > 0) {
+      setQuery(q);
+    }
+  }, [q]);
 
   const results = useMemo(
     () => search(applyFilters(CATALOGUE, filters), query),
@@ -69,7 +78,11 @@ export default function DiscoverScreen() {
               </Button>
             </View>
 
-            <SearchField onChange={setQuery} value={query} />
+            <SearchField
+              autoFocus={typeof q === "string"}
+              onChange={setQuery}
+              value={query}
+            />
 
             <View className="flex-row flex-wrap gap-3">
               {CATEGORIES.map((category) => (

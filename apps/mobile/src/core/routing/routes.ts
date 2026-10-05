@@ -18,13 +18,10 @@ export const ROUTES = {
   dates: "/rent/dates",
   discover: "/(tabs)/discover",
   /**
-   * Which Home the tab opens. `homeV2` is the editorial reworking (story-first,
-   * price demoted to a footnote). Swap these two values to compare — the other
-   * route stays registered either way, so nothing is lost.
+   * Home is the magazine marketplace at the tab root: editorial hero,
+   * categories, occasions, trending / new / looks rails, recommended grid.
    */
-  home: "/(tabs)/home-v2",
-  homeLegacy: "/(tabs)",
-  homeV2: "/(tabs)/home-v2",
+  home: "/(tabs)",
   list: "/(tabs)/list",
   product: (pieceId: string): `/product/${string}` => `/product/${pieceId}`,
   profile: "/(tabs)/profile",
@@ -37,12 +34,6 @@ export const ROUTES = {
 export const datesFor = (pieceId: string) =>
   ({ params: { pieceId }, pathname: ROUTES.dates }) as const;
 
-/** The five bottom-navigation destinations, in order. */
-export const TABS = [
-  "index",
-  "discover",
-  "list",
-  "rentals",
-  "profile",
-] as const;
+/** The four bottom-navigation destinations, in order. */
+export const TABS = ["index", "discover", "list", "profile"] as const;
 export type TabName = (typeof TABS)[number];

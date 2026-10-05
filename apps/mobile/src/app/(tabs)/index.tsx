@@ -1,53 +1,66 @@
-import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
+import { HomeContent } from "@features/home/components/home-content";
 import {
+  CATALOGUE,
   CATALOGUE_DISCLAIMER,
-  FEATURED,
   rentalSummary,
 } from "@shared/data/catalogue";
 import { useCatalogueGrid } from "@shared/hooks/use-catalogue-grid";
-import { Chip } from "@wearly/ui-native/badge";
 import { EmptyState, SectionHeader } from "@wearly/ui-native/display";
-import type { PlaceholderTone } from "@wearly/ui-native/media";
-import { Media } from "@wearly/ui-native/media";
 import { ProductGrid } from "@wearly/ui-native/product-grid";
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 
 /**
- * Home.
+ * Home — the magazine marketplace.
  *
- * Deliberately not a storefront. The order is: greet, offer one large thing,
- * offer a way in by mood, then let the grid happen. A user should feel "let me
- * explore", not "here is a catalogue".
- *
- * There is no search field here. Search belongs to Discover, which is where
- * someone goes when they already know what they want. Putting both on one screen
- * is how a home screen starts to feel like a database.
+ * `ProductGrid`'s vertical list owns the scroll; the header stacks the
+ * editorial rhythm (hero → categories → occasions → trending / new / looks)
+ * above a 6-piece recommended grid. Search hands off to Discover with a `q`
+ * param — Home never filters locally.
  */
 
-const MOODS = [
-  "For a weekend",
-  "Wedding season",
-  "Everyday",
-  "At work",
-] as const;
-
-const CURATED_COUNT = 6;
+const RAIL_COUNT = 8;
+const GRID_COUNT = 6;
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { state } = useSession();
   const { favourites, items, onFavourite } = useCatalogueGrid();
 
-  const curated = useMemo(() => items.slice(0, CURATED_COUNT), [items]);
-  const greeting = state.name
-    ? `Good to see you, ${state.name.split(" ")[0] ?? ""}`
-    : "Good morning";
-
+  const trending = useMemo(
+    () =>
+      CATALOGUE.slice(0, RAIL_COUNT).map((piece, index) => ({
+        fact: items[index]?.fact ?? piece.lender.neighbourhood,
+        id: piece.id,
+        name: piece.name,
+        placeholderTone: piece.gallery[0],
+        price: rentalSummary(piece, 2),
+        src: piece.images[0],
+      })),
+    [items]
+  );
+  const fresh = useMemo(
+    () =>
+      CATALOGUE.slice(-RAIL_COUNT)
+        .reverse()
+        .map((piece) => ({
+          fact: "Just added",
+          id: piece.id,
+          name: piece.name,
+          placeholderTone: piece.gallery[0],
+          price: rentalSummary(piece, 2),
+          src: piece.images[0],
+        })),
+    []
+  );
+  const recommended = useMemo(() => items.slice(0, GRID_COUNT), [items]);
   const open = (id: string) => router.push(ROUTES.product(id));
+  // Home search is an entry point: hand off to Discover focused, with no
+  // local filtering. `q` (even empty) is the focus signal.
+  const toDiscover = () =>
+    router.navigate({ params: { q: "" }, pathname: ROUTES.discover });
 
   return (
     <View className="flex-1 bg-background">
@@ -61,93 +74,35 @@ export default function HomeScreen() {
         }
         favourites={favourites}
         header={
-          <HomeHeader
-            greeting={greeting}
-            onMood={() => router.navigate(ROUTES.discover)}
-            onOpen={open}
-          />
+          <View className="gap-2">
+            <HomeContent
+              favourites={favourites}
+              fresh={fresh}
+              onExploreHero={toDiscover}
+              onFavourite={onFavourite}
+              onFilters={toDiscover}
+              onOpen={open}
+              onSearch={toDiscover}
+              onSeeAll={toDiscover}
+              trending={trending}
+            />
+            <View className="pt-6">
+              <SectionHeader
+                caption="Chosen for you, refreshed often"
+                title="Recommended for you"
+              />
+            </View>
+          </View>
         }
-        items={curated}
+        items={recommended}
         onFavourite={onFavourite}
         onOpen={open}
       />
-
       <View className="px-page-inline pb-8">
         <Text tone="muted-foreground" variant="caption">
           {CATALOGUE_DISCLAIMER}
         </Text>
       </View>
     </View>
-  );
-}
-
-interface HomeHeaderProps {
-  greeting: string;
-  onMood: () => void;
-  onOpen: (id: string) => void;
-}
-
-function HomeHeader({ greeting, onMood, onOpen }: HomeHeaderProps) {
-  return (
-    <View className="gap-10 pt-6 pb-2">
-      <View className="gap-2">
-        <Text tone="muted-foreground" variant="caption">
-          {greeting}
-        </Text>
-        <Text variant="display">{"Wear it\nfor the moment."}</Text>
-      </View>
-
-      <FeaturedCard onPress={() => onOpen(FEATURED.id)} />
-
-      <View className="gap-4">
-        <SectionHeader caption="Start somewhere" title="Shop by mood" />
-        <View className="flex-row flex-wrap gap-3">
-          {MOODS.map((mood) => (
-            <Chip key={mood} onPress={onMood}>
-              {mood}
-            </Chip>
-          ))}
-        </View>
-      </View>
-
-      <SectionHeader
-        caption="Six pieces, chosen rather than scraped"
-        title="Curated for you"
-      />
-    </View>
-  );
-}
-
-interface FeaturedCardProps {
-  onPress: () => void;
-}
-
-/** The one large thing. An editorial block, not merely a bigger product card. */
-function FeaturedCard({ onPress }: FeaturedCardProps) {
-  const summary = rentalSummary(FEATURED, 4);
-
-  return (
-    <Pressable
-      accessibilityLabel={`Featured: ${FEATURED.name}, ${summary}`}
-      accessibilityRole="button"
-      className="w-full overflow-hidden rounded-card border border-border bg-card active:bg-muted"
-      onPress={onPress}
-    >
-      <Media
-        aspect="16/9"
-        icon="sparkles"
-        src={FEATURED.images[0]}
-        tone={FEATURED.gallery[0] as PlaceholderTone}
-      />
-      <View className="gap-1 p-5">
-        <Text variant="headingSm">{FEATURED.name}</Text>
-        <Text tone="muted-foreground" variant="caption">
-          {FEATURED.lender.name} · {FEATURED.lender.neighbourhood}
-        </Text>
-        <Text className="pt-2" variant="price">
-          {summary}
-        </Text>
-      </View>
-    </Pressable>
   );
 }
