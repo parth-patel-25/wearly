@@ -1,0 +1,75 @@
+# NOTE: EAS CLI REPLACES (does not merge) .gitignore when this file exists.
+# Every rule from .gitignore and apps/mobile/.gitignore must be restated here,
+# or it silently stops applying. Keep this file a strict superset of both.
+
+# --- generated native folders (the 4G apps/mobile/android regression) ---
+# Unanchored on purpose: `/android` would only match the repo root and miss
+# apps/mobile/android. EAS runs prebuild server-side, so these are never needed.
+android/
+ios/
+
+# --- secrets ---
+.env
+.env*.local
+!.env.example
+*.pem
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# --- dependencies ---
+node_modules/
+.pnp
+.pnp.js
+
+# --- Expo ---
+.expo/
+.expo-shared/
+expo-env.d.ts
+dist/
+web-build/
+
+# --- build + cache output ---
+build/
+out/
+.next/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# --- Native / Metro build residue ---
+.kotlin/
+*.orig.*
+.metro-health-check*
+
+# --- debug logs ---
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# --- macOS / editors ---
+.DS_Store
+.idea/
+.vscode/
+
+# --- monorepo trims ---
+# NOTE: no workspace directory (apps/*, packages/*) may be excluded here.
+# bun.lock pins all 8 workspaces; if any member dir is missing from the upload,
+# `bun install --frozen-lockfile` fails with "lockfile had changes".
+# Sibling workspaces are source-only (~1MB combined, node_modules excluded
+# above), so keeping them costs nothing and keeps the workspace set intact.
+
+# --- docs + agent config ---
+docs/
+example/
+README.md
+AGENTS.md
+.agents/
+opencode.json
+
+# --- tooling config not needed for the native build ---
+# turbo.json is intentionally KEPT: root package.json scripts reference turbo,
+# and it costs ~700B to leave a safety margin if EAS ever invokes a root script.
+biome.jsonc
