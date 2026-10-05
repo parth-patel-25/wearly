@@ -17,9 +17,9 @@ import { Uniwind } from "uniwind";
  * the warm off-white, the "blush" that the whole colour system is tuned around.
  * It is the reference render, not one of two equally weighted options.
  *
- * `EXPO_PUBLIC_WEARLY_THEME` still overrides this for a forced run, and the
- * in-app toggle in `theme-toggle.tsx` starts from the same resolved value so the
- * control never disagrees with the screen.
+ * `EXPO_PUBLIC_WEARLY_THEME` still overrides this for a forced run. There is
+ * no in-app switch (the dev floating toggle was removed) — dark is reviewed
+ * with a forced run, not a button.
  */
 
 export type ThemePreference = "dark" | "light" | "system";
@@ -31,10 +31,6 @@ const raw = process.env.EXPO_PUBLIC_WEARLY_THEME;
 
 /**
  * The theme the environment forces, or `null`.
- *
- * Exported rather than kept private so the in-app theme toggle can start from the
- * same value instead of claiming "Auto" while the app is actually pinned to dark —
- * a control that lies about the current state is worse than no control.
  */
 export const FORCED_THEME: ThemePreference | null =
   raw === "light" || raw === "dark" ? raw : null;

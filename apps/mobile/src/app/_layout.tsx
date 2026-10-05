@@ -1,5 +1,4 @@
 import { SessionProvider } from "@core/providers/session-provider";
-import { ThemeToggle } from "@core/theme/theme-toggle";
 import { useThemeOverride } from "@core/theme/use-theme-override";
 import { RentalDraftProvider } from "@features/rental/providers/rental-draft-provider";
 import { HeroLayer } from "@wearly/ui-native/hero-layer";
@@ -90,9 +89,6 @@ export default function RootLayout() {
               </Stack>
               {/* Above every screen, so the expansion is not clipped by a route. */}
               <HeroLayer />
-              {/* Dev-only, and above every screen so the palette can be checked
-                  from anywhere without navigating to a settings screen. */}
-              <ThemeToggle />
             </HeroProvider>
           </ToastProvider>
         </RentalDraftProvider>
