@@ -39,7 +39,7 @@ export function HomeHeader({
     : `${greetingFor()} 👋`;
 
   return (
-    <View className="flex-row items-center justify-between gap-3 pt-6">
+    <View className="flex-row items-center justify-between gap-3">
       <View className="flex-1 gap-1">
         <Text variant="headingLg">{greeting}</Text>
         <Text tone="muted-foreground" variant="bodySm">

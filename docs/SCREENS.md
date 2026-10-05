@@ -49,6 +49,11 @@ category + occasion rails, Trending / New / Looks rails, then a recommended
 grid. `ROUTES.home` is `/(tabs)`; the old `homeLegacy`/`homeV2`/`homeV3` keys
 and their screens are gone (git history preserves them).
 
+**Two-card Home (2026-10-05).** Two full-bleed white cards with a `bg-muted`
+gap between: header (greeting + search) rounded bottom-only, content sheet
+rounded top-only. Greeting scrolls away, search stays pinned — same order,
+same content, tab bar unchanged.
+
 **The `List` tab replaced the centre `+`.** Listing used to be a fixed 48px filled
 circle wedged between Discover and Rentals — a button, not a destination, and the
 reason the bar's tabs were not all the same width. It is now the third tab, a

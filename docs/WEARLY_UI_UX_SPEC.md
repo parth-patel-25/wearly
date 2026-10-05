@@ -264,6 +264,15 @@ pink is accent only (80/15/5), product cards image-first with rental price
 (`₹499 · 2 days`) + at most one social-proof fact, no fake counts, search on
 Home navigates to Discover with query passthrough (no local filtering).
 
+Home layout (2026-10-05): two full-bleed white cards separated by a `bg-muted`
+gap — the header card on top (greeting + search, rounded on the bottom corners
+only) and the content sheet below (rounded on the top corners only). The
+greeting scrolls away but the search strip stays pinned; at rest the two white
+blocks read as one header card. The sheet holds everything else in the
+existing order, followed by the recommended grid. Surface tokens only
+(`bg-muted` page/gap, `bg-card` cards, `border-border`), no custom colours;
+the tab bar is unchanged.
+
 ### 7.2 Discovery
 
 Search, categories, filters, discovery, saving. Search stays visually simple.

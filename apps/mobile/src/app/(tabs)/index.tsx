@@ -1,25 +1,34 @@
 import { ROUTES } from "@core/routing/routes";
 import { HomeContent } from "@features/home/components/home-content";
+import { HomeIntroCard } from "@features/home/components/home-intro-card";
+import { HomeSearch } from "@features/home/components/home-search";
+import { RecommendedGrid } from "@features/home/components/recommended-grid";
 import {
   CATALOGUE,
   CATALOGUE_DISCLAIMER,
   rentalSummary,
 } from "@shared/data/catalogue";
 import { useCatalogueGrid } from "@shared/hooks/use-catalogue-grid";
-import { EmptyState, SectionHeader } from "@wearly/ui-native/display";
-import { ProductGrid } from "@wearly/ui-native/product-grid";
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 /**
  * Home — the magazine marketplace.
  *
- * `ProductGrid`'s vertical list owns the scroll; the header stacks the
- * editorial rhythm (hero → categories → occasions → trending / new / looks)
- * above a 6-piece recommended grid. Search hands off to Discover with a `q`
- * param — Home never filters locally.
+ * Two full-bleed white cards separated by a `bg-muted` gap: the header card
+ * on top (greeting + search, rounded on the bottom corners only) and the
+ * content sheet below (rounded on the top corners only). The greeting scrolls
+ * away; the search strip is the `ScrollView`'s sticky child (index 1) and
+ * stays pinned — at rest the two white blocks read as one header card.
+ * Everything inside the sheet keeps its existing order: hero → categories →
+ * occasions → trending / new / looks, then the recommended grid.
+ *
+ * One vertical scroller owns the gesture. The rails inside are horizontal, and
+ * the six-piece recommended grid is plain flex pairs — far below the count
+ * where a nested virtualised list would pay for itself. Search hands off to
+ * Discover with a `q` param — Home never filters locally.
  */
 
 const RAIL_COUNT = 8;
@@ -63,46 +72,57 @@ export default function HomeScreen() {
     router.navigate({ params: { q: "" }, pathname: ROUTES.discover });
 
   return (
-    <View className="flex-1 bg-background">
-      <ProductGrid
-        emptyState={
-          <EmptyState
-            body="The catalogue is empty right now. Check back soon."
-            icon="shirt"
-            title="Nothing to show yet"
+    <View className="flex-1 bg-muted">
+      {/* Direct children must stay Views: stickyHeaderIndices counts them.
+          No container gap — spacing lives on the sheet wrapper so the two
+          white blocks stay flush at rest. */}
+      <ScrollView
+        contentContainerClassName="pb-10"
+        showsVerticalScrollIndicator={false}
+        stickyHeaderIndices={[1]}
+      >
+        <View>
+          <HomeIntroCard
+            onNotifications={() => undefined}
+            onProfile={() => undefined}
           />
-        }
-        favourites={favourites}
-        header={
-          <View className="gap-2">
-            <HomeContent
-              favourites={favourites}
-              fresh={fresh}
-              onExploreHero={toDiscover}
-              onFavourite={onFavourite}
-              onFilters={toDiscover}
-              onOpen={open}
-              onSearch={toDiscover}
-              onSeeAll={toDiscover}
-              trending={trending}
-            />
-            <View className="pt-6">
-              <SectionHeader
-                caption="Chosen for you, refreshed often"
-                title="Recommended for you"
+        </View>
+        {/* The pinned strip: the white bottom half of the header card,
+            rounded on the bottom corners only. Solid `bg-card` so scrolled
+            content slides underneath it. */}
+        <View className="rounded-b-card bg-card px-gutter py-2">
+          <HomeSearch onFilters={toDiscover} onPress={toDiscover} />
+        </View>
+        {/* The muted gap lives here: transparent `pt-3` over the page
+            background, then the full-bleed white sheet with rounded top
+            corners only — grey shows in the notches on both facing edges. */}
+        <View className="pt-3">
+          <View className="rounded-t-card border-border border-t bg-card">
+            <View className="gap-10 p-5">
+              <HomeContent
+                favourites={favourites}
+                fresh={fresh}
+                onExploreHero={toDiscover}
+                onFavourite={onFavourite}
+                onOpen={open}
+                onSeeAll={toDiscover}
+                trending={trending}
               />
+              <View className="gap-4">
+                <RecommendedGrid
+                  favourites={favourites}
+                  items={recommended}
+                  onFavourite={onFavourite}
+                  onOpen={open}
+                />
+                <Text tone="muted-foreground" variant="caption">
+                  {CATALOGUE_DISCLAIMER}
+                </Text>
+              </View>
             </View>
           </View>
-        }
-        items={recommended}
-        onFavourite={onFavourite}
-        onOpen={open}
-      />
-      <View className="px-gutter pb-8">
-        <Text tone="muted-foreground" variant="caption">
-          {CATALOGUE_DISCLAIMER}
-        </Text>
-      </View>
+        </View>
+      </ScrollView>
     </View>
   );
 }
