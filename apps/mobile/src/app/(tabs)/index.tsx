@@ -91,14 +91,14 @@ export default function HomeScreen() {
             rounded on the bottom corners only. `pb-5` matches the sheet's
             top inner padding so both cards breathe the same. Solid `bg-card`
             so scrolled content slides underneath it. */}
-        <View className="rounded-b-sheet bg-card px-gutter pt-2 pb-5">
+        <View className="rounded-b-4xl bg-card px-gutter pt-2 pb-5">
           <HomeSearch onFilters={toDiscover} onPress={toDiscover} />
         </View>
         {/* The muted gap lives here: transparent `pt-3` over the page
             background, then the full-bleed white sheet with rounded top
             corners only — grey shows in the notches on both facing edges. */}
         <View className="pt-3">
-          <View className="rounded-t-sheet border-border border-t bg-card">
+          <View className="rounded-t-4xl bg-card">
             <View className="gap-10 p-5">
               <HomeContent
                 favourites={favourites}

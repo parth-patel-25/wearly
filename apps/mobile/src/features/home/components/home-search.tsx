@@ -8,6 +8,9 @@ import { Pressable, View } from "react-native";
  * A faux field, not an input: Home never filters locally. Tapping hands off
  * to Discover with the query (if any) so the real `SearchField` there takes
  * over, focused. Keeps Home calm and Discover the one place search lives.
+ *
+ * The placeholder truncates (`flex-1` + `numberOfLines`) so a long line never
+ * spills past the pill on narrow screens.
  */
 
 interface HomeSearchProps {
@@ -26,7 +29,12 @@ export function HomeSearch({ onFilters, onPress }: HomeSearchProps) {
         onPress={onPress}
       >
         <Icon name="search" size="sm" tone="muted-foreground" />
-        <Text tone="muted-foreground" variant="bodyMd">
+        <Text
+          className="flex-1"
+          numberOfLines={1}
+          tone="muted-foreground"
+          variant="bodyMd"
+        >
           Search dresses, looks, jackets…
         </Text>
       </Pressable>

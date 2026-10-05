@@ -15,6 +15,7 @@
     --wearly-radius-xl: 1.5rem; /* 24px — cards */
     --wearly-radius-2xl: 1.75rem; /* 28px — dialogs, bottom sheets */
     --wearly-radius-3xl: 2rem; /* 32px — promotional surfaces */
+    --wearly-radius-4xl: 2.5rem; /* 40px — large section sheets */
     --wearly-radius-pill: 9999px; /* buttons, badges, chips */
   }
 }

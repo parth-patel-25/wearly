@@ -917,6 +917,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-05 | Home cards moved to a new `--wearly-radius-4xl` (40px) token; sheet top border removed (it traced outside the rounded corners); `HomeSearch` placeholder truncates via `flex-1` + `numberOfLines` so it never spills past the pill. |
 | 2026-10-05 | Home is two full-bleed white cards separated by a `bg-muted` gap: header card (greeting + search) rounded bottom-only, content sheet rounded top-only, both at the 32px sheet radius; search strip bottom padding (`pb-5`) matches the sheet's top inner padding. Greeting scrolls away while search stays pinned via `ScrollView stickyHeaderIndices`; recommended grid rendered as flex `flex-row` pairs (6 items need no virtualisation) so the screen keeps one vertical scroller. Tokens only, tab bar untouched. |
 | 2026-10-05 | Mobile screen gutters unified to reusable `px-gutter`/`mx-gutter` (16px): `Screen` `p-4` → `p-gutter`, `welcome` `px-4` → `px-gutter`, all tab/rent/product/grid/sheet/toast `px/mx-page-inline` → `px/mx-gutter`. Web `px-page-inline` unchanged. |
 | 2026-10-05 | Home is a single screen again: v3 moved to the tab root `/(tabs)`, v1/v2 screens + `editorial-masthead`/`lead-story`/`occasion-rail` + `homeLegacy`/`homeV2`/`homeV3` route keys deleted, `TABS` fixed to the real 4 tabs. |

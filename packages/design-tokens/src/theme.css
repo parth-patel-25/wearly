@@ -72,7 +72,7 @@
   --radius-xl: var(--wearly-radius-xl);
   --radius-2xl: var(--wearly-radius-2xl);
   --radius-3xl: var(--wearly-radius-3xl);
-  --radius-4xl: var(--wearly-radius-3xl);
+  --radius-4xl: var(--wearly-radius-4xl);
   --radius-pill: var(--wearly-radius-pill);
 
   /* Component defaults — re-theming one component is a single line. */
