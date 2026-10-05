@@ -324,14 +324,15 @@ A 4px base: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96.
 Tailwind's numeric scale derives from `--spacing: 0.25rem`, so `p-4` is 1rem on
 both platforms. Three named roles exist so screens do not each invent a rhythm:
 `gap-gutter`, `gap-section`, `px-page-inline`. `gutter` and `page-inline` widen at
-the `md` breakpoint.
+the `md` breakpoint. Screen gutters must use the reusable `px-gutter` /
+`mx-gutter` role (16px on mobile) — never a hardcoded `px-4` or `px-[16px]`.
 
 Heights: `h-9` 36, `h-11` 44 (the WCAG 2.2 minimum target), `h-12` 48,
 `h-13` 52 for mobile primary actions.
 
-Mobile screens use `px-4` (16px) for the outer frame, matching `Screen`'s
-`p-4` and the Home rhythm — including `welcome` (all three steps). `px-page-inline`
-(24px) is web/marketing only.
+Mobile screens use `px-gutter` (16px) for the outer frame, matching `Screen`'s
+`p-gutter` and the Home rhythm — including `welcome` (all three steps). `px-page-inline`
+(24px, 40px at `md`) is web/marketing only.
 
 ---
 
@@ -916,6 +917,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-05 | Mobile screen gutters unified to reusable `px-gutter`/`mx-gutter` (16px): `Screen` `p-4` → `p-gutter`, `welcome` `px-4` → `px-gutter`, all tab/rent/product/grid/sheet/toast `px/mx-page-inline` → `px/mx-gutter`. Web `px-page-inline` unchanged. |
 | 2026-10-05 | Home is a single screen again: v3 moved to the tab root `/(tabs)`, v1/v2 screens + `editorial-masthead`/`lead-story`/`occasion-rail` + `homeLegacy`/`homeV2`/`homeV3` route keys deleted, `TABS` fixed to the real 4 tabs. |
 | 2026-10-04 | `Media` accepts bundled `require()` + `fallbackSrc` (remote on `onError`, tone block last); onboarding hero uses local `onboarding-hero.png` with the Unsplash hoodie as fallback. |
 | 2026-10-04 | Onboarding hero: Fashion pill `accent` → `primary` fill with `primary-foreground` (white) text; pager active dot `accent` → `primary`. |

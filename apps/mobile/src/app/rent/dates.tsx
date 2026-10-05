@@ -50,7 +50,7 @@ export default function DatesScreen() {
 function MissingPiece() {
   const router = useRouter();
   return (
-    <View className="flex-1 items-center justify-center gap-6 bg-background px-page-inline">
+    <View className="flex-1 items-center justify-center gap-6 bg-background px-gutter">
       <Text className="text-center" variant="headingMd">
         We lost track of which piece this is
       </Text>
@@ -105,7 +105,7 @@ function DatesBody({ piece }: DatesBodyProps) {
 
   return (
     <View className="flex-1 bg-background pt-safe">
-      <View className="flex-1 gap-8 px-page-inline pt-4">
+      <View className="flex-1 gap-8 px-gutter pt-4">
         <View className="flex-row items-center justify-between">
           <IconButton
             accessibilityLabel="Go back"
@@ -139,7 +139,7 @@ function DatesBody({ piece }: DatesBodyProps) {
         )}
       </View>
 
-      <View className="gap-4 border-border border-t bg-card px-page-inline pt-5 pb-10">
+      <View className="gap-4 border-border border-t bg-card px-gutter pt-5 pb-10">
         <Card className="gap-2 p-5">
           <PriceRow
             hint={

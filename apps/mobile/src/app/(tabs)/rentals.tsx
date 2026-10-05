@@ -32,7 +32,7 @@ export default function RentalsScreen() {
   const { state } = useSession();
 
   return (
-    <View className="flex-1 gap-8 bg-background px-page-inline pt-6">
+    <View className="flex-1 gap-8 bg-background px-gutter pt-6">
       <View className="flex-row items-center justify-between">
         <Text variant="headingXl">Your rentals</Text>
         {state.lastRental ? (

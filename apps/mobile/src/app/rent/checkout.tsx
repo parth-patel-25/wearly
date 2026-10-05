@@ -83,7 +83,7 @@ export default function CheckoutScreen() {
 
   if (!(piece && totals)) {
     return (
-      <View className="flex-1 items-center justify-center gap-6 bg-background px-page-inline">
+      <View className="flex-1 items-center justify-center gap-6 bg-background px-gutter">
         <Text className="text-center" variant="headingMd">
           There is nothing to check out yet
         </Text>
@@ -112,7 +112,7 @@ export default function CheckoutScreen() {
         className="flex flex-col"
         contentContainerClassName="flex flex-col gap-8 pb-8"
       >
-        <View className="flex-row items-center justify-between px-page-inline pt-4">
+        <View className="flex-row items-center justify-between px-gutter pt-4">
           <IconButton
             accessibilityLabel="Go back"
             icon="arrow-left"
@@ -122,7 +122,7 @@ export default function CheckoutScreen() {
           <View className="size-11" />
         </View>
 
-        <Card className="mx-page-inline flex-row items-center gap-4 p-4">
+        <Card className="mx-gutter flex-row items-center gap-4 p-4">
           <View className="w-20 overflow-hidden rounded-media">
             <Media aspect="1/1" src={piece.images[0]} tone={piece.gallery[0]} />
           </View>
@@ -136,7 +136,7 @@ export default function CheckoutScreen() {
           </View>
         </Card>
 
-        <View className="px-page-inline">
+        <View className="px-gutter">
           <Panel subtitle="Shown now, charged now" title="How you get it">
             <View className="flex-row flex-wrap gap-3 pt-1">
               <Chip
@@ -161,7 +161,7 @@ export default function CheckoutScreen() {
           </Panel>
         </View>
 
-        <View className="px-page-inline">
+        <View className="px-gutter">
           <Panel title="What you are paying">
             <View className="flex-col gap-3">
               <PriceRow
@@ -196,7 +196,7 @@ export default function CheckoutScreen() {
           </Panel>
         </View>
 
-        <View className="mx-page-inline flex-row items-start gap-3 rounded-card bg-accent p-5">
+        <View className="mx-gutter flex-row items-start gap-3 rounded-card bg-accent p-5">
           <Icon name="shield" size="sm" tone="accent-foreground" />
           <Text className="flex-1" tone="accent-foreground" variant="bodySm">
             That is the whole cost. Nothing else is added on the next screen.
@@ -204,7 +204,7 @@ export default function CheckoutScreen() {
         </View>
       </ScrollView>
 
-      <View className="gap-3 border-border border-t bg-card px-page-inline pt-5 pb-10">
+      <View className="gap-3 border-border border-t bg-card px-gutter pt-5 pb-10">
         <Text tone="muted-foreground" variant="caption">
           {state.isAuthenticated
             ? `Paying as ${state.name ?? "your account"}. Nothing else is added.`

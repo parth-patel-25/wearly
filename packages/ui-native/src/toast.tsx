@@ -110,7 +110,7 @@ interface ToastViewProps {
 
 function ToastView({ message, onDismiss }: ToastViewProps) {
   return (
-    <View className="pointer-events-none absolute inset-x-0 top-0 z-50 items-center px-page-inline pt-16">
+    <View className="pointer-events-none absolute inset-x-0 top-0 z-50 items-center px-gutter pt-16">
       <Pressable
         accessibilityHint="Dismisses this message"
         accessibilityLabel={message.text}

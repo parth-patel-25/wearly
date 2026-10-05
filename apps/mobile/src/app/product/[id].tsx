@@ -72,7 +72,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
         contentContainerClassName="flex flex-col gap-10 pb-44"
         showsVerticalScrollIndicator={false}
       >
-        <View className="flex-row items-center justify-between px-page-inline pt-4">
+        <View className="flex-row items-center justify-between px-gutter pt-4">
           <IconButton
             accessibilityLabel="Go back"
             icon="arrow-left"
@@ -93,7 +93,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
 
         <Gallery piece={piece} />
 
-        <View className="gap-2 px-page-inline">
+        <View className="gap-2 px-gutter">
           <Text variant="headingXl">{piece.name}</Text>
           <Text variant="price">{`${formatRupees(piece.dailyRate)} / day`}</Text>
           <Text tone="muted-foreground" variant="bodySm">
@@ -101,7 +101,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
           </Text>
         </View>
 
-        <View className="flex-row flex-wrap gap-2 px-page-inline">
+        <View className="flex-row flex-wrap gap-2 px-gutter">
           <Badge variant="primary">{CONDITION_LABEL[piece.condition]}</Badge>
           <Badge>{`Size ${size}`}</Badge>
           <Badge variant="success">Available now</Badge>
@@ -211,7 +211,7 @@ interface SectionProps {
 
 function Section({ children, subtitle, title }: SectionProps) {
   return (
-    <View className="px-page-inline">
+    <View className="px-gutter">
       <Panel subtitle={subtitle} title={title}>
         {children}
       </Panel>
@@ -246,7 +246,7 @@ function StickyCta({ pieceId, summary }: StickyCtaProps) {
   const router = useRouter();
 
   return (
-    <View className="absolute inset-x-0 bottom-0 flex-row items-center gap-4 border-border border-t bg-card px-page-inline pt-4 pb-10">
+    <View className="absolute inset-x-0 bottom-0 flex-row items-center gap-4 border-border border-t bg-card px-gutter pt-4 pb-10">
       <View className="flex-1 gap-0.5">
         <Text variant="price">{summary}</Text>
         <Text tone="muted-foreground" variant="caption">
@@ -265,7 +265,7 @@ function StickyCta({ pieceId, summary }: StickyCtaProps) {
 function MissingProduct() {
   const router = useRouter();
   return (
-    <View className="flex-1 items-center justify-center gap-6 bg-background px-page-inline">
+    <View className="flex-1 items-center justify-center gap-6 bg-background px-gutter">
       <Text className="text-center" variant="headingMd">
         We could not find that piece
       </Text>

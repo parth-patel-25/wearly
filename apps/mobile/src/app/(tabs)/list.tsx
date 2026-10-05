@@ -59,7 +59,7 @@ export default function ListScreen() {
   const { state } = useSession();
 
   return (
-    <View className="flex-1 gap-8 bg-background px-page-inline pt-6">
+    <View className="flex-1 gap-8 bg-background px-gutter pt-6">
       <View className="gap-1">
         <Text variant="headingXl">Share something good</Text>
         <Text tone="muted-foreground" variant="bodyMd">

@@ -47,7 +47,7 @@ const TRACK_INSET = 6;
 const THRESHOLD = 0.6;
 
 /**
- * Both page gutters. Must agree with the `px-4` on the welcome screen
+ * Both page gutters. Must agree with the `px-gutter` on the welcome screen
  * (space-4, 16px a side) — the track is the screen less its insets rather than
  * a guessed percentage.
  */
@@ -64,7 +64,7 @@ function fire(style: ImpactFeedbackStyle): void {
 export function SwipeToContinue({ label, onComplete }: SwipeToContinueProps) {
   const { width: screen } = useWindowDimensions();
   // The track reports its own width. Until the first layout lands, fall back
-  // to the explicit arithmetic (screen less both `px-4` gutters) so
+  // to the explicit arithmetic (screen less both `px-gutter` gutters) so
   // the control is usable on its very first frame.
   const [trackWidth, setTrackWidth] = useState(0);
   const onTrackLayout = useCallback((event: LayoutChangeEvent) => {

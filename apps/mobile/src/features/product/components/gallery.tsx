@@ -41,7 +41,7 @@ export function Gallery({ onSelect, piece }: GalleryProps) {
 
   return (
     <View className="gap-3">
-      <View className="flex-row gap-2 px-page-inline">
+      <View className="flex-row gap-2 px-gutter">
         {frames.map((frame) => (
           <Pressable
             accessibilityLabel={`View image ${frame.position + 1} of ${frames.length}`}
@@ -56,7 +56,7 @@ export function Gallery({ onSelect, piece }: GalleryProps) {
         ))}
       </View>
 
-      <View className="flex-row items-center justify-between px-page-inline">
+      <View className="flex-row items-center justify-between px-gutter">
         <View className="flex-row gap-2">
           {frames.map((frame) => (
             <View

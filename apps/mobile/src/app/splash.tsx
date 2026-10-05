@@ -74,7 +74,7 @@ export default function SplashScreen() {
         accessibilityHint="Skips the introduction"
         accessibilityLabel="Skip intro"
         accessibilityRole="button"
-        className="flex grow items-center justify-center gap-10 px-page-inline"
+        className="flex grow items-center justify-center gap-10 px-gutter"
         onPress={go}
       >
         <View className="h-40 w-40 items-center justify-center">

@@ -51,7 +51,7 @@ export function ProductGrid({
   return (
     <FlatList
       columnWrapperClassName="gap-4"
-      contentContainerClassName="flex flex-col gap-6 px-page-inline pb-10"
+      contentContainerClassName="flex flex-col gap-6 px-gutter pb-10"
       data={items}
       initialNumToRender={6}
       keyExtractor={(item) => item.id}

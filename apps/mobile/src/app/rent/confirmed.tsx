@@ -43,7 +43,7 @@ export default function ConfirmedScreen() {
 function NothingToConfirm() {
   const router = useRouter();
   return (
-    <View className="flex-1 items-center justify-center gap-6 bg-background px-page-inline">
+    <View className="flex-1 items-center justify-center gap-6 bg-background px-gutter">
       <Text className="text-center" variant="headingMd">
         There is no rental to confirm
       </Text>
@@ -95,7 +95,7 @@ function ConfirmationBody() {
 
   return (
     <View className="flex-1 bg-background pt-safe">
-      <View className="flex-1 gap-10 px-page-inline pt-16 pb-8">
+      <View className="flex-1 gap-10 px-gutter pt-16 pb-8">
         <Animated.View className="items-center gap-5" style={headlineStyle}>
           <DrawingCheck />
           <View className="items-center gap-2">
@@ -169,7 +169,7 @@ function ConfirmationBody() {
         </Animated.View>
       </View>
 
-      <View className="gap-3 border-border border-t bg-card px-page-inline pt-5 pb-10">
+      <View className="gap-3 border-border border-t bg-card px-gutter pt-5 pb-10">
         <Button
           onPress={() => {
             clear();

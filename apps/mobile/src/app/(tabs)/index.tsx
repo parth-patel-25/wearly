@@ -98,7 +98,7 @@ export default function HomeScreen() {
         onFavourite={onFavourite}
         onOpen={open}
       />
-      <View className="px-page-inline pb-8">
+      <View className="px-gutter pb-8">
         <Text tone="muted-foreground" variant="caption">
           {CATALOGUE_DISCLAIMER}
         </Text>

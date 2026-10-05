@@ -193,7 +193,7 @@ function search(pieces: typeof CATALOGUE, query: string) {
 
 function SavedHint({ count }: { count: number }) {
   return (
-    <View className="px-page-inline pb-8">
+    <View className="px-gutter pb-8">
       <Text tone="muted-foreground" variant="caption">
         {`${count} saved ${count === 1 ? "piece" : "pieces"}. Saved items live in your profile.`}
       </Text>

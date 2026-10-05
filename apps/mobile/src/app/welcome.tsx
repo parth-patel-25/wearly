@@ -105,7 +105,7 @@ export default function WelcomeScreen() {
 
   return (
     <Screen className="flex-1 bg-background" scrollable={false}>
-      <View className="flex-1 gap-6 px-4 pt-4 pb-6">
+      <View className="flex-1 gap-6 px-gutter pt-4 pb-6">
         {isIntro ? (
           <OnboardingHero
             onSwipeComplete={goToStyling}

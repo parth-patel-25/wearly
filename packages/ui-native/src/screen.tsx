@@ -21,7 +21,7 @@ export interface ScreenProps {
   scrollable?: boolean;
 }
 
-const DEFAULT_CONTENT = "flex grow flex-col gap-4 p-4";
+const DEFAULT_CONTENT = "flex grow flex-col gap-4 p-gutter";
 
 /**
  * Base screen layout. Flexbox only — no absolute positioning — so it scales
