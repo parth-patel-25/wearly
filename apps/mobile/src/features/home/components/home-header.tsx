@@ -48,10 +48,10 @@ export function HomeHeader({
       >
         <Avatar name={name ?? undefined} size="lg" />
       </Pressable>
-      <View className="flex-1 gap-1">
-        {/* bodyMd (15px) sits 1px over the bodySm description — the smallest
-            step the named scale allows without a one-off token. */}
-        <Text className="flex-1" numberOfLines={1} variant="bodyMd">
+      <View className="flex-1 justify-center gap-0">
+        {/* `buttonLg` (16px, medium) keeps the medium weight one step down —
+            stacked tight over the bodySm description, still locked to one line. */}
+        <Text numberOfLines={1} variant="buttonLg">
           {greeting}
         </Text>
         <Text tone="muted-foreground" variant="bodySm">

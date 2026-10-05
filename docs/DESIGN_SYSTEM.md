@@ -916,6 +916,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-05 | Home header greeting tightened (`gap-0.5`, `price` 17px medium, one line); docked search strip slims its top padding via scroll-measured header height (static class literals only). |
 | 2026-10-05 | Removed the dev-only floating theme toggle (`theme-toggle.tsx` deleted, root layout unmounted — dark is reviewed via `EXPO_PUBLIC_WEARLY_THEME=dark`); home header row is avatar-first with a larger avatar and a one-line greeting. |
 | 2026-10-05 | Home cards moved to a new `--wearly-radius-4xl` (40px) token; sheet top border removed (it traced outside the rounded corners); `HomeSearch` placeholder truncates via `flex-1` + `numberOfLines` so it never spills past the pill. |
 | 2026-10-05 | Home is two full-bleed white cards separated by a `bg-muted` gap: header card (greeting + search) rounded bottom-only, content sheet rounded top-only, both at the 32px sheet radius; search strip bottom padding (`pb-5`) matches the sheet's top inner padding. Greeting scrolls away while search stays pinned via `ScrollView stickyHeaderIndices`; recommended grid rendered as flex `flex-row` pairs (6 items need no virtualisation) so the screen keeps one vertical scroller. Tokens only, tab bar untouched. |
