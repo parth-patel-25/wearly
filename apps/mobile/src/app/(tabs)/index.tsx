@@ -11,7 +11,7 @@ import {
 import { useCatalogueGrid } from "@shared/hooks/use-catalogue-grid";
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
-import { useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { ScrollView, View } from "react-native";
 
 /**
@@ -37,11 +37,6 @@ const GRID_COUNT = 6;
 export default function HomeScreen() {
   const router = useRouter();
   const { favourites, items, onFavourite } = useCatalogueGrid();
-  // Whether the search strip is docked. While docked it slims its top
-  // padding — the resting `pt-8` air is only needed above the greeting.
-  // The header height comes from the laid-out node, never arithmetic.
-  const [docked, setDocked] = useState(false);
-  const headerHeight = useRef(0);
 
   const trending = useMemo(
     () =>
@@ -83,37 +78,21 @@ export default function HomeScreen() {
           white blocks stay flush at rest. */}
       <ScrollView
         contentContainerClassName="pb-10"
-        onScroll={({ nativeEvent }) => {
-          const height = headerHeight.current;
-          setDocked(height > 0 && nativeEvent.contentOffset.y >= height);
-        }}
-        scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         stickyHeaderIndices={[1]}
       >
-        <View
-          onLayout={({ nativeEvent }) => {
-            headerHeight.current = nativeEvent.layout.height;
-          }}
-        >
+        <View>
           <HomeIntroCard
             onNotifications={() => undefined}
             onProfile={() => undefined}
           />
         </View>
         {/* The pinned strip: the white bottom half of the header card,
-            rounded on the bottom corners only. At rest `pt-8` opens the gap
-            between the header row and the search row; docked it slims to
-            `pt-2`. Both class strings are static literals so the Uniwind
-            scan never misses one. Solid `bg-card` so scrolled content slides
+            rounded on the bottom corners only. `pt-4` stays constant in both
+            resting and docked states so the sticky pin never re-lays-out
+            mid-scroll. Solid `bg-card` so scrolled content slides
             underneath it. */}
-        <View
-          className={
-            docked
-              ? "rounded-b-4xl bg-card px-gutter pt-2 pb-5"
-              : "rounded-b-4xl bg-card px-gutter pt-8 pb-5"
-          }
-        >
+        <View className="rounded-b-4xl bg-card px-gutter pt-4 pb-5">
           <HomeSearch onFilters={toDiscover} onPress={toDiscover} />
         </View>
         {/* The muted gap lives here: transparent `pt-3` over the page
