@@ -77,7 +77,7 @@ export default function HomeScreen() {
           No container gap — spacing lives on the sheet wrapper so the two
           white blocks stay flush at rest. */}
       <ScrollView
-        contentContainerClassName="pb-10"
+        contentContainerClassName="pb-0"
         showsVerticalScrollIndicator={false}
         stickyHeaderIndices={[1]}
       >
@@ -100,7 +100,7 @@ export default function HomeScreen() {
             corners only — grey shows in the notches on both facing edges. */}
         <View className="pt-3">
           <View className="rounded-t-5xl bg-card">
-            <View className="gap-10 p-5">
+            <View className="gap-10 px-5 pt-5 pb-4">
               <HomeContent
                 favourites={favourites}
                 fresh={fresh}

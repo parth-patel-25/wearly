@@ -52,7 +52,9 @@ and their screens are gone (git history preserves them).
 **Two-card Home (2026-10-05).** Two full-bleed white cards with a `bg-muted`
 gap between: header (greeting + search) rounded bottom-only, content sheet
 rounded top-only. Greeting scrolls away, search stays pinned — same order,
-same content, tab bar unchanged.
+same content, tab bar unchanged. Sheet bottom is flush: scroll container
+carries no extra padding (`pb-0`), inner sheet keeps `px-5 pt-5 pb-4` so the
+disclaimer ends 16px above the tab bar (2026-10-06).
 
 **The `List` tab replaced the centre `+`.** Listing used to be a fixed 48px filled
 circle wedged between Discover and Rentals — a button, not a destination, and the

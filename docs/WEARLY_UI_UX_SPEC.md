@@ -269,7 +269,9 @@ gap — the header card on top (greeting + search, rounded on the bottom corners
 only) and the content sheet below (rounded on the top corners only). The
 greeting scrolls away but the search strip stays pinned; at rest the two white
 blocks read as one header card. The sheet holds everything else in the
-existing order, followed by the recommended grid. Surface tokens only
+existing order, followed by the recommended grid. Sheet bottom is flush
+(`pb-0` scroll container + `px-5 pt-5 pb-4` inner, 2026-10-06) so no muted
+gap sits between the last card and the tab bar. Surface tokens only
 (`bg-muted` page/gap, `bg-card` cards, `border-border`), no custom colours;
 the tab bar is unchanged.
 
