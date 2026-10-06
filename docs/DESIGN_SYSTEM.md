@@ -399,9 +399,9 @@ matching the existing `./screen` and `./providers` convention.
 | Brand | `brand-mark` |
 | Motion | `motion` `tone` `icon` `icon-glyphs` `control-tokens` |
 | Hero transition | `hero-provider` `hero-layer` |
-| Layout | `screen` `providers` |
+| Layout | `screen` `providers` `app-list` |
 
-`ProductGrid` wraps `FlatList`, not `ScrollView`. The catalogue is expected to
+`ProductGrid` wraps `AppList` (FlashList), not `ScrollView`. The catalogue is expected to
 grow past fifty pieces, and a grid that renders every cell up front is how a
 marketplace app starts dropping frames.
 

@@ -1,10 +1,11 @@
 import type { Piece } from "@shared/data/catalogue";
 import { findPiece, formatRupees } from "@shared/data/catalogue";
+import { AppList } from "@wearly/ui-native/app-list";
 import { Button } from "@wearly/ui-native/button";
 import { SectionHeader } from "@wearly/ui-native/display";
 import { Media } from "@wearly/ui-native/media";
 import { Text } from "@wearly/ui-native/text";
-import { FlatList, View } from "react-native";
+import { View } from "react-native";
 import type { Look } from "../home-data";
 
 /**
@@ -60,15 +61,15 @@ export function LooksRail({ looks, onOpenLook }: LooksRailProps) {
         caption="Styled outfits, ready to rent"
         title="Looks people are loving"
       />
-      <FlatList
-        contentContainerClassName="gap-4"
+      <AppList
         data={[...looks]}
         horizontal
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <LookCard look={item} onOpen={() => onOpenLook(item.pieceIds[0])} />
         )}
-        showsHorizontalScrollIndicator={false}
+        separator={<View className="w-4" />}
+        showsScrollIndicator={false}
       />
     </View>
   );

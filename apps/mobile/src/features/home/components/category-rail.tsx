@@ -1,6 +1,7 @@
+import { AppList } from "@wearly/ui-native/app-list";
 import { Chip } from "@wearly/ui-native/badge";
 import { SectionHeader } from "@wearly/ui-native/display";
-import { FlatList, View } from "react-native";
+import { View } from "react-native";
 import { HOME_CATEGORIES } from "../home-data";
 
 /**
@@ -31,8 +32,7 @@ export function CategoryRail({
         }
         title="Categories"
       />
-      <FlatList
-        contentContainerClassName="gap-3"
+      <AppList
         data={[...HOME_CATEGORIES]}
         horizontal
         keyExtractor={(item) => item}
@@ -41,7 +41,8 @@ export function CategoryRail({
             {item}
           </Chip>
         )}
-        showsHorizontalScrollIndicator={false}
+        separator={<View className="w-3" />}
+        showsScrollIndicator={false}
       />
     </View>
   );

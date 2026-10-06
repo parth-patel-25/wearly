@@ -16,6 +16,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~57.0.16",
     "@hookform/resolvers": "^5.9.1",
+    "@shopify/flash-list": "^2.3.3",
     "@wearly/design-tokens": "workspace:*",
     "@wearly/shared": "workspace:*",
     "@wearly/ui-native": "workspace:*",

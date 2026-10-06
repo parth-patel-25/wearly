@@ -1,9 +1,10 @@
+import type { ListRenderItem } from "@shopify/flash-list";
+import { AppList } from "@wearly/ui-native/app-list";
 import { Chip } from "@wearly/ui-native/badge";
 import { SectionHeader } from "@wearly/ui-native/display";
 import { ProductCard } from "@wearly/ui-native/product-card";
 import type { ProductGridItem } from "@wearly/ui-native/product-grid";
-import type { ListRenderItem } from "react-native";
-import { FlatList, View } from "react-native";
+import { View } from "react-native";
 
 /**
  * Horizontal product rail.
@@ -56,14 +57,13 @@ export function ProductRail({
         caption={caption}
         title={title}
       />
-      <FlatList
-        contentContainerClassName="gap-4"
+      <AppList
         data={items}
         horizontal
-        initialNumToRender={4}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        showsHorizontalScrollIndicator={false}
+        separator={<View className="w-4" />}
+        showsScrollIndicator={false}
       />
     </View>
   );

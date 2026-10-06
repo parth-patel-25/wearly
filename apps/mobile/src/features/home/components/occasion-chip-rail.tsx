@@ -1,6 +1,7 @@
+import { AppList } from "@wearly/ui-native/app-list";
 import { Chip } from "@wearly/ui-native/badge";
 import { SectionHeader } from "@wearly/ui-native/display";
-import { FlatList, View } from "react-native";
+import { View } from "react-native";
 import { HOME_OCCASIONS } from "../home-data";
 
 /**
@@ -22,8 +23,7 @@ export function OccasionChipRail({ onSelect }: OccasionChipRailProps) {
         caption="Shop the situation, not the SKU"
         title="What are you dressing for?"
       />
-      <FlatList
-        contentContainerClassName="gap-3"
+      <AppList
         data={[...HOME_OCCASIONS]}
         horizontal
         keyExtractor={(item) => item.label}
@@ -32,7 +32,8 @@ export function OccasionChipRail({ onSelect }: OccasionChipRailProps) {
             {item.label}
           </Chip>
         )}
-        showsHorizontalScrollIndicator={false}
+        separator={<View className="w-3" />}
+        showsScrollIndicator={false}
       />
     </View>
   );

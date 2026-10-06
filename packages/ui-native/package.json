@@ -23,6 +23,7 @@
     "./toast": "./src/toast.tsx",
     "./product-card": "./src/product-card.tsx",
     "./product-grid": "./src/product-grid.tsx",
+    "./app-list": "./src/app-list.tsx",
     "./calendar": "./src/calendar.tsx",
     "./calendar-cell": "./src/calendar-cell.tsx",
     "./tab-bar": "./src/tab-bar.tsx",
@@ -35,6 +36,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@shopify/flash-list": "^2.3.3",
     "@wearly/design-tokens": "workspace:*",
     "react-native-gesture-handler": "~2.32.0",
     "react-native-safe-area-context": "~5.7.0",

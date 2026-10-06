@@ -1,17 +1,18 @@
+import type { ListRenderItem } from "@shopify/flash-list";
 import type { ReactElement } from "react";
-import type { ListRenderItem } from "react-native";
-import { FlatList } from "react-native";
+import { View } from "react-native";
+import { AppList } from "./app-list";
 import type { ProductCardFrame, ProductCardProps } from "./product-card";
 import { ProductCard } from "./product-card";
 
 /**
  * The product grid.
  *
- * `FlatList` rather than a `ScrollView` of mapped views: the catalogue is
- * expected to grow well past fifty pieces, and a grid that renders every cell up
- * front is how a marketplace app starts dropping frames. FlatList is React
- * Native's virtualised list, so this is the same call as virtualising a large
- * table on the web.
+ * `AppList` (FlashList) rather than a `ScrollView` of mapped views: the
+ * catalogue is expected to grow well past fifty pieces, and a grid that
+ * renders every cell up front is how a marketplace app starts dropping
+ * frames. FlashList recycles views and lays out without measuring each cell,
+ * so this is the same call as virtualising a large table on the web.
  *
  * Two columns, generous gap. The image does the selling, so the space around it
  * is not wasted.
@@ -39,30 +40,28 @@ export function ProductGrid({
   onFavourite,
   onOpen,
 }: ProductGridProps) {
-  const renderItem: ListRenderItem<ProductGridItem> = ({ item }) => (
-    <ProductCard
-      {...item}
-      isFavourite={favourites.has(item.id)}
-      onFavourite={() => onFavourite(item.id)}
-      onPress={(frame) => onOpen(item.id, frame)}
-    />
+  const renderItem: ListRenderItem<ProductGridItem> = ({ index, item }) => (
+    <View className={index % 2 === 0 ? "w-full pr-4 pb-6" : "w-full pb-6"}>
+      <ProductCard
+        {...item}
+        isFavourite={favourites.has(item.id)}
+        onFavourite={() => onFavourite(item.id)}
+        onPress={(frame) => onOpen(item.id, frame)}
+      />
+    </View>
   );
 
   return (
-    <FlatList
-      columnWrapperClassName="gap-4"
-      contentContainerClassName="flex flex-col gap-6 px-gutter pb-10"
+    <AppList
+      className="flex-1 px-gutter"
       data={items}
-      initialNumToRender={6}
+      emptyState={emptyState}
+      footer={<View className="h-10" />}
+      header={header}
       keyExtractor={(item) => item.id}
-      ListEmptyComponent={emptyState}
-      ListHeaderComponent={header}
-      maxToRenderPerBatch={6}
       numColumns={2}
-      removeClippedSubviews
       renderItem={renderItem}
-      showsVerticalScrollIndicator={false}
-      windowSize={5}
+      showsScrollIndicator={false}
     />
   );
 }

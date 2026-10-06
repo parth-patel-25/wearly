@@ -14,7 +14,7 @@ Proves the design language and the hero-expansion interaction end to end.
 - [x] 02 Home — magazine marketplace at `/(tabs)` (single Home; v1/v2 variants removed 2026-10-05)
 - [x] 03 Search — in Discover
 - [x] 04 Categories — in Discover (chip rail)
-- [x] 05 Product grid — FlatList grid in Home and Discover
+- [x] 05 Product grid — FlashList grid in Home and Discover
 - [x] 06 Filters — bottom sheet
 - [x] 07 Product details — hero expansion from the card
 - [x] 08 Image gallery — in product detail
