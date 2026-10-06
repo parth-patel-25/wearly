@@ -288,6 +288,13 @@ availability, size, condition, owner, reviews, location/delivery, deposit,
 policies. Do not expose everything at once — use sections and progressive
 disclosure. The primary CTA (`Rent this`) stays accessible while scrolling.
 
+Structure: a full-bleed 3:4 photograph leads, with the header row (back ·
+centred "Product Details" title · favourite) floating over its top. The
+content below is a sheet that overlaps the photograph's bottom edge slightly
+and carries the Home sheet's top corner radius (`rounded-t-5xl`). The earlier
+three-frame gallery strip was removed — one composed image leads, and
+everything below keeps its place in the flow.
+
 ### 7.4 Rental flow
 
 ```

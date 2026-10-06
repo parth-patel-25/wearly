@@ -17,7 +17,7 @@ Proves the design language and the hero-expansion interaction end to end.
 - [x] 05 Product grid — FlashList grid in Home and Discover
 - [x] 06 Filters — bottom sheet
 - [x] 07 Product details — hero expansion from the card
-- [x] 08 Image gallery — in product detail
+- [x] 08 Image gallery — full-bleed 3:4 hero image in product detail; header floats over it, content sheet overlaps its bottom edge with `rounded-t-5xl` (multi-frame strip removed 2026-10-06)
 - [x] 11 Date selection — calendar, range selection
 - [x] 12 Price breakdown — in checkout
 - [x] 13 Checkout

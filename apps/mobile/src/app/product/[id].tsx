@@ -1,6 +1,5 @@
 import { useSession } from "@core/providers/session-provider";
 import { datesFor, ROUTES } from "@core/routing/routes";
-import { Gallery } from "@features/product/components/gallery";
 import type { Piece } from "@shared/data/catalogue";
 import {
   CONDITION_LABEL,
@@ -16,6 +15,7 @@ import { Card, Panel } from "@wearly/ui-native/card";
 import { ProgressBar } from "@wearly/ui-native/display";
 import type { IconName } from "@wearly/ui-native/icon";
 import { Icon } from "@wearly/ui-native/icon";
+import { Media } from "@wearly/ui-native/media";
 import { KeyValueRow } from "@wearly/ui-native/status";
 import { Text } from "@wearly/ui-native/text";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -69,15 +69,22 @@ function ProductDetail({ piece }: ProductDetailProps) {
     <View className="flex-1 bg-background pt-safe">
       <ScrollView
         className="flex flex-col"
-        contentContainerClassName="flex flex-col gap-10 pb-44"
+        contentContainerClassName="flex flex-col pb-44"
         showsVerticalScrollIndicator={false}
       >
-        <View className="flex-row items-center justify-between px-gutter pt-4">
+        {/* `z-10` keeps the header above the image that follows it: the image
+            is pulled up by the header's exact height (`-mt-16` = size-12
+            button + pt-4) so the header floats over the hero without any
+            absolute positioning. */}
+        <View className="z-10 flex-row items-center justify-between px-gutter pt-4">
           <IconButton
             accessibilityLabel="Go back"
             icon="arrow-left"
             onPress={() => router.back()}
           />
+          <Text className="flex-1 text-center" variant="headingMd">
+            Product Details
+          </Text>
           <IconButton
             accessibilityLabel={
               isSaved ? "Remove from saved" : "Save this piece"
@@ -91,111 +98,120 @@ function ProductDetail({ piece }: ProductDetailProps) {
           />
         </View>
 
-        <Gallery piece={piece} />
+        <Media
+          aspect="3/4"
+          className="-mt-16"
+          src={piece.images[0]}
+          tone={piece.gallery[0]}
+        />
 
-        <View className="gap-2 px-gutter">
-          <Text variant="headingXl">{piece.name}</Text>
-          <Text variant="price">{`${formatRupees(piece.dailyRate)} / day`}</Text>
-          <Text tone="muted-foreground" variant="bodySm">
-            {`${summary} · ${formatRupees(piece.deposit)} refundable deposit`}
-          </Text>
-        </View>
-
-        <View className="flex-row flex-wrap gap-2 px-gutter">
-          <Badge variant="primary">{CONDITION_LABEL[piece.condition]}</Badge>
-          <Badge>{`Size ${size}`}</Badge>
-          <Badge variant="success">Available now</Badge>
-        </View>
-
-        <Section title="About this piece">
-          <Text tone="muted-foreground" variant="bodyMd">
-            {piece.description}
-          </Text>
-        </Section>
-
-        <Section subtitle="Known before you book" title="Fit and condition">
-          <KeyValueRow label="Size" value={size} />
-          <KeyValueRow
-            label="Condition"
-            value={CONDITION_LABEL[piece.condition]}
-          />
-          <KeyValueRow label="Care" value="Dry clean only" />
-        </Section>
-
-        <Section subtitle="You pick the dates next" title="Availability">
-          <KeyValueRow label="Earliest start" value={piece.availableFrom} />
-          <KeyValueRow
-            label="Already committed"
-            value={`${piece.unavailable.length} days this month`}
-          />
-          <View className="flex-row flex-wrap gap-2 pt-3">
-            {piece.unavailable.map((day) => (
-              <Badge key={day} variant="warning">
-                {day}
-              </Badge>
-            ))}
+        {/* The content sheet overlaps the image's bottom edge (`-mt-8`) and
+            carries the Home content sheet's top corner radius. */}
+        <View className="-mt-8 flex flex-col gap-10 rounded-t-5xl bg-background pt-8">
+          <View className="gap-2 px-gutter">
+            <Text variant="headingXl">{piece.name}</Text>
+            <Text variant="price">{`${formatRupees(piece.dailyRate)} / day`}</Text>
+            <Text tone="muted-foreground" variant="bodySm">
+              {`${summary} · ${formatRupees(piece.deposit)} refundable deposit`}
+            </Text>
           </View>
-        </Section>
 
-        <Section title="Who you are renting from">
-          <Card className="flex-row items-center gap-4 p-5">
-            <Avatar name={piece.lender.name} size="lg" />
-            <View className="flex-1 gap-1">
-              <Text variant="bodyMd">{piece.lender.name}</Text>
-              <View className="flex-row items-center gap-1">
-                <Icon name="map-pin" size="xs" tone="muted-foreground" />
+          <View className="flex-row flex-wrap gap-2 px-gutter">
+            <Badge variant="primary">{CONDITION_LABEL[piece.condition]}</Badge>
+            <Badge>{`Size ${size}`}</Badge>
+            <Badge variant="success">Available now</Badge>
+          </View>
+
+          <Section title="About this piece">
+            <Text tone="muted-foreground" variant="bodyMd">
+              {piece.description}
+            </Text>
+          </Section>
+
+          <Section subtitle="Known before you book" title="Fit and condition">
+            <KeyValueRow label="Size" value={size} />
+            <KeyValueRow
+              label="Condition"
+              value={CONDITION_LABEL[piece.condition]}
+            />
+            <KeyValueRow label="Care" value="Dry clean only" />
+          </Section>
+
+          <Section subtitle="You pick the dates next" title="Availability">
+            <KeyValueRow label="Earliest start" value={piece.availableFrom} />
+            <KeyValueRow
+              label="Already committed"
+              value={`${piece.unavailable.length} days this month`}
+            />
+            <View className="flex-row flex-wrap gap-2 pt-3">
+              {piece.unavailable.map((day) => (
+                <Badge key={day} variant="warning">
+                  {day}
+                </Badge>
+              ))}
+            </View>
+          </Section>
+
+          <Section title="Who you are renting from">
+            <Card className="flex-row items-center gap-4 p-5">
+              <Avatar name={piece.lender.name} size="lg" />
+              <View className="flex-1 gap-1">
+                <Text variant="bodyMd">{piece.lender.name}</Text>
+                <View className="flex-row items-center gap-1">
+                  <Icon name="map-pin" size="xs" tone="muted-foreground" />
+                  <Text tone="muted-foreground" variant="caption">
+                    {piece.lender.neighbourhood}
+                  </Text>
+                </View>
+              </View>
+              {piece.lender.verified ? (
+                <Badge variant="success">ID verified</Badge>
+              ) : (
+                <Badge>Not verified</Badge>
+              )}
+            </Card>
+          </Section>
+
+          <Section title="Good to know">
+            <Policy
+              icon="truck"
+              text="Delivery or pickup, your choice. Chosen before you pay."
+            />
+            <Policy
+              icon="lock"
+              text={`${formatRupees(piece.deposit)} deposit, released once it comes back.`}
+            />
+            <Policy
+              icon="sparkles"
+              text="Dry clean only. The cleaning cost is in the price above."
+            />
+          </Section>
+
+          <Section title="Reviews">
+            <View className="flex-row items-center gap-4 rounded-card bg-muted p-5">
+              <View className="size-11 items-center justify-center rounded-pill bg-card">
+                <Icon name="sparkles" size="sm" tone="muted-foreground" />
+              </View>
+              <View className="flex-1 gap-1">
+                <Text variant="bodySm">Not reviewed yet</Text>
                 <Text tone="muted-foreground" variant="caption">
-                  {piece.lender.neighbourhood}
+                  This prototype has no real renters, so there is nothing honest
+                  to show here.
                 </Text>
               </View>
             </View>
-            {piece.lender.verified ? (
-              <Badge variant="success">ID verified</Badge>
-            ) : (
-              <Badge>Not verified</Badge>
-            )}
-          </Card>
-        </Section>
+          </Section>
 
-        <Section title="Good to know">
-          <Policy
-            icon="truck"
-            text="Delivery or pickup, your choice. Chosen before you pay."
-          />
-          <Policy
-            icon="lock"
-            text={`${formatRupees(piece.deposit)} deposit, released once it comes back.`}
-          />
-          <Policy
-            icon="sparkles"
-            text="Dry clean only. The cleaning cost is in the price above."
-          />
-        </Section>
-
-        <Section title="Reviews">
-          <View className="flex-row items-center gap-4 rounded-card bg-muted p-5">
-            <View className="size-11 items-center justify-center rounded-pill bg-card">
-              <Icon name="sparkles" size="sm" tone="muted-foreground" />
-            </View>
-            <View className="flex-1 gap-1">
-              <Text variant="bodySm">Not reviewed yet</Text>
+          <Section title="About Wearly">
+            <View className="gap-3">
+              <ProgressBar label="Your Wearly profile" value={10} />
               <Text tone="muted-foreground" variant="caption">
-                This prototype has no real renters, so there is nothing honest
-                to show here.
+                Browsing never needs an account. You will only be asked when you
+                rent, save or list.
               </Text>
             </View>
-          </View>
-        </Section>
-
-        <Section title="About Wearly">
-          <View className="gap-3">
-            <ProgressBar label="Your Wearly profile" value={10} />
-            <Text tone="muted-foreground" variant="caption">
-              Browsing never needs an account. You will only be asked when you
-              rent, save or list.
-            </Text>
-          </View>
-        </Section>
+          </Section>
+        </View>
       </ScrollView>
 
       <StickyCta pieceId={piece.id} summary={summary} />
