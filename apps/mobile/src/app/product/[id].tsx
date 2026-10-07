@@ -68,8 +68,12 @@ function ProductDetail({ piece }: ProductDetailProps) {
     // under the notch on a device that has one.
     <View className="flex-1 bg-background pt-safe">
       <ScrollView
-        className="flex flex-col"
-        contentContainerClassName="flex flex-col pb-44"
+        className="flex flex-1 flex-col"
+        // `bg-card`: the sheet fills to the footer bar and only its hairline
+        // border separates them. The footer is a static flex sibling (same as
+        // the rent flow). Bottom breathing room lives inside the sheet
+        // (`pb-8`) so no blank strip sits between sheet and bar.
+        contentContainerClassName="flex flex-col bg-card"
         showsVerticalScrollIndicator={false}
       >
         {/* `z-10` keeps the header above the image that follows it: the image
@@ -111,7 +115,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
             (`rounded-t-6xl`), plus `shadow-lift` — one step above the sheet
             elevation — so the white lifts off light imagery instead of
             blending into it. Rose-tinted, never grey. */}
-        <View className="-mt-16 flex flex-col gap-10 rounded-t-6xl bg-card pt-8 shadow-lift">
+        <View className="-mt-16 flex flex-col gap-10 rounded-t-6xl bg-card pt-8 pb-8 shadow-lift">
           <View className="gap-2 px-gutter">
             <Text variant="headingXl">{piece.name}</Text>
             <Text variant="price">{`${formatRupees(piece.dailyRate)} / day`}</Text>
@@ -192,7 +196,10 @@ function ProductDetail({ piece }: ProductDetailProps) {
           </Section>
 
           <Section title="Reviews">
-            <View className="flex-row items-center gap-4 rounded-card bg-muted p-5">
+            {/* `pb-3` instead of the symmetric `p-5` bottom: the card's own
+                padding stacks with the sheet's `gap-10`, which otherwise leaves
+                ~60px below this card versus ~48px at every other junction. */}
+            <View className="flex-row items-center gap-4 rounded-card bg-muted p-5 pb-3">
               <View className="size-11 items-center justify-center rounded-pill bg-card">
                 <Icon name="sparkles" size="sm" tone="muted-foreground" />
               </View>
@@ -266,7 +273,7 @@ function StickyCta({ pieceId, summary }: StickyCtaProps) {
   const router = useRouter();
 
   return (
-    <View className="absolute inset-x-0 bottom-0 flex-row items-center gap-4 border-border border-t bg-card px-gutter pt-4 pb-10">
+    <View className="flex-row items-center gap-4 border-border border-t bg-card px-gutter pt-4 pb-10">
       <View className="flex-1 gap-0.5">
         <Text variant="price">{summary}</Text>
         <Text tone="muted-foreground" variant="caption">

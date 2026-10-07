@@ -920,7 +920,11 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-07 | Product detail sheet flows flush into the sticky CTA: debug `border-red-500` removed, scroll `pb-8` moved inside the sheet (`pt-8 pb-8`) so no blank strip sits between the sheet and the bar's hairline. |
+| 2026-10-07 | Product detail sticky CTA is a static flex footer (same as rent flow), not an absolute overlay — the `pb-44` scroll clearance is removed so no white strip sits above `Rent this`. |
 | 2026-10-07 | Product detail content sheet: new `--wearly-radius-6xl` (56px, `rounded-t-6xl`) and new `shadow-lift` (`--wearly-shadow-xl`, one step above `float`) so the white curve lifts off the hero photograph. Both declared in `design-tokens` and symmetric across themes; no one-off values. |
+| 2026-10-07 | Product detail scroll content painted `bg-card` so the `pb-44` CTA clearance no longer shows a page-background strip between the white sheet and the white sticky bar — only the bar's hairline separates them. |
+| 2026-10-07 | Product detail Reviews card bottom padding `p-5` → `pb-3`: its inner padding stacked with the sheet `gap-10` (~60px) versus ~48px at other junctions. |
 | 2026-10-05 | Home header + content cards bumped to a new `--wearly-radius-5xl` (48px) token (`rounded-b-5xl` / `rounded-t-5xl`); search strip top padding reduced to a constant `pt-4`. |
 | 2026-10-05 | Home header greeting tightened (`gap-0.5`, `price` 17px medium, one line); docked search strip slims its top padding via scroll-measured header height (static class literals only). |
 | 2026-10-05 | Removed the dev-only floating theme toggle (`theme-toggle.tsx` deleted, root layout unmounted — dark is reviewed via `EXPO_PUBLIC_WEARLY_THEME=dark`); home header row is avatar-first with a larger avatar and a one-line greeting. |
