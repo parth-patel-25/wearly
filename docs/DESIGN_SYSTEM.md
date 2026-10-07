@@ -920,6 +920,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-07 | Product sticky CTA is one full-width button — `Rent this · ₹rate` with a smaller `/N days` suffix nested in the label (`caption`, `primary-foreground`). The side price block and deposit note are gone; the footer is just the bar + button. |
 | 2026-10-07 | Product header chrome (status backdrop, bar background, hairline) shares one animated opacity (`DURATION.base`, instant under reduced motion) instead of instant class swaps: the header is a column shell with a fading `bg-card` layer, content row, and 1px hairline. Title steps down `headingMd` → `headingSm`. |
 | 2026-10-07 | Product header title fades in/out (`opacity`, `DURATION.base` 200ms on the UI thread, instant under reduced motion) instead of popping: always mounted, `aria-hidden` while transparent. |
 | 2026-10-07 | Product header title is dynamic: empty at rest, shows the piece name (truncated) once the in-content title scrolls fully past the header, clears when scrolled back. Crossing measured with page coords (`measure` on title + header, threshold in a shared value) so it survives insets and type sizes. |

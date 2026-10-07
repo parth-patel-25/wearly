@@ -278,7 +278,11 @@ function ProductDetail({ piece }: ProductDetailProps) {
         </View>
       </Animated.ScrollView>
 
-      <StickyCta pieceId={piece.id} summary={summary} />
+      <StickyCta
+        dailyRate={piece.dailyRate}
+        days={RENTAL_DAYS}
+        pieceId={piece.id}
+      />
     </View>
   );
 }
@@ -318,26 +322,22 @@ function Policy({ icon, text }: PolicyProps) {
 }
 
 interface StickyCtaProps {
+  dailyRate: number;
+  days: number;
   pieceId: string;
-  summary: string;
 }
 
-function StickyCta({ pieceId, summary }: StickyCtaProps) {
+function StickyCta({ dailyRate, days, pieceId }: StickyCtaProps) {
   const router = useRouter();
 
   return (
-    <View className="flex-row items-center gap-4 border-border border-t bg-card px-gutter pt-4 pb-10">
-      <View className="flex-1 gap-0.5">
-        <Text variant="price">{summary}</Text>
-        <Text tone="muted-foreground" variant="caption">
-          Deposit refunded on return
+    <View className="border-border border-t bg-card px-gutter pt-4 pb-10">
+      <Button onPress={() => router.push(datesFor(pieceId))} size="lg">
+        {`Rent this · ${formatRupees(dailyRate)}`}
+        <Text tone="primary-foreground" variant="caption">
+          {`/${days} ${days === 1 ? "day" : "days"}`}
         </Text>
-      </View>
-      <View className="min-w-40">
-        <Button onPress={() => router.push(datesFor(pieceId))} size="lg">
-          Rent this
-        </Button>
-      </View>
+      </Button>
     </View>
   );
 }
