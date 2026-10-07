@@ -333,7 +333,7 @@ function StickyCta({ dailyRate, days, pieceId }: StickyCtaProps) {
   return (
     <View className="border-border border-t bg-card px-gutter pt-4 pb-10">
       <Button onPress={() => router.push(datesFor(pieceId))} size="lg">
-        {`Rent this · ${formatRupees(dailyRate)}`}
+        {`Rent this · ${formatRupees(dailyRate * days)}`}
         <Text tone="primary-foreground" variant="caption">
           {`/${days} ${days === 1 ? "day" : "days"}`}
         </Text>
