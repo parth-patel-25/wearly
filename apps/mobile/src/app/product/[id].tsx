@@ -66,65 +66,67 @@ function ProductDetail({ piece }: ProductDetailProps) {
   const parallax = useHeroParallax();
 
   return (
-    // The status strip is its own opaque backdrop (inset height only): the
-    // parallax photo drifts up underneath it instead of showing through the
-    // status bar. `bg-background` at rest, `bg-card` once the header turns
-    // solid, so the two always read as one bar. The header row's own `pt-4`
-    // is the gap below the inset, which keeps the back button clear of the
-    // notch on a device that has one.
+    // The status strip is its own `bg-card` backdrop (inset height only),
+    // fading in with the rest of the chrome: the parallax photo drifts up
+    // underneath it instead of showing through the status bar. The header
+    // row's own `pt-4` is the gap below the inset, which keeps the back
+    // button clear of the notch on a device that has one.
     <View className="flex-1 bg-background">
-      <View
-        className={
-          parallax.headerSolid
-            ? "z-10 bg-card pt-safe"
-            : "z-10 bg-background pt-safe"
-        }
+      <Animated.View
+        className="z-10 bg-card pt-safe"
+        style={parallax.chromeStyle}
       />
-      {/* Fixed header: a flex sibling above the scroller (`z-10`), so it stays
-          put while photo and sheet move underneath it. Transparent while
-          floating over the hero, solid `bg-card` once scrolled — the border
-          slot is always rendered so the switch never re-lays-out. Symmetric
-          `pt-4`/`pb-4` around the `size-12` buttons so the hairline never
-          touches the icons. The title is always mounted and fades in once
-          the in-content title has scrolled past it (`titleFadeStyle`). The
-          photo is pulled up by the header's exact height (`-mt-20` = buttons +
-          `pt-4` + `pb-4`) without any absolute positioning. */}
+      {/* Fixed header column (`z-10`): a flex sibling above the scroller, so
+          it stays put while photo and sheet move underneath it. The solid
+          background is a fading layer (`h-20`, exactly the row's
+          buttons + `pt-4` + `pb-4`) with the content row pulled over it
+          (`-mt-20`), plus a 1px hairline — all three chrome pieces share one
+          animated opacity, so nothing pops. Symmetric `pt-4`/`pb-4` keeps the
+          hairline clear of the icons. The title is always mounted and fades
+          in once the in-content title has scrolled past it. The photo is
+          pulled up by the header's exact height (`-mt-20`) without any
+          absolute positioning. */}
       <View
-        className={
-          parallax.headerSolid
-            ? "z-10 flex-row items-center justify-between border-border border-b bg-card px-gutter pt-4 pb-4"
-            : "z-10 flex-row items-center justify-between border-transparent border-b bg-transparent px-gutter pt-4 pb-4"
-        }
+        className="z-10"
         onLayout={parallax.onCrossingLayout}
         ref={parallax.headerRef}
       >
-        <IconButton
-          accessibilityLabel="Go back"
-          icon="arrow-left"
-          onPress={() => router.back()}
-          variant="outline"
-        />
-        <Animated.View
-          aria-hidden={!parallax.titleHidden}
-          className="flex-1 items-center justify-center"
-          style={parallax.titleFadeStyle}
-        >
-          <Text
-            className="w-full text-center"
-            numberOfLines={1}
-            variant="headingMd"
+        <Animated.View className="h-20 bg-card" style={parallax.chromeStyle} />
+        <View className="-mt-20 flex-row items-center justify-between px-gutter pt-4 pb-4">
+          <IconButton
+            accessibilityLabel="Go back"
+            icon="arrow-left"
+            onPress={() => router.back()}
+            variant="outline"
+          />
+          <Animated.View
+            aria-hidden={!parallax.titleHidden}
+            className="flex-1 items-center justify-center"
+            style={parallax.titleFadeStyle}
           >
-            {piece.name}
-          </Text>
-        </Animated.View>
-        <IconButton
-          accessibilityLabel={isSaved ? "Remove from saved" : "Save this piece"}
-          icon={isSaved ? "heart-filled" : "heart"}
-          onPress={() =>
-            dispatch({ pieceId: piece.id, type: "toggle-favourite" })
-          }
-          tone="primary"
-          variant="soft"
+            <Text
+              className="w-full text-center"
+              numberOfLines={1}
+              variant="headingSm"
+            >
+              {piece.name}
+            </Text>
+          </Animated.View>
+          <IconButton
+            accessibilityLabel={
+              isSaved ? "Remove from saved" : "Save this piece"
+            }
+            icon={isSaved ? "heart-filled" : "heart"}
+            onPress={() =>
+              dispatch({ pieceId: piece.id, type: "toggle-favourite" })
+            }
+            tone="primary"
+            variant="soft"
+          />
+        </View>
+        <Animated.View
+          className="h-px w-full bg-border"
+          style={parallax.chromeStyle}
         />
       </View>
 

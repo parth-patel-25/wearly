@@ -49,12 +49,12 @@ export function useHeroParallax() {
   const crossAt = useSharedValue(0);
   const titleHiddenShared = useSharedValue(false);
   const titleOpacity = useSharedValue(0);
+  const chromeOpacity = useSharedValue(0);
   const headerRef = useRef<View>(null);
   const titleRef = useRef<View>(null);
   const [photoHeight, setPhotoHeight] = useState(
     Dimensions.get("window").width * (4 / 3)
   );
-  const [headerSolid, setHeaderSolid] = useState(false);
   const [titleHidden, setTitleHidden] = useState(false);
 
   const onPhotoLayout = (event: LayoutChangeEvent): void => {
@@ -78,20 +78,30 @@ export function useHeroParallax() {
     },
   });
 
-  // The worklet above must stay on the UI thread — calling it from a JS
-  // scroll callback throws — so the header flag syncs back separately. It
-  // flips on threshold crossings only, so `runOnJS` fires rarely (rest <->
-  // scrolled) instead of per-frame.
+  // The chrome (status backdrop, bar background, hairline) shares one
+  // animated opacity rather than swapping classes.
   useAnimatedReaction(
     () => scrollY.value,
     (y) => {
       if (y > HEADER_SOLID_AT && !solidShared.value) {
         solidShared.value = true;
-        runOnJS(setHeaderSolid)(true);
+        chromeOpacity.value = reduceMotion
+          ? 1
+          : withTiming(1, { duration: DURATION.base });
       } else if (y <= 0 && solidShared.value) {
         solidShared.value = false;
-        runOnJS(setHeaderSolid)(false);
+        chromeOpacity.value = reduceMotion
+          ? 0
+          : withTiming(0, { duration: DURATION.base });
       }
+    }
+  );
+
+  // The header title handoff. Each flag flips on crossings only, so `runOnJS`
+  // fires rarely (rest <-> scrolled) instead of per-frame.
+  useAnimatedReaction(
+    () => scrollY.value,
+    (y) => {
       const hidden = y > crossAt.value;
       if (hidden !== titleHiddenShared.value) {
         titleHiddenShared.value = hidden;
@@ -124,9 +134,14 @@ export function useHeroParallax() {
     opacity: titleOpacity.value,
   }));
 
+  // Status backdrop, bar background and hairline fade as one.
+  const chromeStyle = useAnimatedStyle(() => ({
+    opacity: chromeOpacity.value,
+  }));
+
   return {
+    chromeStyle,
     headerRef,
-    headerSolid,
     onCrossingLayout,
     onPhotoLayout,
     onScroll,

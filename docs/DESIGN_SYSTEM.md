@@ -920,6 +920,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-07 | Product header chrome (status backdrop, bar background, hairline) shares one animated opacity (`DURATION.base`, instant under reduced motion) instead of instant class swaps: the header is a column shell with a fading `bg-card` layer, content row, and 1px hairline. Title steps down `headingMd` → `headingSm`. |
 | 2026-10-07 | Product header title fades in/out (`opacity`, `DURATION.base` 200ms on the UI thread, instant under reduced motion) instead of popping: always mounted, `aria-hidden` while transparent. |
 | 2026-10-07 | Product header title is dynamic: empty at rest, shows the piece name (truncated) once the in-content title scrolls fully past the header, clears when scrolled back. Crossing measured with page coords (`measure` on title + header, threshold in a shared value) so it survives insets and type sizes. |
 | 2026-10-07 | Product header gains symmetric `pb-4` (`pt-4` + `pb-4` around the `size-12` buttons) so the hairline never touches the icons; the photo pull-up moves `-mt-16` → `-mt-20` to match the new 80px header height. |
