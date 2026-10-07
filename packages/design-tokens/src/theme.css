@@ -74,6 +74,7 @@
   --radius-3xl: var(--wearly-radius-3xl);
   --radius-4xl: var(--wearly-radius-4xl);
   --radius-5xl: var(--wearly-radius-5xl);
+  --radius-6xl: var(--wearly-radius-6xl);
   --radius-pill: var(--wearly-radius-pill);
 
   /* Component defaults — re-theming one component is a single line. */
@@ -213,6 +214,7 @@
   --shadow-soft: var(--wearly-shadow-sm);
   --shadow-raised: var(--wearly-shadow-md);
   --shadow-float: var(--wearly-shadow-lg);
+  --shadow-lift: var(--wearly-shadow-xl);
   --shadow-focus: var(--wearly-ring-shadow);
   /* Keep Tailwind's built-in names aligned with the scale. */
   --shadow-xs: var(--wearly-shadow-sm);

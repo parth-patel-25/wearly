@@ -183,4 +183,5 @@ export const elevation = [
   { use: "Cards, resting surfaces", utility: "shadow-soft" },
   { use: "Hovered / draggable", utility: "shadow-raised" },
   { use: "Dialogs, sheets, sticky bars", utility: "shadow-float" },
+  { use: "Sheets overlapping photography", utility: "shadow-lift" },
 ] as const;

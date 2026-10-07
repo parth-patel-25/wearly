@@ -107,9 +107,11 @@ function ProductDetail({ piece }: ProductDetailProps) {
 
         {/* The content sheet overlaps the image's bottom edge (`-mt-16`) so
             the rounded top corners read clearly against the photograph. Pure
-            `bg-card` white, same as the Home sheet, so the curve stays
-            visible against the pink-toned image placeholders. */}
-        <View className="-mt-16 flex flex-col gap-10 rounded-t-5xl bg-card pt-8">
+            `bg-card` white, same as the Home sheet, at one radius step larger
+            (`rounded-t-6xl`), plus `shadow-lift` — one step above the sheet
+            elevation — so the white lifts off light imagery instead of
+            blending into it. Rose-tinted, never grey. */}
+        <View className="-mt-16 flex flex-col gap-10 rounded-t-6xl bg-card pt-8 shadow-lift">
           <View className="gap-2 px-gutter">
             <Text variant="headingXl">{piece.name}</Text>
             <Text variant="price">{`${formatRupees(piece.dailyRate)} / day`}</Text>

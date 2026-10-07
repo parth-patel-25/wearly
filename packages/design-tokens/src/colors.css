@@ -166,6 +166,7 @@
       --wearly-shadow-sm: 0 1px 3px oklch(0.2566 0.0128 331.5 / 0.05);
       --wearly-shadow-md: 0 4px 16px -2px oklch(0.2566 0.0128 331.5 / 0.07);
       --wearly-shadow-lg: 0 8px 30px -6px oklch(0.2566 0.0128 331.5 / 0.1);
+      --wearly-shadow-xl: 0 12px 36px -8px oklch(0.2566 0.0128 331.5 / 0.14);
       --wearly-ring-shadow: 0 0 0 3px oklch(0.5874 0.1599 2 / 0.18);
     }
 
@@ -179,6 +180,7 @@
       --wearly-shadow-sm: 0 1px 3px oklch(0 0 0 / 0.3);
       --wearly-shadow-md: 0 4px 16px -2px oklch(0 0 0 / 0.4);
       --wearly-shadow-lg: 0 8px 30px -6px oklch(0 0 0 / 0.5);
+      --wearly-shadow-xl: 0 12px 36px -8px oklch(0 0 0 / 0.55);
       --wearly-ring-shadow: 0 0 0 3px oklch(0.7826 0.1071 357.8 / 0.25);
     }
     /* biome-ignore-end lint/suspicious/noDuplicateCustomProperties: see above */

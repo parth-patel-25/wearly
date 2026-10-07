@@ -297,6 +297,7 @@ Tailwind's 4px default.
 | `radius-3xl` | 32px |
 | `radius-4xl` | 40px |
 | `radius-5xl` | 48px |
+| `radius-6xl` | 56px |
 | `radius-pill` | 9999px |
 
 **Prefer the component names** over the numeric scale — re-theming one component
@@ -347,6 +348,7 @@ Barely noticeable by design.
 | `shadow-soft` | `0 1px 3px` @ 5% | Cards, resting surfaces |
 | `shadow-raised` | `0 4px 16px -2px` @ 7% | Hovered, draggable |
 | `shadow-float` | `0 8px 30px -6px` @ 10% | Dialogs, sheets, sticky bars |
+| `shadow-lift` | `0 12px 36px -8px` @ 14% | Sheets overlapping photography |
 
 Shadows are rose-tinted so they never read as cold grey. If a card needs a
 strong shadow to be readable, the problem is its border or surface contrast,
@@ -918,6 +920,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-07 | Product detail content sheet: new `--wearly-radius-6xl` (56px, `rounded-t-6xl`) and new `shadow-lift` (`--wearly-shadow-xl`, one step above `float`) so the white curve lifts off the hero photograph. Both declared in `design-tokens` and symmetric across themes; no one-off values. |
 | 2026-10-05 | Home header + content cards bumped to a new `--wearly-radius-5xl` (48px) token (`rounded-b-5xl` / `rounded-t-5xl`); search strip top padding reduced to a constant `pt-4`. |
 | 2026-10-05 | Home header greeting tightened (`gap-0.5`, `price` 17px medium, one line); docked search strip slims its top padding via scroll-measured header height (static class literals only). |
 | 2026-10-05 | Removed the dev-only floating theme toggle (`theme-toggle.tsx` deleted, root layout unmounted — dark is reviewed via `EXPO_PUBLIC_WEARLY_THEME=dark`); home header row is avatar-first with a larger avatar and a one-line greeting. |

@@ -17,6 +17,7 @@
     --wearly-radius-3xl: 2rem; /* 32px — promotional surfaces */
     --wearly-radius-4xl: 2.5rem; /* 40px — large section sheets */
     --wearly-radius-5xl: 3rem; /* 48px — hero section sheets */
+    --wearly-radius-6xl: 3.5rem; /* 56px — product detail sheet */
     --wearly-radius-pill: 9999px; /* buttons, badges, chips */
   }
 }
