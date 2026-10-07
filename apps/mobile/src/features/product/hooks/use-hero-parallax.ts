@@ -1,3 +1,4 @@
+import { DURATION } from "@wearly/design-tokens/motion";
 import { useRef, useState } from "react";
 import type { LayoutChangeEvent, View } from "react-native";
 import { Dimensions } from "react-native";
@@ -8,6 +9,7 @@ import {
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 
 /**
@@ -46,6 +48,7 @@ export function useHeroParallax() {
   const solidShared = useSharedValue(false);
   const crossAt = useSharedValue(0);
   const titleHiddenShared = useSharedValue(false);
+  const titleOpacity = useSharedValue(0);
   const headerRef = useRef<View>(null);
   const titleRef = useRef<View>(null);
   const [photoHeight, setPhotoHeight] = useState(
@@ -92,6 +95,13 @@ export function useHeroParallax() {
       const hidden = y > crossAt.value;
       if (hidden !== titleHiddenShared.value) {
         titleHiddenShared.value = hidden;
+        if (reduceMotion) {
+          titleOpacity.value = hidden ? 1 : 0;
+        } else {
+          titleOpacity.value = withTiming(hidden ? 1 : 0, {
+            duration: DURATION.base,
+          });
+        }
         runOnJS(setTitleHidden)(hidden);
       }
     }
@@ -108,6 +118,12 @@ export function useHeroParallax() {
     ],
   }));
 
+  // The header title fade. Always mounted — opacity alone shows and hides it,
+  // so fade-outs never unmount mid-transition.
+  const titleFadeStyle = useAnimatedStyle(() => ({
+    opacity: titleOpacity.value,
+  }));
+
   return {
     headerRef,
     headerSolid,
@@ -117,6 +133,7 @@ export function useHeroParallax() {
     photoStyle,
     scrollerMarginTop: -photoHeight,
     spacerHeight: Math.max(photoHeight - SHEET_PEEK, 0),
+    titleFadeStyle,
     titleHidden,
     titleRef,
   };

@@ -920,6 +920,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-07 | Product header title fades in/out (`opacity`, `DURATION.base` 200ms on the UI thread, instant under reduced motion) instead of popping: always mounted, `aria-hidden` while transparent. |
 | 2026-10-07 | Product header title is dynamic: empty at rest, shows the piece name (truncated) once the in-content title scrolls fully past the header, clears when scrolled back. Crossing measured with page coords (`measure` on title + header, threshold in a shared value) so it survives insets and type sizes. |
 | 2026-10-07 | Product header gains symmetric `pb-4` (`pt-4` + `pb-4` around the `size-12` buttons) so the hairline never touches the icons; the photo pull-up moves `-mt-16` → `-mt-20` to match the new 80px header height. |
 | 2026-10-07 | Product header back button uses the `outline` variant (`bg-card` + `border-border`, same `size-12` as the heart): white with a border instead of transparent ghost, so it reads over the photo. No new tokens. |

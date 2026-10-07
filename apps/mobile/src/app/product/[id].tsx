@@ -85,9 +85,9 @@ function ProductDetail({ piece }: ProductDetailProps) {
           floating over the hero, solid `bg-card` once scrolled — the border
           slot is always rendered so the switch never re-lays-out. Symmetric
           `pt-4`/`pb-4` around the `size-12` buttons so the hairline never
-          touches the icons. The title starts empty and takes over the piece
-          name once the in-content title has scrolled past it. The photo is
-          pulled up by the header's exact height (`-mt-20` = buttons +
+          touches the icons. The title is always mounted and fades in once
+          the in-content title has scrolled past it (`titleFadeStyle`). The
+          photo is pulled up by the header's exact height (`-mt-20` = buttons +
           `pt-4` + `pb-4`) without any absolute positioning. */}
       <View
         className={
@@ -104,13 +104,19 @@ function ProductDetail({ piece }: ProductDetailProps) {
           onPress={() => router.back()}
           variant="outline"
         />
-        <Text
-          className="flex-1 text-center"
-          numberOfLines={1}
-          variant="headingMd"
+        <Animated.View
+          aria-hidden={!parallax.titleHidden}
+          className="flex-1 items-center justify-center"
+          style={parallax.titleFadeStyle}
         >
-          {parallax.titleHidden ? piece.name : null}
-        </Text>
+          <Text
+            className="w-full text-center"
+            numberOfLines={1}
+            variant="headingMd"
+          >
+            {piece.name}
+          </Text>
+        </Animated.View>
         <IconButton
           accessibilityLabel={isSaved ? "Remove from saved" : "Save this piece"}
           icon={isSaved ? "heart-filled" : "heart"}
