@@ -294,8 +294,10 @@ content below is a sheet that overlaps the photograph's bottom edge slightly
 and carries the Home sheet's top corner radius (`rounded-t-5xl`). The
 photograph is fixed behind the sheet and drifts upward with a parallax lag
 as the sheet slides over it; scrolling back down uncovers it again. The
-header row (back · centred "Product Details" title · favourite) stays fixed
-above the scrolling sheet. The earlier
+header row (back · title · favourite) stays fixed
+above the scrolling sheet: it starts empty over the hero and shows the piece
+name once the in-content title has scrolled past it, clearing again when
+scrolled back. The earlier
 three-frame gallery strip was removed — one composed image leads, and
 everything below keeps its place in the flow.
 

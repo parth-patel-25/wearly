@@ -85,15 +85,18 @@ function ProductDetail({ piece }: ProductDetailProps) {
           floating over the hero, solid `bg-card` once scrolled — the border
           slot is always rendered so the switch never re-lays-out. Symmetric
           `pt-4`/`pb-4` around the `size-12` buttons so the hairline never
-          touches the icons. The photo is pulled up by the header's exact
-          height (`-mt-20` = buttons + `pt-4` + `pb-4`) without any absolute
-          positioning. */}
+          touches the icons. The title starts empty and takes over the piece
+          name once the in-content title has scrolled past it. The photo is
+          pulled up by the header's exact height (`-mt-20` = buttons +
+          `pt-4` + `pb-4`) without any absolute positioning. */}
       <View
         className={
           parallax.headerSolid
             ? "z-10 flex-row items-center justify-between border-border border-b bg-card px-gutter pt-4 pb-4"
             : "z-10 flex-row items-center justify-between border-transparent border-b bg-transparent px-gutter pt-4 pb-4"
         }
+        onLayout={parallax.onCrossingLayout}
+        ref={parallax.headerRef}
       >
         <IconButton
           accessibilityLabel="Go back"
@@ -101,8 +104,12 @@ function ProductDetail({ piece }: ProductDetailProps) {
           onPress={() => router.back()}
           variant="outline"
         />
-        <Text className="flex-1 text-center" variant="headingMd">
-          Product Details
+        <Text
+          className="flex-1 text-center"
+          numberOfLines={1}
+          variant="headingMd"
+        >
+          {parallax.titleHidden ? piece.name : null}
         </Text>
         <IconButton
           accessibilityLabel={isSaved ? "Remove from saved" : "Save this piece"}
@@ -151,7 +158,11 @@ function ProductDetail({ piece }: ProductDetailProps) {
             blending into it. Rose-tinted, never grey. */}
         <View className="flex flex-col gap-10 rounded-t-6xl bg-card pt-8 pb-8 shadow-lift">
           <View className="gap-2 px-gutter">
-            <Text variant="headingXl">{piece.name}</Text>
+            {/* Measured (see `useHeroParallax`): when this title scrolls fully
+                past the header, the header takes over showing the piece name. */}
+            <View onLayout={parallax.onCrossingLayout} ref={parallax.titleRef}>
+              <Text variant="headingXl">{piece.name}</Text>
+            </View>
             <Text variant="price">{`${formatRupees(piece.dailyRate)} / day`}</Text>
             <Text tone="muted-foreground" variant="bodySm">
               {`${summary} · ${formatRupees(piece.deposit)} refundable deposit`}

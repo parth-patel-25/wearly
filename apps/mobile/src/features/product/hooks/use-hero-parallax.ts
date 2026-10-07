@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { LayoutChangeEvent } from "react-native";
+import { useRef, useState } from "react";
+import type { LayoutChangeEvent, View } from "react-native";
 import { Dimensions } from "react-native";
 import {
   runOnJS,
@@ -22,6 +22,10 @@ import {
  * with `onLayout` (estimated from the full-bleed 3:4 frame first, so the
  * sheet starts in the right place on frame one). Under reduced motion the
  * photo stays put — only the movement is dropped.
+ *
+ * It also reports when the in-content title has scrolled fully past the
+ * header (`titleHidden`), so the header can take over showing the piece name.
+ * Both flags only flip on crossings, never per-frame.
  */
 
 // `SHEET_PEEK` (size-16): how far the sheet overlaps the photo's bottom edge
@@ -40,13 +44,29 @@ export function useHeroParallax() {
   const reduceMotion = useReducedMotion() === true;
   const scrollY = useSharedValue(0);
   const solidShared = useSharedValue(false);
+  const crossAt = useSharedValue(0);
+  const titleHiddenShared = useSharedValue(false);
+  const headerRef = useRef<View>(null);
+  const titleRef = useRef<View>(null);
   const [photoHeight, setPhotoHeight] = useState(
     Dimensions.get("window").width * (4 / 3)
   );
   const [headerSolid, setHeaderSolid] = useState(false);
+  const [titleHidden, setTitleHidden] = useState(false);
 
   const onPhotoLayout = (event: LayoutChangeEvent): void => {
     setPhotoHeight(event.nativeEvent.layout.height);
+  };
+
+  // The crossing point is measured in page coordinates — title bottom minus
+  // header bottom — so insets and type sizes cannot throw it off. Recomputed
+  // on either layout, which also covers rotation.
+  const onCrossingLayout = (): void => {
+    titleRef.current?.measure((_x, _y, _w, h, _pageX, pageY) => {
+      headerRef.current?.measure((_hx, _hy, _hw, hh, _hpageX, hpageY) => {
+        crossAt.value = pageY + h - (hpageY + hh);
+      });
+    });
   };
 
   const onScroll = useAnimatedScrollHandler({
@@ -69,6 +89,11 @@ export function useHeroParallax() {
         solidShared.value = false;
         runOnJS(setHeaderSolid)(false);
       }
+      const hidden = y > crossAt.value;
+      if (hidden !== titleHiddenShared.value) {
+        titleHiddenShared.value = hidden;
+        runOnJS(setTitleHidden)(hidden);
+      }
     }
   );
 
@@ -84,11 +109,15 @@ export function useHeroParallax() {
   }));
 
   return {
+    headerRef,
     headerSolid,
+    onCrossingLayout,
     onPhotoLayout,
     onScroll,
     photoStyle,
     scrollerMarginTop: -photoHeight,
     spacerHeight: Math.max(photoHeight - SHEET_PEEK, 0),
+    titleHidden,
+    titleRef,
   };
 }
