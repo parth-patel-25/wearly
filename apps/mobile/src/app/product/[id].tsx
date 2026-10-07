@@ -83,20 +83,23 @@ function ProductDetail({ piece }: ProductDetailProps) {
       {/* Fixed header: a flex sibling above the scroller (`z-10`), so it stays
           put while photo and sheet move underneath it. Transparent while
           floating over the hero, solid `bg-card` once scrolled — the border
-          slot is always rendered so the switch never re-lays-out. The photo
-          is pulled up by the header's exact height (`-mt-16` = size-12
-          button + pt-4) without any absolute positioning. */}
+          slot is always rendered so the switch never re-lays-out. Symmetric
+          `pt-4`/`pb-4` around the `size-12` buttons so the hairline never
+          touches the icons. The photo is pulled up by the header's exact
+          height (`-mt-20` = buttons + `pt-4` + `pb-4`) without any absolute
+          positioning. */}
       <View
         className={
           parallax.headerSolid
-            ? "z-10 flex-row items-center justify-between border-border border-b bg-card px-gutter pt-4"
-            : "z-10 flex-row items-center justify-between border-transparent border-b bg-transparent px-gutter pt-4"
+            ? "z-10 flex-row items-center justify-between border-border border-b bg-card px-gutter pt-4 pb-4"
+            : "z-10 flex-row items-center justify-between border-transparent border-b bg-transparent px-gutter pt-4 pb-4"
         }
       >
         <IconButton
           accessibilityLabel="Go back"
           icon="arrow-left"
           onPress={() => router.back()}
+          variant="outline"
         />
         <Text className="flex-1 text-center" variant="headingMd">
           Product Details
@@ -115,7 +118,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
       {/* Parallax hero: fixed outside the scroller and drifting up slower than
           the sheet (see `useHeroParallax`) instead of scrolling with it. */}
       <Animated.View
-        className="-mt-16"
+        className="-mt-20"
         onLayout={parallax.onPhotoLayout}
         style={parallax.photoStyle}
       >

@@ -920,6 +920,8 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-07 | Product header gains symmetric `pb-4` (`pt-4` + `pb-4` around the `size-12` buttons) so the hairline never touches the icons; the photo pull-up moves `-mt-16` → `-mt-20` to match the new 80px header height. |
+| 2026-10-07 | Product header back button uses the `outline` variant (`bg-card` + `border-border`, same `size-12` as the heart): white with a border instead of transparent ghost, so it reads over the photo. No new tokens. |
 | 2026-10-07 | Product status strip gets its own opaque backdrop (`pt-safe` View, `bg-background` at rest → `bg-card` once scrolled): the parallax photo drifts up underneath it instead of showing through the status bar. Same `z-10` as the header so paint order holds. |
 | 2026-10-07 | Product header gains a solid `bg-card` background with a hairline once scrolled (`y > 8`, clears at rest): transparent while floating over the hero, solid once content slides underneath. Border slot always rendered (`border-transparent` at rest) so pinning never re-lays-out. |
 | 2026-10-07 | Product hero parallax: the fixed photo drifts up at half the scroll speed (`useHeroParallax`, Reanimated UI thread, honours reduced motion) while the sheet slides over it. Sticky-header attempt reverted — header is a fixed sibling above the scroller again. |
