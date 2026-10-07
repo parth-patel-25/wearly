@@ -170,10 +170,14 @@ screen changes as the circle starts moving, not after it lands.
 
 **Never open on a login screen.** The first experience is a brand moment.
 
-1. **Splash** — animated. Logo, custom visual asset, soft pink/warm background,
-   subtle animation, smooth transition into the app. In the spirit of a warm
-   emotional brand introduction, but with its own identity and assets. It must
-   feel like *"Welcome to Wearly"*, not *"Please create an account"*.
+1. **Splash** — fabric-reveal brand moment. The approved flow-mark SVG (soft
+   `w` + two leaves, exact geometry and brand pinks) is unveiled left→right
+   as if soft fabric is flowing into the mark — never a generic fade, bounce
+   or spinner — then the `wearly` wordmark and `WEAR / RENT / REPEAT` tagline
+   arrive quietly beneath it (~1.8s total, calm crossfade into the app). In
+   the spirit of a warm emotional brand introduction, but with its own
+   identity and assets. It must feel like *"Welcome to Wearly"*, not *"Please
+   create an account"*.
 2. **Welcome / personalisation** — three steps, pre-authentication. Never a
    registration form; the questions are asked like a conversation.
 

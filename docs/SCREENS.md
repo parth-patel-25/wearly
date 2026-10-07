@@ -10,7 +10,13 @@ The product intent behind each screen lives in `docs/WEARLY_UI_UX_SPEC.md`.
 
 Proves the design language and the hero-expansion interaction end to end.
 
-- [x] 01 Splash / onboarding — animated brand moment
+- [x] 01 Splash / onboarding — fabric-reveal brand moment (`features/splash`):
+  the approved flow-mark SVG (`assets/brand/wearly-flow-mark.svg`, W + two
+  leaves, geometry untouched) wipes in left→right under a background-toned
+  veil, the vivid flourish settles last, then the `wearly` wordmark and the
+  `WEAR / RENT / REPEAT` tagline (Satoshi — the SVG carries the mark only)
+  fade/rise in. ~1.8s total, UI-thread only, reduced-motion collapses to a
+  short fade, dark variant re-tones the gradients without touching geometry.
 - [x] 02 Home — magazine marketplace at `/(tabs)` (single Home; v1/v2 variants removed 2026-10-05)
 - [x] 03 Search — in Discover
 - [x] 04 Categories — in Discover (chip rail)
