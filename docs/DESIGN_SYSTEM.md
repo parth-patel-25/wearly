@@ -348,7 +348,7 @@ Barely noticeable by design.
 | `shadow-soft` | `0 1px 3px` @ 5% | Cards, resting surfaces |
 | `shadow-raised` | `0 4px 16px -2px` @ 7% | Hovered, draggable |
 | `shadow-float` | `0 8px 30px -6px` @ 10% | Dialogs, sheets, sticky bars |
-| `shadow-lift` | `0 12px 36px -8px` @ 14% | Sheets overlapping photography |
+| `shadow-lift` | `0 16px 48px -8px` @ 18% | Sheets overlapping photography |
 
 Shadows are rose-tinted so they never read as cold grey. If a card needs a
 strong shadow to be readable, the problem is its border or surface contrast,
@@ -920,6 +920,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-07 | Product sheet `shadow-lift` deepened (`0 12px 36px -8px` @ 14% → `0 16px 48px -8px` @ 18%) so the 56px top radius reads against light photography. |
 | 2026-10-07 | Product detail sheet flows flush into the sticky CTA: debug `border-red-500` removed, scroll `pb-8` moved inside the sheet (`pt-8 pb-8`) so no blank strip sits between the sheet and the bar's hairline. |
 | 2026-10-07 | Product detail sticky CTA is a static flex footer (same as rent flow), not an absolute overlay — the `pb-44` scroll clearance is removed so no white strip sits above `Rent this`. |
 | 2026-10-07 | Product detail content sheet: new `--wearly-radius-6xl` (56px, `rounded-t-6xl`) and new `shadow-lift` (`--wearly-shadow-xl`, one step above `float`) so the white curve lifts off the hero photograph. Both declared in `design-tokens` and symmetric across themes; no one-off values. |
