@@ -102,12 +102,14 @@ function ProductDetail({ piece }: ProductDetailProps) {
           aspect="3/4"
           className="-mt-16"
           src={piece.images[0]}
-          tone={piece.gallery[0]}
+          tone="secondary"
         />
 
-        {/* The content sheet overlaps the image's bottom edge (`-mt-8`) and
-            carries the Home content sheet's top corner radius. */}
-        <View className="-mt-8 flex flex-col gap-10 rounded-t-5xl bg-background pt-8">
+        {/* The content sheet overlaps the image's bottom edge (`-mt-16`) so
+            the rounded top corners read clearly against the photograph. Pure
+            `bg-card` white, same as the Home sheet, so the curve stays
+            visible against the pink-toned image placeholders. */}
+        <View className="-mt-16 flex flex-col gap-10 rounded-t-5xl bg-card pt-8">
           <View className="gap-2 px-gutter">
             <Text variant="headingXl">{piece.name}</Text>
             <Text variant="price">{`${formatRupees(piece.dailyRate)} / day`}</Text>

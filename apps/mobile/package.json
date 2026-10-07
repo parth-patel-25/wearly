@@ -4,11 +4,11 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
-    "android": "expo start --android",
+    "android": "expo run:android",
     "clean": "rm -rf .expo .turbo dist *.tsbuildinfo",
     "dev": "expo start",
     "images:generate": "bun scripts/generate-catalogue-images.ts",
-    "ios": "expo start --ios",
+    "ios": "expo run:ios",
     "start": "expo start",
     "typecheck": "tsc --noEmit",
     "web": "expo start --web"
