@@ -25,19 +25,20 @@ import { useCallback } from "react";
  */
 export function useOpenProduct(): (
   id: string,
-  frame: ProductCardFrame
+  frame?: ProductCardFrame
 ) => void {
   const router = useRouter();
   const { begin } = useHero();
 
   return useCallback(
-    (id: string, frame: ProductCardFrame) => {
+    (id: string, frame?: ProductCardFrame) => {
       const piece = findPiece(id);
       const [tone] = piece?.gallery ?? [];
 
-      if (piece && tone && frame.width > 0 && frame.height > 0) {
+      if (piece && tone && frame && frame.width > 0 && frame.height > 0) {
         begin(id, frame, () => (
-          <Media aspect="4/5" src={piece.images[0]} tone={tone} />
+          // 3:4, like the detail hero — a mismatched aspect snaps at handoff.
+          <Media aspect="3/4" src={piece.images[0]} tone={tone} />
         ));
       }
 

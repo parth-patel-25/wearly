@@ -400,7 +400,7 @@ matching the existing `./screen` and `./providers` convention.
 | Overlays | `bottom-sheet` `toast` |
 | Brand | `brand-mark` |
 | Motion | `motion` `tone` `icon` `icon-glyphs` `control-tokens` |
-| Hero transition | `hero-provider` `hero-layer` |
+| Hero transition | `hero-provider` `hero-layer` `use-product-enter` — card frame expands (slide + scale + fade) to the 3:4 full-bleed hero while the detail sheet/buttons enter together; Home scope first |
 | Layout | `screen` `providers` `app-list` |
 
 `ProductGrid` wraps `AppList` (FlashList), not `ScrollView`. The catalogue is expected to
@@ -922,6 +922,7 @@ Never introduce a second styling system, and never add a component library.
 | --- | --- |
 | 2026-10-07 | Product sticky CTA is one full-width button — `Rent this · ₹total` (`dailyRate × days`) with a smaller `/N days` suffix nested in the label (`caption`, `primary-foreground`). The side price block and deposit note are gone; the footer is just the bar + button. |
 | 2026-10-07 | Product header chrome (status backdrop, bar background, hairline) shares one animated opacity (`DURATION.base`, instant under reduced motion) instead of instant class swaps: the header is a column shell with a fading `bg-card` layer, content row, and 1px hairline. Title steps down `headingMd` → `headingSm`. |
+| 2026-10-07 | Product hero handoff is sequenced, not overlapped: the detail photo entrance waits for the hero overlay to finish expanding (`phase === "settled"`, 600ms fallback) so the image never renders twice; overlay renders the same 3:4 frame and holds the 20px media radius end to end so corners never snap. |
 | 2026-10-07 | Product header title fades in/out (`opacity`, `DURATION.base` 200ms on the UI thread, instant under reduced motion) instead of popping: always mounted, `aria-hidden` while transparent. |
 | 2026-10-07 | Product header title is dynamic: empty at rest, shows the piece name (truncated) once the in-content title scrolls fully past the header, clears when scrolled back. Crossing measured with page coords (`measure` on title + header, threshold in a shared value) so it survives insets and type sizes. |
 | 2026-10-07 | Product header gains symmetric `pb-4` (`pt-4` + `pb-4` around the `size-12` buttons) so the hairline never touches the icons; the photo pull-up moves `-mt-16` → `-mt-20` to match the new 80px header height. |

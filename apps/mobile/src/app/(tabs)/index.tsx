@@ -3,6 +3,7 @@ import { HomeContent } from "@features/home/components/home-content";
 import { HomeIntroCard } from "@features/home/components/home-intro-card";
 import { HomeSearch } from "@features/home/components/home-search";
 import { RecommendedGrid } from "@features/home/components/recommended-grid";
+import { useOpenProduct } from "@features/product/hooks/use-open-product";
 import {
   CATALOGUE,
   CATALOGUE_DISCLAIMER,
@@ -65,7 +66,7 @@ export default function HomeScreen() {
     []
   );
   const recommended = useMemo(() => items.slice(0, GRID_COUNT), [items]);
-  const open = (id: string) => router.push(ROUTES.product(id));
+  const open = useOpenProduct();
   // Home search is an entry point: hand off to Discover focused, with no
   // local filtering. `q` (even empty) is the focus signal.
   const toDiscover = () =>

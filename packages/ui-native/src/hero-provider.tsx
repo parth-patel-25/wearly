@@ -32,9 +32,13 @@ export interface HeroFrame {
   y: number;
 }
 
+export type HeroPhase = "collapsing" | "expanding" | "settled";
+
 export interface HeroState {
   /** What is expanding, and from where. */
   frame: HeroFrame | null;
+  /** Which phase the overlay is in. Null frame means idle. */
+  phase: HeroPhase | null;
   /** The content the expanding surface shows while it grows. */
   render: (() => ReactNode) | null;
   /** The product the expansion belongs to, so a deep link can skip it. */
@@ -44,8 +48,12 @@ export interface HeroState {
 interface HeroApi {
   /** Record the tapped card's frame, then navigate. */
   begin: (targetId: string, frame: HeroFrame, render: () => ReactNode) => void;
-  /** Clear once the expansion has finished. */
+  /** Clear once the collapse has finished. */
   end: () => void;
+  /** Mark the expand finished so the overlay can fade out. */
+  settle: () => void;
+  /** Replay the expansion backwards (back navigation mirror). */
+  startCollapse: () => void;
   state: HeroState;
 }
 
@@ -54,24 +62,35 @@ const HeroContext = createContext<HeroApi | null>(null);
 export function HeroProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<HeroState>({
     frame: null,
+    phase: null,
     render: null,
     targetId: null,
   });
 
   const begin = useCallback(
     (targetId: string, frame: HeroFrame, render: () => ReactNode) => {
-      setState({ frame, render, targetId });
+      setState({ frame, phase: "expanding", render, targetId });
     },
     []
   );
 
+  const settle = useCallback(() => {
+    setState((prev) =>
+      prev.phase === "expanding" ? { ...prev, phase: "settled" } : prev
+    );
+  }, []);
+
+  const startCollapse = useCallback(() => {
+    setState((prev) => (prev.frame ? { ...prev, phase: "collapsing" } : prev));
+  }, []);
+
   const end = useCallback(() => {
-    setState({ frame: null, render: null, targetId: null });
+    setState({ frame: null, phase: null, render: null, targetId: null });
   }, []);
 
   const api = useMemo<HeroApi>(
-    () => ({ begin, end, state }),
-    [begin, end, state]
+    () => ({ begin, end, settle, startCollapse, state }),
+    [begin, end, settle, startCollapse, state]
   );
 
   return <HeroContext.Provider value={api}>{children}</HeroContext.Provider>;

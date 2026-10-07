@@ -1,6 +1,7 @@
 import { useSession } from "@core/providers/session-provider";
 import { datesFor, ROUTES } from "@core/routing/routes";
 import { useHeroParallax } from "@features/product/hooks/use-hero-parallax";
+import { useProductEnter } from "@features/product/hooks/use-product-enter";
 import type { Piece } from "@shared/data/catalogue";
 import {
   CONDITION_LABEL,
@@ -64,6 +65,8 @@ function ProductDetail({ piece }: ProductDetailProps) {
   const size = sizeOf(piece);
   const summary = rentalSummary(piece, RENTAL_DAYS);
   const parallax = useHeroParallax();
+  const enter = useProductEnter(piece.id);
+  const handleBack = () => enter.playExit(() => router.back());
 
   return (
     // The status strip is its own `bg-card` backdrop (inset height only),
@@ -93,12 +96,14 @@ function ProductDetail({ piece }: ProductDetailProps) {
       >
         <Animated.View className="h-20 bg-card" style={parallax.chromeStyle} />
         <View className="-mt-20 flex-row items-center justify-between px-gutter pt-4 pb-4">
-          <IconButton
-            accessibilityLabel="Go back"
-            icon="arrow-left"
-            onPress={() => router.back()}
-            variant="outline"
-          />
+          <Animated.View style={enter.leftButtonStyle}>
+            <IconButton
+              accessibilityLabel="Go back"
+              icon="arrow-left"
+              onPress={handleBack}
+              variant="outline"
+            />
+          </Animated.View>
           <Animated.View
             aria-hidden={!parallax.titleHidden}
             className="flex-1 items-center justify-center"
@@ -112,17 +117,19 @@ function ProductDetail({ piece }: ProductDetailProps) {
               {piece.name}
             </Text>
           </Animated.View>
-          <IconButton
-            accessibilityLabel={
-              isSaved ? "Remove from saved" : "Save this piece"
-            }
-            icon={isSaved ? "heart-filled" : "heart"}
-            onPress={() =>
-              dispatch({ pieceId: piece.id, type: "toggle-favourite" })
-            }
-            tone="primary"
-            variant="soft"
-          />
+          <Animated.View style={enter.rightButtonStyle}>
+            <IconButton
+              accessibilityLabel={
+                isSaved ? "Remove from saved" : "Save this piece"
+              }
+              icon={isSaved ? "heart-filled" : "heart"}
+              onPress={() =>
+                dispatch({ pieceId: piece.id, type: "toggle-favourite" })
+              }
+              tone="primary"
+              variant="soft"
+            />
+          </Animated.View>
         </View>
         <Animated.View
           className="h-px w-full bg-border"
@@ -131,13 +138,15 @@ function ProductDetail({ piece }: ProductDetailProps) {
       </View>
 
       {/* Parallax hero: fixed outside the scroller and drifting up slower than
-          the sheet (see `useHeroParallax`) instead of scrolling with it. */}
-      <Animated.View
-        className="-mt-20"
-        onLayout={parallax.onPhotoLayout}
-        style={parallax.photoStyle}
-      >
-        <Media aspect="3/4" src={piece.images[0]} tone="secondary" />
+          the sheet (see `useHeroParallax`) instead of scrolling with it.
+          Outer entrance (slide + scale + fade), inner parallax drift. */}
+      <Animated.View className="-mt-20" style={enter.photoStyle}>
+        <Animated.View
+          onLayout={parallax.onPhotoLayout}
+          style={parallax.photoStyle}
+        >
+          <Media aspect="3/4" src={piece.images[0]} tone="secondary" />
+        </Animated.View>
       </Animated.View>
 
       <Animated.ScrollView
@@ -163,8 +172,12 @@ function ProductDetail({ piece }: ProductDetailProps) {
             `bg-card` white, same as the Home sheet, at one radius step larger
             (`rounded-t-6xl`), plus `shadow-lift` — one step above the sheet
             elevation — so the white lifts off light imagery instead of
-            blending into it. Rose-tinted, never grey. */}
-        <View className="flex flex-col gap-10 rounded-t-6xl bg-card pt-8 pb-8 shadow-lift">
+            blending into it. Rose-tinted, never grey.
+            Entrance: rises from the bottom with a fade. */}
+        <Animated.View
+          className="flex flex-col gap-10 rounded-t-6xl bg-card pt-8 pb-8 shadow-lift"
+          style={enter.sheetStyle}
+        >
           <View className="gap-2 px-gutter">
             {/* Measured (see `useHeroParallax`): when this title scrolls fully
                 past the header, the header takes over showing the piece name. */}
@@ -275,7 +288,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
               </Text>
             </View>
           </Section>
-        </View>
+        </Animated.View>
       </Animated.ScrollView>
 
       <StickyCta

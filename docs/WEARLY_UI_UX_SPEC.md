@@ -117,7 +117,7 @@ strong-but-soft hierarchy, clear labels. Obvious without being aggressive.
 | --- | --- |
 | Button press | `1.0 → 0.97 → 1.0`, very short, soft spring back |
 | Favourite heart | small pop, smooth colour transition |
-| Card → detail | **hero expansion** — the card opens into the page |
+| Card → detail | **hero expansion** — the card image slides and scales up to full-bleed, content sheet rises from the bottom, header back slides from the left and save slides from the right, all with fade in/out together (~280ms, quick + together). Back mirrors the same choreography in reverse |
 | Bottom sheet | slides from the bottom, scrim fades in |
 | Screen change | gentle fade / scale, never delays navigation |
 

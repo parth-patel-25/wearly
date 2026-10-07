@@ -2,6 +2,7 @@ import type { ListRenderItem } from "@shopify/flash-list";
 import { AppList } from "@wearly/ui-native/app-list";
 import { Chip } from "@wearly/ui-native/badge";
 import { SectionHeader } from "@wearly/ui-native/display";
+import type { ProductCardFrame } from "@wearly/ui-native/product-card";
 import { ProductCard } from "@wearly/ui-native/product-card";
 import type { ProductGridItem } from "@wearly/ui-native/product-grid";
 import { View } from "react-native";
@@ -19,7 +20,7 @@ interface ProductRailProps {
   favourites: ReadonlySet<string>;
   items: readonly ProductGridItem[];
   onFavourite: (id: string) => void;
-  onOpen: (id: string) => void;
+  onOpen: (id: string, frame?: ProductCardFrame) => void;
   onSeeAll: () => void;
   title: string;
 }
@@ -41,7 +42,7 @@ export function ProductRail({
         {...item}
         isFavourite={favourites.has(item.id)}
         onFavourite={() => onFavourite(item.id)}
-        onPress={() => onOpen(item.id)}
+        onPress={(frame) => onOpen(item.id, frame)}
       />
     </View>
   );

@@ -1,3 +1,4 @@
+import type { ProductCardFrame } from "@wearly/ui-native/product-card";
 import type { ProductGridItem } from "@wearly/ui-native/product-grid";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
@@ -31,7 +32,7 @@ interface HomeContentProps {
   fresh: readonly ProductGridItem[];
   onExploreHero: () => void;
   onFavourite: (id: string) => void;
-  onOpen: (id: string) => void;
+  onOpen: (id: string, frame?: ProductCardFrame) => void;
   onSeeAll: () => void;
   trending: readonly ProductGridItem[];
 }

@@ -5,6 +5,7 @@ import type { SharedValue } from "react-native-reanimated";
 import Animated, {
   Easing,
   interpolate,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -15,50 +16,63 @@ import { useHero } from "./hero-provider";
 /**
  * The expanding surface.
  *
- * Rendered once, at the root, above everything. When a card is tapped its frame
- * is recorded, the product page navigates, and this layer animates the tapped
- * card's own media from that rectangle up to full bleed. The real page content is
- * faded in underneath as the expansion completes, so the two are never both
- * fighting for attention.
- *
- * The reverse — collapsing the page back into the grid — runs the same values
- * backwards, which is why the destination grid cell is measured on the way out
- * rather than guessed at.
+ * Quick + together: the tapped card's media slides and scales up to the
+ * full-bleed 3:4 hero while fading in, then fades out to reveal the detail
+ * page running its own matching entrance underneath. Back navigation mirrors
+ * it: the overlay fades back in and collapses to the recorded frame.
  */
 
 const EASING = Easing.bezier(0.16, 1, 0.3, 1);
-const EXPAND_MS = DURATION.slow;
+const EXPAND_MS = 260;
+const COLLAPSE_MS = 240;
+const REVEAL_MS = 140;
 
 export function HeroLayer() {
-  const { end, state } = useHero();
+  const { end, settle, state } = useHero();
   const progress = useSharedValue(0);
+  const overlay = useSharedValue(0);
   const screen = Dimensions.get("window");
 
   useEffect(() => {
-    if (state.frame) {
+    if (state.phase === "expanding") {
       progress.value = 0;
-      progress.value = withTiming(1, { duration: EXPAND_MS, easing: EASING });
-      return;
+      overlay.value = 1;
+      progress.value = withTiming(
+        1,
+        { duration: EXPAND_MS, easing: EASING },
+        (finished) => {
+          if (finished) {
+            runOnJS(settle)();
+          }
+        }
+      );
+    } else if (state.phase === "settled") {
+      overlay.value = withTiming(0, {
+        duration: REVEAL_MS,
+        easing: Easing.out(Easing.quad),
+      });
+    } else if (state.phase === "collapsing") {
+      overlay.value = withTiming(1, { duration: DURATION.instant });
+      progress.value = withTiming(
+        0,
+        { duration: COLLAPSE_MS, easing: EASING },
+        (finished) => {
+          if (finished) {
+            runOnJS(end)();
+          }
+        }
+      );
     }
-    progress.value = withTiming(0, { duration: DURATION.fast });
-  }, [progress, state.frame]);
+  }, [end, overlay, progress, settle, state.phase]);
 
-  useEffect(() => {
-    if (!state.frame) {
-      // Let the collapse finish before the overlay stops rendering, otherwise
-      // the page would pop back in mid-animation.
-      const timeout = setTimeout(() => end(), DURATION.fast);
-      return () => clearTimeout(timeout);
-    }
-  }, [end, state.frame]);
-
-  if (!(state.frame && state.render)) {
+  if (!(state.frame && state.render && state.phase)) {
     return null;
   }
 
   return (
     <ExpandingSurface
       frame={state.frame}
+      overlay={overlay}
       progress={progress}
       render={state.render}
       screen={screen}
@@ -68,6 +82,7 @@ export function HeroLayer() {
 
 interface ExpandingSurfaceProps {
   frame: { height: number; width: number; x: number; y: number };
+  overlay: SharedValue<number>;
   progress: SharedValue<number>;
   render: () => React.ReactNode;
   screen: { height: number; width: number };
@@ -75,28 +90,35 @@ interface ExpandingSurfaceProps {
 
 function ExpandingSurface({
   frame,
+  overlay,
   progress,
   render,
   screen,
 }: ExpandingSurfaceProps) {
+  const targetWidth = screen.width;
+  const targetHeight = Math.round(screen.width * (4 / 3));
   const style = useAnimatedStyle(() => {
     const top = interpolate(progress.value, [0, 1], [frame.y, 0]);
     const left = interpolate(progress.value, [0, 1], [frame.x, 0]);
     const width = interpolate(
       progress.value,
       [0, 1],
-      [frame.width, screen.width]
+      [frame.width, targetWidth]
     );
     const height = interpolate(
       progress.value,
       [0, 1],
-      [frame.height, screen.height]
+      [frame.height, targetHeight]
     );
+    const fadeIn = interpolate(progress.value, [0, 0.2, 1], [0, 1, 1]);
 
     return {
+      // Constant 20px (`rounded-media`): the card and the detail hero both
+      // round at 20, so morphing the radius would snap at both handoffs.
+      borderRadius: 20,
       height,
       left,
-      opacity: interpolate(progress.value, [0, 0.15, 1], [1, 1, 1]),
+      opacity: overlay.value * fadeIn,
       top,
       width,
       zIndex: 10,
@@ -105,7 +127,7 @@ function ExpandingSurface({
 
   return (
     <View className="absolute inset-0" pointerEvents="none">
-      <Animated.View className="overflow-hidden rounded-media" style={style}>
+      <Animated.View className="overflow-hidden" style={style}>
         {render()}
       </Animated.View>
     </View>

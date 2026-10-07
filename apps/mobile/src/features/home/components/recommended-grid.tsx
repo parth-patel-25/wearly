@@ -1,4 +1,5 @@
 import { EmptyState, SectionHeader } from "@wearly/ui-native/display";
+import type { ProductCardFrame } from "@wearly/ui-native/product-card";
 import { ProductCard } from "@wearly/ui-native/product-card";
 import type { ProductGridItem } from "@wearly/ui-native/product-grid";
 import { useMemo } from "react";
@@ -18,7 +19,7 @@ interface RecommendedGridProps {
   favourites: ReadonlySet<string>;
   items: readonly ProductGridItem[];
   onFavourite: (id: string) => void;
-  onOpen: (id: string) => void;
+  onOpen: (id: string, frame?: ProductCardFrame) => void;
 }
 
 const PAIR = 2;
@@ -69,7 +70,7 @@ export function RecommendedGrid({
                   {...item}
                   isFavourite={favourites.has(item.id)}
                   onFavourite={() => onFavourite(item.id)}
-                  onPress={() => onOpen(item.id)}
+                  onPress={(frame) => onOpen(item.id, frame)}
                 />
               </View>
             ))}
