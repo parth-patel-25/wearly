@@ -291,7 +291,11 @@ disclosure. The primary CTA (`Rent this`) stays accessible while scrolling.
 Structure: a full-bleed 3:4 photograph leads, with the header row (back ·
 centred "Product Details" title · favourite) floating over its top. The
 content below is a sheet that overlaps the photograph's bottom edge slightly
-and carries the Home sheet's top corner radius (`rounded-t-5xl`). The earlier
+and carries the Home sheet's top corner radius (`rounded-t-5xl`). The
+photograph is fixed behind the sheet and drifts upward with a parallax lag
+as the sheet slides over it; scrolling back down uncovers it again. The
+header row (back · centred "Product Details" title · favourite) stays fixed
+above the scrolling sheet. The earlier
 three-frame gallery strip was removed — one composed image leads, and
 everything below keeps its place in the flow.
 

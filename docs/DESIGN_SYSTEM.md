@@ -920,6 +920,11 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-07 | Product status strip gets its own opaque backdrop (`pt-safe` View, `bg-background` at rest → `bg-card` once scrolled): the parallax photo drifts up underneath it instead of showing through the status bar. Same `z-10` as the header so paint order holds. |
+| 2026-10-07 | Product header gains a solid `bg-card` background with a hairline once scrolled (`y > 8`, clears at rest): transparent while floating over the hero, solid once content slides underneath. Border slot always rendered (`border-transparent` at rest) so pinning never re-lays-out. |
+| 2026-10-07 | Product hero parallax: the fixed photo drifts up at half the scroll speed (`useHeroParallax`, Reanimated UI thread, honours reduced motion) while the sheet slides over it. Sticky-header attempt reverted — header is a fixed sibling above the scroller again. |
+| 2026-10-07 | Product detail header is sticky (`stickyHeaderIndices`, same as Home search): the 3:4 photo scrolls in-flow and slides up with the sheet, and the header stays pinned above the scrolling content. Fixed-photo overlay removed. |
+| 2026-10-07 | Product detail hero is fixed: the scroll layer overlaps the photo (transparent spacer) so the sheet slides up over it on scroll and uncovers it on scroll back. Header stays fixed above the scroller. No absolute positioning — flex siblings plus a measured negative margin. |
 | 2026-10-07 | Product sheet `shadow-lift` deepened (`0 12px 36px -8px` @ 14% → `0 16px 48px -8px` @ 18%) so the 56px top radius reads against light photography. |
 | 2026-10-07 | Product detail sheet flows flush into the sticky CTA: debug `border-red-500` removed, scroll `pb-8` moved inside the sheet (`pt-8 pb-8`) so no blank strip sits between the sheet and the bar's hairline. |
 | 2026-10-07 | Product detail sticky CTA is a static flex footer (same as rent flow), not an absolute overlay — the `pb-44` scroll clearance is removed so no white strip sits above `Rent this`. |

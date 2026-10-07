@@ -1,5 +1,6 @@
 import { useSession } from "@core/providers/session-provider";
 import { datesFor, ROUTES } from "@core/routing/routes";
+import { useHeroParallax } from "@features/product/hooks/use-hero-parallax";
 import type { Piece } from "@shared/data/catalogue";
 import {
   CONDITION_LABEL,
@@ -19,7 +20,8 @@ import { Media } from "@wearly/ui-native/media";
 import { KeyValueRow } from "@wearly/ui-native/status";
 import { Text } from "@wearly/ui-native/text";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
+import Animated from "react-native-reanimated";
 
 /**
  * Product detail.
@@ -61,61 +63,90 @@ function ProductDetail({ piece }: ProductDetailProps) {
   const isSaved = state.favourites.includes(piece.id);
   const size = sizeOf(piece);
   const summary = rentalSummary(piece, RENTAL_DAYS);
+  const parallax = useHeroParallax();
 
   return (
-    // `pt-safe` is the status-bar inset; the header row's own `pt-4` is the gap
-    // below it. Splitting the two is what stops the back button from sitting
-    // under the notch on a device that has one.
-    <View className="flex-1 bg-background pt-safe">
-      <ScrollView
-        className="flex flex-1 flex-col"
-        // `bg-card`: the sheet fills to the footer bar and only its hairline
-        // border separates them. The footer is a static flex sibling (same as
-        // the rent flow). Bottom breathing room lives inside the sheet
-        // (`pb-8`) so no blank strip sits between sheet and bar.
-        contentContainerClassName="flex flex-col bg-card"
-        showsVerticalScrollIndicator={false}
+    // The status strip is its own opaque backdrop (inset height only): the
+    // parallax photo drifts up underneath it instead of showing through the
+    // status bar. `bg-background` at rest, `bg-card` once the header turns
+    // solid, so the two always read as one bar. The header row's own `pt-4`
+    // is the gap below the inset, which keeps the back button clear of the
+    // notch on a device that has one.
+    <View className="flex-1 bg-background">
+      <View
+        className={
+          parallax.headerSolid
+            ? "z-10 bg-card pt-safe"
+            : "z-10 bg-background pt-safe"
+        }
+      />
+      {/* Fixed header: a flex sibling above the scroller (`z-10`), so it stays
+          put while photo and sheet move underneath it. Transparent while
+          floating over the hero, solid `bg-card` once scrolled — the border
+          slot is always rendered so the switch never re-lays-out. The photo
+          is pulled up by the header's exact height (`-mt-16` = size-12
+          button + pt-4) without any absolute positioning. */}
+      <View
+        className={
+          parallax.headerSolid
+            ? "z-10 flex-row items-center justify-between border-border border-b bg-card px-gutter pt-4"
+            : "z-10 flex-row items-center justify-between border-transparent border-b bg-transparent px-gutter pt-4"
+        }
       >
-        {/* `z-10` keeps the header above the image that follows it: the image
-            is pulled up by the header's exact height (`-mt-16` = size-12
-            button + pt-4) so the header floats over the hero without any
-            absolute positioning. */}
-        <View className="z-10 flex-row items-center justify-between px-gutter pt-4">
-          <IconButton
-            accessibilityLabel="Go back"
-            icon="arrow-left"
-            onPress={() => router.back()}
-          />
-          <Text className="flex-1 text-center" variant="headingMd">
-            Product Details
-          </Text>
-          <IconButton
-            accessibilityLabel={
-              isSaved ? "Remove from saved" : "Save this piece"
-            }
-            icon={isSaved ? "heart-filled" : "heart"}
-            onPress={() =>
-              dispatch({ pieceId: piece.id, type: "toggle-favourite" })
-            }
-            tone="primary"
-            variant="soft"
-          />
-        </View>
+        <IconButton
+          accessibilityLabel="Go back"
+          icon="arrow-left"
+          onPress={() => router.back()}
+        />
+        <Text className="flex-1 text-center" variant="headingMd">
+          Product Details
+        </Text>
+        <IconButton
+          accessibilityLabel={isSaved ? "Remove from saved" : "Save this piece"}
+          icon={isSaved ? "heart-filled" : "heart"}
+          onPress={() =>
+            dispatch({ pieceId: piece.id, type: "toggle-favourite" })
+          }
+          tone="primary"
+          variant="soft"
+        />
+      </View>
 
-        <Media
-          aspect="3/4"
-          className="-mt-16"
-          src={piece.images[0]}
-          tone="secondary"
+      {/* Parallax hero: fixed outside the scroller and drifting up slower than
+          the sheet (see `useHeroParallax`) instead of scrolling with it. */}
+      <Animated.View
+        className="-mt-16"
+        onLayout={parallax.onPhotoLayout}
+        style={parallax.photoStyle}
+      >
+        <Media aspect="3/4" src={piece.images[0]} tone="secondary" />
+      </Animated.View>
+
+      <Animated.ScrollView
+        className="flex flex-1 flex-col bg-transparent"
+        // Transparent: the photo shows through the spacer until the sheet
+        // slides up to cover it. Bottom breathing room lives inside the
+        // sheet (`pb-8`) so it meets the footer bar with only the bar's
+        // hairline between them.
+        contentContainerClassName="flex flex-col bg-transparent"
+        onScroll={parallax.onScroll}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        style={{ marginTop: parallax.scrollerMarginTop }}
+      >
+        <View
+          className="w-full bg-transparent"
+          style={{ height: parallax.spacerHeight }}
         />
 
-        {/* The content sheet overlaps the image's bottom edge (`-mt-16`) so
-            the rounded top corners read clearly against the photograph. Pure
+        {/* The content sheet rests over the photo's bottom edge (`SHEET_PEEK`
+            in `useHeroParallax`) so the rounded top corners read clearly
+            against the photograph. Pure
             `bg-card` white, same as the Home sheet, at one radius step larger
             (`rounded-t-6xl`), plus `shadow-lift` — one step above the sheet
             elevation — so the white lifts off light imagery instead of
             blending into it. Rose-tinted, never grey. */}
-        <View className="-mt-16 flex flex-col gap-10 rounded-t-6xl bg-card pt-8 pb-8 shadow-lift">
+        <View className="flex flex-col gap-10 rounded-t-6xl bg-card pt-8 pb-8 shadow-lift">
           <View className="gap-2 px-gutter">
             <Text variant="headingXl">{piece.name}</Text>
             <Text variant="price">{`${formatRupees(piece.dailyRate)} / day`}</Text>
@@ -223,7 +254,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
             </View>
           </Section>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       <StickyCta pieceId={piece.id} summary={summary} />
     </View>
