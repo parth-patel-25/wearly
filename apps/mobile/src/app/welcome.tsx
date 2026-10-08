@@ -1,10 +1,8 @@
 import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
 import { OnboardingHero } from "@features/welcome/components/onboarding-hero";
-import { Chip } from "@wearly/ui-native/badge";
-import { Button } from "@wearly/ui-native/button";
+import { OnboardingQuestion } from "@features/welcome/components/onboarding-question";
 import { Screen } from "@wearly/ui-native/screen";
-import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { View } from "react-native";
@@ -23,16 +21,16 @@ import { View } from "react-native";
  * they are welcome, not that they are being onboarded.
  *
  * Picking an answer and moving on are deliberately **two** taps. Advancing in the
- * press handler would unmount the chip on the same frame it was chosen, so the
+ * press handler would unmount the card on the same frame it was chosen, so the
  * selected state would never be seen — a choice that does not visibly register is
  * a choice the user is not sure they made, and they tap again.
  *
- * Each question opens with one chip already selected, so the flow can be answered
- * by simply moving on. That default is a *display* default only: it is shown as
- * chosen but never written to the session, so a user who taps straight through has
- * answered nothing and the footer keeps saying so. `Everyone` is the default for
- * the styling question because presuming a gender would be a worse first
- * impression than asking.
+ * Each question opens with one answer already highlighted, so the flow can be
+ * answered by simply moving on. That default is a *display* default only: it is
+ * shown as chosen but never written to the session, so a user who taps straight
+ * through has answered nothing and the footer keeps saying so. `Everyone` is the
+ * default for the styling question because presuming a gender would be a worse
+ * first impression than asking.
  *
  * The answers are stored but never used to gate anything. A prototype that
  * pretended to personalise a ranking it does not have would be exactly the fake
@@ -73,7 +71,7 @@ export default function WelcomeScreen() {
   const field: QuestionStep = isWears ? "wears" : "stylingFor";
 
   /**
-   * What the chip row highlights. A default stands in until the user picks for
+   * What the option grid highlights. A default stands in until the user picks for
    * themselves, so the screen is never in a state where nothing is selected.
    */
   const selected = state[field] ?? DEFAULT_ANSWER[field];
@@ -103,80 +101,56 @@ export default function WelcomeScreen() {
    */
   const goToStyling = useCallback(() => setStep("stylingFor"), []);
 
-  return (
-    <Screen className="flex-1 bg-background" scrollable={false}>
-      <View className="flex-1 gap-6 px-gutter pt-4 pb-6">
-        {isIntro ? (
+  if (isIntro) {
+    return (
+      <Screen className="flex-1 bg-background" scrollable={false}>
+        <View className="flex-1 gap-6 px-gutter pt-4 pb-6">
           <OnboardingHero
             onSwipeComplete={goToStyling}
             step={STEPS.indexOf(step)}
             totalSteps={TOTAL_STEPS}
           />
-        ) : (
-          <View className="flex-1 justify-between gap-10">
-            {step === "stylingFor" ? (
-              <Question
-                onPick={pick}
-                options={STYLING_FOR}
-                selected={selected}
-                title="Who are we styling for?"
-              />
-            ) : (
-              <Question
-                onPick={pick}
-                options={WEARS}
-                selected={selected}
-                title="What do you usually wear?"
-              />
-            )}
+        </View>
+      </Screen>
+    );
+  }
 
-            <View className="gap-3">
-              <Button onPress={finish} size="lg" variant="ghost">
-                Skip this
-              </Button>
-              <Button onPress={advance} size="lg">
-                {isWears ? "Start browsing" : "Next"}
-              </Button>
-              <Text
-                className="text-center"
-                tone="muted-foreground"
-                variant="caption"
-              >
-                {state.stylingFor === null
-                  ? "You can browse without an account."
-                  : `Styling for ${state.stylingFor}. You can browse without an account.`}
-              </Text>
-            </View>
-          </View>
+  const isStyling = step === "stylingFor";
+
+  return (
+    <Screen className="flex-1 bg-background" scrollable={false}>
+      <View className="flex-1 gap-6 px-gutter pt-4 pb-6">
+        {isStyling ? (
+          <OnboardingQuestion
+            caption={
+              state.stylingFor === null
+                ? "You can browse without an account."
+                : `Styling for ${state.stylingFor}. You can browse without an account.`
+            }
+            onPrimaryPress={advance}
+            onSelect={pick}
+            onSkipPress={finish}
+            options={STYLING_FOR}
+            primaryLabel="Next"
+            selected={selected}
+            step={STEPS.indexOf(step) + 1}
+            titleLines={["Who are we", "styling for?"]}
+            totalSteps={TOTAL_STEPS}
+          />
+        ) : (
+          <OnboardingQuestion
+            onPrimaryPress={advance}
+            onSelect={pick}
+            onSkipPress={finish}
+            options={WEARS}
+            primaryLabel="Start browsing"
+            selected={selected}
+            step={STEPS.indexOf(step) + 1}
+            titleLines={["What do you", "usually wear?"]}
+            totalSteps={TOTAL_STEPS}
+          />
         )}
       </View>
     </Screen>
-  );
-}
-
-interface QuestionProps {
-  onPick: (option: string) => void;
-  options: readonly string[];
-  /** Answers already given, so a picked option can show as selected. */
-  selected: string | null;
-  title: string;
-}
-
-function Question({ selected, onPick, options, title }: QuestionProps) {
-  return (
-    <View className="gap-6">
-      <Text variant="headingXl">{title}</Text>
-      <View className="flex-row flex-wrap gap-3">
-        {options.map((option) => (
-          <Chip
-            key={option}
-            onPress={() => onPick(option)}
-            selected={selected === option}
-          >
-            {option}
-          </Chip>
-        ))}
-      </View>
-    </View>
   );
 }
