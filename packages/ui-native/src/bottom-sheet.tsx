@@ -50,7 +50,7 @@ export function BottomSheet({
           onPress={onClose}
         />
         <View
-          className="max-h-sheet rounded-sheet border-border border-t bg-card px-gutter"
+          className="max-h-sheet rounded-t-sheet border-border border-t bg-card px-gutter"
           style={{ paddingBottom: insets.bottom + 24 }}
         >
           <View className="items-center pt-3 pb-2">

@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
+import Animated from "react-native-reanimated";
 import { DayCell, NavButton } from "./calendar-cell";
+import { useSlideIn } from "./motion";
 import { Text } from "./text";
 
 /**
@@ -75,6 +77,14 @@ export function Calendar({
     const from = range.start ?? minDate;
     return from ? fromKey(from) : new Date();
   });
+  const [direction, setDirection] = useState<1 | -1>(1);
+  const monthKey = toKey(visibleMonth);
+  const slideStyle = useSlideIn({ direction, resetKey: monthKey });
+
+  const go = useCallback((delta: 1 | -1) => {
+    setDirection(delta);
+    setVisibleMonth((month) => addMonths(month, delta));
+  }, []);
 
   const blockedSet = useMemo(() => new Set(blocked), [blocked]);
   const cells = useMemo(() => buildGrid(visibleMonth), [visibleMonth]);
@@ -96,22 +106,24 @@ export function Calendar({
   return (
     <View className="flex flex-col gap-4">
       <View className="flex-row items-center justify-between">
-        <Text variant="headingSm">
-          {visibleMonth.toLocaleDateString(undefined, {
-            month: "long",
-            year: "numeric",
-          })}
-        </Text>
+        <Animated.View style={slideStyle}>
+          <Text variant="headingSm">
+            {visibleMonth.toLocaleDateString(undefined, {
+              month: "long",
+              year: "numeric",
+            })}
+          </Text>
+        </Animated.View>
         <View className="flex-row gap-1">
           <NavButton
             icon="chevron-left"
             label="Previous month"
-            onPress={() => setVisibleMonth(addMonths(visibleMonth, -1))}
+            onPress={() => go(-1)}
           />
           <NavButton
             icon="chevron-right"
             label="Next month"
-            onPress={() => setVisibleMonth(addMonths(visibleMonth, 1))}
+            onPress={() => go(1)}
           />
         </View>
       </View>
@@ -129,7 +141,7 @@ export function Calendar({
         ))}
       </View>
 
-      <View className="flex-row flex-wrap">
+      <Animated.View className="flex-row flex-wrap" style={slideStyle}>
         {cells.map((key, index) => {
           if (key === null) {
             // biome-ignore lint/suspicious/noArrayIndexKey: positional placeholder
@@ -147,7 +159,7 @@ export function Calendar({
             />
           );
         })}
-      </View>
+      </Animated.View>
     </View>
   );
 }

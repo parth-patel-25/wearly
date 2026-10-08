@@ -156,3 +156,45 @@ export function useFadeIn({ delay = 0, distance = 8 }: FadeInOptions = {}) {
     transform: [{ translateY: offset.value }],
   }));
 }
+
+export interface SlideInOptions {
+  /** +1 enters from the right (next), -1 from the left (previous). */
+  direction?: 1 | -1;
+  /** How far off its resting position content starts, in pixels. */
+  distance?: number;
+  /** Change to replay the entrance — the calendar passes its month key. */
+  resetKey?: string;
+}
+
+/**
+ * A directional slide-and-fade, for paged content like calendar months. Same
+ * contract as `useFadeIn`: shared values driven from an effect, so under
+ * reduced motion the content renders at its end state instead of depending on
+ * an entering animation that may never run. One hook call can style several
+ * views — the calendar shares it between the month title and the day grid.
+ */
+export function useSlideIn({
+  direction = 1,
+  distance = 24,
+  resetKey,
+}: SlideInOptions = {}) {
+  const shouldAnimate = useEnterAnimation();
+  const opacity = useSharedValue(shouldAnimate ? 0 : 1);
+  const offset = useSharedValue(shouldAnimate ? direction * distance : 0);
+
+  useEffect(() => {
+    if (!shouldAnimate) {
+      return;
+    }
+    opacity.value = 0;
+    offset.value = direction * distance;
+    const timing = { duration: DURATION.base, easing: EASE };
+    opacity.value = withTiming(1, timing);
+    offset.value = withTiming(0, timing);
+  }, [direction, distance, offset, opacity, resetKey, shouldAnimate]);
+
+  return useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateX: offset.value }],
+  }));
+}

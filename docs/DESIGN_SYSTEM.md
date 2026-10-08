@@ -933,6 +933,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-08 | Calendar month paging slides directionally (`useSlideIn`, UI thread, `DURATION.base` 200ms + fade, instant under reduced motion): next month enters from the right, previous from the left. Month title and day grid share one animated style keyed by the visible month. |
 | 2026-10-07 | Product sticky CTA is one full-width button — `Rent this · ₹total` (`dailyRate × days`) with a smaller `/N days` suffix nested in the label (`caption`, `primary-foreground`). The side price block and deposit note are gone; the footer is just the bar + button. |
 | 2026-10-07 | Product header chrome (status backdrop, bar background, hairline) shares one animated opacity (`DURATION.base`, instant under reduced motion) instead of instant class swaps: the header is a column shell with a fading `bg-card` layer, content row, and 1px hairline. Title steps down `headingMd` → `headingSm`. |
 | 2026-10-07 | Product header title fades in/out (`opacity`, `DURATION.base` 200ms on the UI thread, instant under reduced motion) instead of popping: always mounted, `aria-hidden` while transparent. |
