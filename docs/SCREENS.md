@@ -15,7 +15,7 @@ Proves the design language and the hero-expansion interaction end to end.
   leaves, geometry untouched) wipes in left→right under a background-toned
   veil, the vivid flourish settles last, then the `wearly` wordmark and the
   `WEAR / RENT / REPEAT` tagline (Satoshi — the SVG carries the mark only)
-  fade/rise in. ~2.8s total, UI-thread only, reduced-motion collapses to a
+  fade/rise in. ~3.3s total, UI-thread only, reduced-motion collapses to a
   short fade, dark variant re-tones the gradients without touching geometry.
 - [x] 02 Home — magazine marketplace at `/(tabs)` (single Home; v1/v2 variants removed 2026-10-05)
 - [x] 03 Search — in Discover

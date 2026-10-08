@@ -2,7 +2,7 @@
  * Splash choreography, in one place.
  *
  * Milliseconds from the moment the splash mounts. The full performance runs
- * ~2750ms: a clean background beat, a slow left-to-right fabric wipe over
+ * ~3250ms: a clean background beat, a slow left-to-right fabric wipe over
  * the mark, the flourish settling last, the wordmark and tagline arriving
  * quietly, a short hold, then a calm crossfade out.
  *
@@ -16,25 +16,25 @@ export const SPLASH_TIMING = {
   /** Crossfade into the app. */
   exitDuration: 300,
   /** Vivid flourish settling into place. */
-  flourishDelay: 1300,
+  flourishDelay: 1800,
   flourishDuration: 300,
   /** Completed logo held for recognition. */
-  holdUntil: 2450,
+  holdUntil: 2950,
   /** Veil wipe revealing the W + lower leaf, left -> center -> right. */
   markRevealDelay: 200,
-  markRevealDuration: 1100,
+  markRevealDuration: 1600,
   /** Barely-there settle once the whole mark is visible (critically damped). */
-  settleDelay: 1450,
+  settleDelay: 1950,
   /** Tagline whispering in last. */
-  taglineDelay: 1950,
+  taglineDelay: 2450,
   taglineDuration: 350,
   /** Wordmark rising beneath the symbol. */
-  wordmarkDelay: 1650,
+  wordmarkDelay: 2150,
   wordmarkDuration: 350,
 } as const;
 
 /** Full performance length, including the exit fade. */
-export const SPLASH_TOTAL_MS = 2750;
+export const SPLASH_TOTAL_MS = 3250;
 
 /** Reduced-motion path: background, composed mark fade, wordmark, home. */
 export const SPLASH_REDUCED_MS = 500;

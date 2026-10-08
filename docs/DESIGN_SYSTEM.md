@@ -380,7 +380,7 @@ surrounding layout. Icons that do scale use `active:scale-95` paired with
 ### Splash choreography (feature-level, not tokens)
 
 The splash timeline lives in `features/splash/splash-timing.ts`, not in the
-token layer: it choreographs one screen (~2.8s), it is not a reusable
+token layer: it choreographs one screen (~3.3s), it is not a reusable
 duration. It honours the same ease-out curve and the same reduced-motion rule
 — under reduced motion the fabric wipe, settle spring and rises are skipped
 and the composed mark fades in over ~400ms. The wipe itself is a
@@ -568,7 +568,7 @@ The sanctioned list, and each earns its place for a different reason:
 | Surface | Why it cannot be laid out |
 |---|---|
 | `hero-layer.tsx` | Interpolates a card's measured rectangle to full-bleed. A transient animation layer; there is no flexbox way to interpolate between two positions. |
-| `wearly-logo-animation.tsx` veil + flourish | Two transient splash layers: a background-toned veil that slides off the mark (the fabric wipe, transform-only so geometry is revealed never distorted) and the flourish SVG pinned over the base SVG at the identical size. Both are `pointer-events-none`, both unmount or park off-screen once the ~2.8s performance ends. |
+| `wearly-logo-animation.tsx` veil + flourish | Two transient splash layers: a background-toned veil that slides off the mark (the fabric wipe, transform-only so geometry is revealed never distorted) and the flourish SVG pinned over the base SVG at the identical size. Both are `pointer-events-none`, both unmount or park off-screen once the ~3.3s performance ends. |
 | `product/[id].tsx` sticky bar | Sits on top of a scrolling list, so content passes beneath it. |
 | `toast.tsx` | Overlays the navigator, above every route, without any screen knowing. |
 | `ProductCard`'s favourite heart | Anchored to the image it belongs to, not to the card's flow. |
