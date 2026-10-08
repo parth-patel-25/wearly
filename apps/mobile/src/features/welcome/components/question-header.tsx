@@ -1,6 +1,8 @@
 import { Text } from "@wearly/ui-native/text";
 import { View } from "react-native";
 
+import { StepDots } from "./step-dots";
+
 export interface QuestionHeaderProps {
   /** Editorial lines, rendered one per line. */
   lines: readonly string[];
@@ -12,7 +14,7 @@ export interface QuestionHeaderProps {
 /**
  * Editorial question header.
  *
- * A quiet `02 / 03` eyebrow, then the question set large and centred like the
+ * The shared step dots, then the question set large and centred like the
  * Screen 1 headline — the same story, now asking something. No progress bars,
  * no decoration.
  */
@@ -21,13 +23,9 @@ export function QuestionHeader({
   step,
   totalSteps,
 }: QuestionHeaderProps) {
-  const label = `${String(step).padStart(2, "0")} / ${String(totalSteps).padStart(2, "0")}`;
-
   return (
     <View className="items-center gap-4">
-      <Text tone="muted-foreground" variant="caption">
-        {label}
-      </Text>
+      <StepDots current={step - 1} total={totalSteps} />
       <View className="gap-0">
         {lines.map((line) => (
           <Text

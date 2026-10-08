@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { View } from "react-native";
 
+import { StepDots } from "./step-dots";
 import { SwipeToContinue } from "./swipe-to-continue";
 
 /**
@@ -34,12 +35,9 @@ const PILL_TILT = "-12deg";
 /** Gap between the floating pill and "With Your" — 2px by request. */
 const PILL_GAP = 1;
 
-/** Stable pager dot keys — the flow has three steps and never grows silently. */
-const DOT_KEYS = ["one", "two", "three"] as const;
-
 export interface OnboardingHeroProps {
   onSwipeComplete: () => void;
-  /** Zero-based. Renders the pager, so the screen says where it is. */
+  /** Zero-based. Renders the step dots, so the screen says where it is. */
   step: number;
   totalSteps: number;
 }
@@ -101,7 +99,7 @@ export function OnboardingHero({
 
         <View className="gap-5 pt-1">
           <SwipeToContinue label="Get Started" onComplete={onSwipeComplete} />
-          <Pager current={step} total={totalSteps} />
+          <StepDots current={step} total={totalSteps} />
         </View>
       </View>
     </View>
@@ -122,33 +120,6 @@ function Pill({ onLayout }: { onLayout: (event: LayoutChangeEvent) => void }) {
       >
         Fashion
       </Text>
-    </View>
-  );
-}
-
-/**
- * Three dots. The active one is wider rather than a different colour, so the
- * position reads at a glance and the inactive pair stays quiet.
- *
- * Keys are names rather than indices because these are positional children of a
- * fixed-length list — `key={index}` would be correct and still reads as a
- * reorder bug to anyone reviewing it later.
- */
-function Pager({ current, total }: { current: number; total: number }) {
-  return (
-    <View
-      accessibilityLabel={`Step ${current + 1} of ${total}`}
-      className="h-4 flex-row items-center justify-center gap-2"
-    >
-      {DOT_KEYS.slice(0, total).map((dot, index) => (
-        <View
-          className={[
-            "h-2 rounded-pill",
-            index === current ? "w-5 bg-primary" : "w-2 bg-muted",
-          ].join(" ")}
-          key={dot}
-        />
-      ))}
     </View>
   );
 }
