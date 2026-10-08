@@ -70,7 +70,13 @@ export default function RootLayout() {
                   name="splash"
                   options={{ animation: "none", headerShown: false }}
                 />
-                <Stack.Screen name="welcome" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="welcome"
+                  options={{
+                    animation: "slide_from_right",
+                    headerShown: false,
+                  }}
+                />
                 <Stack.Screen name="index" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen

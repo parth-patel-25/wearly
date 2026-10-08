@@ -6,14 +6,11 @@ import { useCallback } from "react";
 /**
  * Boot brand moment.
  *
- * PREVIEW: `loop` holds the splash and replays the performance so it can be
- * watched properly — tap replays on demand, and it never navigates away.
- * Remove `loop` to restore the shipping behavior (play once, then welcome).
- *
- * The splash introduces Wearly and routes onwards — first run continues to
- * the welcome personalisation, never to a login wall. The handover fires
- * exactly once; returning from the background never replays it, because this
- * route is replaced rather than stacked.
+ * Plays once, then routes onwards — first run continues to the welcome
+ * personalisation, never to a login wall. The handover fires exactly once;
+ * returning from the background never replays it, because this route is
+ * replaced rather than stacked. (Dev preview: pass `loop` to hold the splash
+ * and replay the performance instead of navigating away.)
  */
 export default function SplashScreen() {
   const router = useRouter();
@@ -22,5 +19,5 @@ export default function SplashScreen() {
     router.replace(ROUTES.welcome);
   }, [router]);
 
-  return <WearlySplash loop onComplete={go} />;
+  return <WearlySplash onComplete={go} />;
 }

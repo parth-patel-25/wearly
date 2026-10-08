@@ -33,7 +33,7 @@ Proves the design language and the hero-expansion interaction end to end.
 
 **Connective tissue, not signature screens:**
 
-- [x] Splash → welcome personalisation (pre-auth, 3 steps: fashion moment, then 2 questions)
+- [x] Splash → welcome personalisation (pre-auth, 3 steps: fashion moment, then 2 questions; the handover is a forward push — splash exits left, welcome slides in from the right, `slide_from_right` on the welcome route)
 - [x] Bottom tab bar (Home · Discover · List · Profile)
 - [x] Explain-first authentication gate (§6.1 "no forced login")
 - [x] Native component foundation in `packages/ui-native`
