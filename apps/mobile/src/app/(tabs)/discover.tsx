@@ -57,6 +57,7 @@ export default function DiscoverScreen() {
   return (
     <View className="flex-1 bg-background">
       <ProductGrid
+        className="flex-1 px-4"
         emptyState={
           <EmptyState
             body="Try removing a filter, or search for something broader."
@@ -193,7 +194,7 @@ function search(pieces: typeof CATALOGUE, query: string) {
 
 function SavedHint({ count }: { count: number }) {
   return (
-    <View className="px-gutter pb-8">
+    <View className="px-4 pb-8">
       <Text tone="muted-foreground" variant="caption">
         {`${count} saved ${count === 1 ? "piece" : "pieces"}. Saved items live in your profile.`}
       </Text>

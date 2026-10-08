@@ -24,6 +24,7 @@ export type ProductGridItem = Omit<
 >;
 
 export interface ProductGridProps {
+  className?: string;
   emptyState: ReactElement;
   favourites: ReadonlySet<string>;
   header?: ReactElement;
@@ -33,6 +34,7 @@ export interface ProductGridProps {
 }
 
 export function ProductGrid({
+  className = "flex-1 px-gutter",
   emptyState,
   favourites,
   header,
@@ -41,7 +43,7 @@ export function ProductGrid({
   onOpen,
 }: ProductGridProps) {
   const renderItem: ListRenderItem<ProductGridItem> = ({ index, item }) => (
-    <View className={index % 2 === 0 ? "w-full pr-4 pb-6" : "w-full pb-6"}>
+    <View className={index % 2 === 0 ? "w-full pr-2 pb-6" : "w-full pb-6 pl-2"}>
       <ProductCard
         {...item}
         isFavourite={favourites.has(item.id)}
@@ -53,7 +55,7 @@ export function ProductGrid({
 
   return (
     <AppList
-      className="flex-1 px-gutter"
+      className={className}
       data={items}
       emptyState={emptyState}
       footer={<View className="h-10" />}
