@@ -10,14 +10,14 @@ import {
 } from "@shared/data/filters";
 import { useCatalogueGrid } from "@shared/hooks/use-catalogue-grid";
 import { Chip } from "@wearly/ui-native/badge";
-import { Button } from "@wearly/ui-native/button";
 import { EmptyState, SectionHeader } from "@wearly/ui-native/display";
 import { SearchField } from "@wearly/ui-native/fields";
+import { Icon } from "@wearly/ui-native/icon";
 import { ProductGrid } from "@wearly/ui-native/product-grid";
 import { Text } from "@wearly/ui-native/text";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 
 /**
  * Discover.
@@ -68,22 +68,30 @@ export default function DiscoverScreen() {
         favourites={favourites}
         header={
           <View className="gap-6 pt-6 pb-2">
-            <View className="flex-row items-center justify-between gap-3">
-              <Text variant="headingXl">Discover</Text>
-              <Button
-                onPress={() => setSheetOpen(true)}
-                size="sm"
-                variant={count > 0 ? "soft" : "outline"}
-              >
-                {count > 0 ? `Filters · ${count}` : "Filters"}
-              </Button>
-            </View>
+            <Text variant="headingXl">Discover</Text>
 
-            <SearchField
-              autoFocus={typeof q === "string"}
-              onChange={setQuery}
-              value={query}
-            />
+            <View className="flex-row items-center gap-3">
+              <View className="flex-1">
+                <SearchField
+                  autoFocus={typeof q === "string"}
+                  onChange={setQuery}
+                  value={query}
+                />
+              </View>
+              <Pressable
+                accessibilityLabel={
+                  count > 0 ? `Open filters, ${count} active` : "Open filters"
+                }
+                accessibilityRole="button"
+                className={`size-12 items-center justify-center rounded-pill border border-border active:bg-muted ${count > 0 ? "bg-accent" : "bg-card"}`}
+                onPress={() => setSheetOpen(true)}
+              >
+                <Icon
+                  name="sliders"
+                  tone={count > 0 ? "accent-foreground" : "foreground"}
+                />
+              </Pressable>
+            </View>
 
             <View className="flex-row flex-wrap gap-3">
               {CATEGORIES.map((category) => (
