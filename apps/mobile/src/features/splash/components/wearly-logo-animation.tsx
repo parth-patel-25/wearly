@@ -32,7 +32,17 @@ import { FlowMarkBaseSvg, FlowMarkFlourishSvg } from "./wearly-flow-mark";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-export function WearlyLogoAnimation() {
+export interface WearlyLogoAnimationProps {
+  /**
+   * Preview mode: skip the exit fade so the composed mark stays put while
+   * the parent replays the performance. Never on in production.
+   */
+  loop?: boolean;
+}
+
+export function WearlyLogoAnimation({
+  loop = false,
+}: WearlyLogoAnimationProps) {
   const reduceMotion = useReducedMotion() === true;
   const animate = !reduceMotion;
   const { theme } = useUniwind();
@@ -77,11 +87,13 @@ export function WearlyLogoAnimation() {
       t.taglineDelay,
       withTiming(1, { duration: t.taglineDuration, easing: curve })
     );
-    exit.value = withDelay(
-      t.holdUntil,
-      withTiming(0, { duration: t.exitDuration, easing: curve })
-    );
-  }, [animate, exit, flourish, settle, tagline, veil, wordmark]);
+    exit.value = loop
+      ? 1
+      : withDelay(
+          t.holdUntil,
+          withTiming(0, { duration: t.exitDuration, easing: curve })
+        );
+  }, [animate, exit, flourish, loop, settle, tagline, veil, wordmark]);
 
   const veilStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: veil.value * travel.value }],

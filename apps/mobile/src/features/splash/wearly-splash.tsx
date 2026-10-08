@@ -12,20 +12,27 @@
 
 import { useEnterAnimation } from "@wearly/ui-native/motion";
 import { Screen } from "@wearly/ui-native/screen";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable } from "react-native";
 
 import { WearlyLogoAnimation } from "./components/wearly-logo-animation";
 import { SPLASH_REDUCED_MS, SPLASH_TOTAL_MS } from "./splash-timing";
 
 export interface WearlySplashProps {
+  /**
+   * Preview mode: hold the splash and replay the performance in a loop
+   * instead of handing over. A tap replays on demand. Dev testing only —
+   * never on in production.
+   */
+  loop?: boolean;
   /** Fired exactly once when the splash hands over. */
   onComplete: () => void;
 }
 
-export function WearlySplash({ onComplete }: WearlySplashProps) {
+export function WearlySplash({ loop = false, onComplete }: WearlySplashProps) {
   const animate = useEnterAnimation();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [cycle, setCycle] = useState(0);
 
   // Exactly-once handover: the first trigger (timer or tap) clears the timer
   // and claims the handover; every later call finds nothing to claim. The
@@ -41,6 +48,9 @@ export function WearlySplash({ onComplete }: WearlySplashProps) {
   }, [onComplete]);
 
   useEffect(() => {
+    if (loop) {
+      return;
+    }
     timer.current = setTimeout(
       finish,
       animate ? SPLASH_TOTAL_MS : SPLASH_REDUCED_MS
@@ -50,7 +60,24 @@ export function WearlySplash({ onComplete }: WearlySplashProps) {
         clearTimeout(timer.current);
       }
     };
-  }, [animate, finish]);
+  }, [animate, finish, loop]);
+
+  // Preview loop: remount the animation every performance so it replays from
+  // a clean state. Remounting (not resetting shared values) is what keeps the
+  // replay identical to a first run.
+  useEffect(() => {
+    if (!(loop && animate)) {
+      return;
+    }
+    const interval = setInterval(() => {
+      setCycle((current) => current + 1);
+    }, SPLASH_TOTAL_MS);
+    return () => clearInterval(interval);
+  }, [animate, loop]);
+
+  const replay = useCallback(() => {
+    setCycle((current) => current + 1);
+  }, []);
 
   return (
     <Screen
@@ -59,13 +86,15 @@ export function WearlySplash({ onComplete }: WearlySplashProps) {
       scrollable={false}
     >
       <Pressable
-        accessibilityHint="Skips the introduction"
-        accessibilityLabel="Skip intro"
+        accessibilityHint={
+          loop ? "Replays the introduction" : "Skips the introduction"
+        }
+        accessibilityLabel={loop ? "Replay intro" : "Skip intro"}
         accessibilityRole="button"
         className="flex grow items-center justify-center px-gutter"
-        onPress={finish}
+        onPress={loop ? replay : finish}
       >
-        <WearlyLogoAnimation />
+        <WearlyLogoAnimation key={cycle} loop={loop} />
       </Pressable>
     </Screen>
   );
