@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   CONTROL_PRIMARY,
   CONTROL_SURFACE,
@@ -9,9 +9,15 @@ import { useToneColor } from "@wearly/ui-native/tone";
 import { ImpactFeedbackStyle, impactAsync } from "expo-haptics";
 import type { ComponentProps } from "react";
 
-export type OptionIconName = ComponentProps<
-  typeof MaterialCommunityIcons
->["name"];
+export type OptionIconName =
+  | {
+      family: "fontawesome6";
+      name: ComponentProps<typeof FontAwesome6>["name"];
+    }
+  | {
+      family: "material-community";
+      name: ComponentProps<typeof MaterialCommunityIcons>["name"];
+    };
 
 export interface OptionCardProps {
   icon?: OptionIconName;
@@ -64,8 +70,10 @@ export function OptionCard({
       onPressOut={onPressOut}
       style={animatedStyle}
     >
-      {icon === undefined ? null : (
-        <MaterialCommunityIcons color={iconColor} name={icon} size={28} />
+      {icon === undefined ? null : icon.family === "fontawesome6" ? (
+        <FontAwesome6 color={iconColor} name={icon.name} size={26} />
+      ) : (
+        <MaterialCommunityIcons color={iconColor} name={icon.name} size={28} />
       )}
       <Text className="text-center" tone={control.tone} variant="buttonLg">
         {label}

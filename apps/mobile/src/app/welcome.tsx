@@ -50,19 +50,19 @@ const WEARS = [
 
 const STYLING_FOR_ICONS: Record<(typeof STYLING_FOR)[number], OptionIconName> =
   {
-    Everyone: "account-group",
-    Kids: "baby-face-outline",
-    Men: "face-man",
-    Women: "face-woman",
+    Everyone: { family: "material-community", name: "account-group" },
+    Kids: { family: "fontawesome6", name: "child-reaching" },
+    Men: { family: "material-community", name: "face-man" },
+    Women: { family: "material-community", name: "face-woman" },
   };
 
 const WEARS_ICONS: Record<(typeof WEARS)[number], OptionIconName> = {
-  Casual: "tshirt-crew",
-  Formal: "tie",
-  Minimal: "minus",
-  Party: "party-popper",
-  Streetwear: "shoe-sneaker",
-  Traditional: "flower-outline",
+  Casual: { family: "material-community", name: "tshirt-crew" },
+  Formal: { family: "material-community", name: "tie" },
+  Minimal: { family: "material-community", name: "hanger" },
+  Party: { family: "material-community", name: "party-popper" },
+  Streetwear: { family: "material-community", name: "shoe-sneaker" },
+  Traditional: { family: "material-community", name: "flower-outline" },
 };
 
 type Step = "intro" | "stylingFor" | "wears";
