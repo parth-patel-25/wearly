@@ -1,12 +1,20 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   CONTROL_PRIMARY,
   CONTROL_SURFACE,
 } from "@wearly/ui-native/control-tokens";
 import { AnimatedPressable, usePressScale } from "@wearly/ui-native/motion";
 import { Text } from "@wearly/ui-native/text";
+import { useToneColor } from "@wearly/ui-native/tone";
 import { ImpactFeedbackStyle, impactAsync } from "expo-haptics";
+import type { ComponentProps } from "react";
+
+export type OptionIconName = ComponentProps<
+  typeof MaterialCommunityIcons
+>["name"];
 
 export interface OptionCardProps {
+  icon?: OptionIconName;
   label: string;
   onPress: () => void;
   selected: boolean;
@@ -25,7 +33,12 @@ function fireLight(): void {
  * when chosen. Press compresses slightly and springs back — feedback only,
  * never navigation. Selection is exposed to assistive tech, never colour alone.
  */
-export function OptionCard({ label, onPress, selected }: OptionCardProps) {
+export function OptionCard({
+  icon,
+  label,
+  onPress,
+  selected,
+}: OptionCardProps) {
   const { animatedStyle, onPressIn, onPressOut } = usePressScale(0.96);
 
   const handlePress = () => {
@@ -33,12 +46,15 @@ export function OptionCard({ label, onPress, selected }: OptionCardProps) {
     onPress();
   };
 
+  const control = selected ? CONTROL_PRIMARY : CONTROL_SURFACE;
+  const iconColor = useToneColor(control.tone);
+
   return (
     <AnimatedPressable
       accessibilityLabel={label}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
-      className={`min-h-20 flex-1 items-center justify-center rounded-card border px-4 py-5 ${
+      className={`min-h-20 flex-1 items-center justify-center gap-2 rounded-card border px-4 py-5 ${
         selected
           ? `border-primary ${CONTROL_PRIMARY.surface} ${CONTROL_PRIMARY.pressed}`
           : `border-border ${CONTROL_SURFACE.surface} ${CONTROL_SURFACE.pressed}`
@@ -48,11 +64,10 @@ export function OptionCard({ label, onPress, selected }: OptionCardProps) {
       onPressOut={onPressOut}
       style={animatedStyle}
     >
-      <Text
-        className="text-center"
-        tone={selected ? CONTROL_PRIMARY.tone : CONTROL_SURFACE.tone}
-        variant="buttonLg"
-      >
+      {icon === undefined ? null : (
+        <MaterialCommunityIcons color={iconColor} name={icon} size={28} />
+      )}
+      <Text className="text-center" tone={control.tone} variant="buttonLg">
         {label}
       </Text>
     </AnimatedPressable>

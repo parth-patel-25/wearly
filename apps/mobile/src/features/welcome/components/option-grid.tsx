@@ -1,9 +1,11 @@
 import { useMemo } from "react";
 import { View } from "react-native";
 
+import type { OptionIconName } from "./option-card";
 import { OptionCard } from "./option-card";
 
 export interface OptionGridProps<T extends string> {
+  icons?: Partial<Record<T, OptionIconName>>;
   onSelect: (option: T) => void;
   options: readonly T[];
   selected: T | null;
@@ -27,6 +29,7 @@ function toRows<T>(options: readonly T[]): T[][] {
  * Home recommended-grid rhythm.
  */
 export function OptionGrid<T extends string>({
+  icons,
   onSelect,
   options,
   selected,
@@ -39,6 +42,7 @@ export function OptionGrid<T extends string>({
         <View className="flex-row gap-3" key={row[0] ?? `row-${index}`}>
           {row.map((option) => (
             <OptionCard
+              icon={icons?.[option]}
               key={option}
               label={option}
               onPress={() => onSelect(option)}

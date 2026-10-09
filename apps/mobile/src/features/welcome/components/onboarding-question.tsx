@@ -1,12 +1,14 @@
 import { View } from "react-native";
 
 import { OnboardingFooter } from "./onboarding-footer";
+import type { OptionIconName } from "./option-card";
 import { OptionGrid } from "./option-grid";
 import { QuestionHeader } from "./question-header";
 
 export interface OnboardingQuestionProps<T extends string> {
   /** Honest supporting line. Omit when there is nothing to say. */
   caption?: string;
+  icons?: Partial<Record<T, OptionIconName>>;
   onPrimaryPress: () => void;
   onSelect: (option: T) => void;
   onSkipPress: () => void;
@@ -28,6 +30,7 @@ export interface OnboardingQuestionProps<T extends string> {
  */
 export function OnboardingQuestion<T extends string>({
   caption,
+  icons,
   onPrimaryPress,
   onSelect,
   onSkipPress,
@@ -46,7 +49,12 @@ export function OnboardingQuestion<T extends string>({
           step={step}
           totalSteps={totalSteps}
         />
-        <OptionGrid onSelect={onSelect} options={options} selected={selected} />
+        <OptionGrid
+          icons={icons}
+          onSelect={onSelect}
+          options={options}
+          selected={selected}
+        />
       </View>
       <OnboardingFooter
         caption={caption}

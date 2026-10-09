@@ -2,6 +2,7 @@ import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
 import { OnboardingHero } from "@features/welcome/components/onboarding-hero";
 import { OnboardingQuestion } from "@features/welcome/components/onboarding-question";
+import type { OptionIconName } from "@features/welcome/components/option-card";
 import { Screen } from "@wearly/ui-native/screen";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -46,6 +47,23 @@ const WEARS = [
   "Streetwear",
   "Minimal",
 ] as const;
+
+const STYLING_FOR_ICONS: Record<(typeof STYLING_FOR)[number], OptionIconName> =
+  {
+    Everyone: "account-group",
+    Kids: "baby-face-outline",
+    Men: "face-man",
+    Women: "face-woman",
+  };
+
+const WEARS_ICONS: Record<(typeof WEARS)[number], OptionIconName> = {
+  Casual: "tshirt-crew",
+  Formal: "tie",
+  Minimal: "minus",
+  Party: "party-popper",
+  Streetwear: "shoe-sneaker",
+  Traditional: "flower-outline",
+};
 
 type Step = "intro" | "stylingFor" | "wears";
 
@@ -127,6 +145,7 @@ export default function WelcomeScreen() {
                 ? "You can browse without an account."
                 : `Styling for ${state.stylingFor}. You can browse without an account.`
             }
+            icons={STYLING_FOR_ICONS}
             onPrimaryPress={advance}
             onSelect={pick}
             onSkipPress={finish}
@@ -139,6 +158,7 @@ export default function WelcomeScreen() {
           />
         ) : (
           <OnboardingQuestion
+            icons={WEARS_ICONS}
             onPrimaryPress={advance}
             onSelect={pick}
             onSkipPress={finish}
