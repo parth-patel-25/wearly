@@ -2,14 +2,8 @@ import { ROUTES } from "@core/routing/routes";
 import { useRentalDraft } from "@features/rental/providers/rental-draft-provider";
 import { countDays } from "@features/rental/validations/rental.schema";
 import type { Piece } from "@shared/data/catalogue";
-import {
-  findPiece,
-  formatRupees,
-  rentalSummary,
-  sizeOf,
-} from "@shared/data/catalogue";
-import { Badge } from "@wearly/ui-native/badge";
-import { Button, IconButton } from "@wearly/ui-native/button";
+import { findPiece, formatRupees, rentalSummary } from "@shared/data/catalogue";
+import { Button } from "@wearly/ui-native/button";
 import type { CalendarRange } from "@wearly/ui-native/calendar";
 import { Calendar } from "@wearly/ui-native/calendar";
 import { Card } from "@wearly/ui-native/card";
@@ -18,7 +12,7 @@ import { Text } from "@wearly/ui-native/text";
 import { useToast } from "@wearly/ui-native/toast";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 /**
  * Date selection.
@@ -105,16 +99,10 @@ function DatesBody({ piece }: DatesBodyProps) {
 
   return (
     <View className="flex-1 bg-background pt-safe">
-      <View className="flex-1 gap-8 px-gutter pt-4">
-        <View className="flex-row items-center justify-between">
-          <IconButton
-            accessibilityLabel="Go back"
-            icon="arrow-left"
-            onPress={() => router.back()}
-          />
-          <Badge variant="primary">{`Size ${sizeOf(piece)}`}</Badge>
-        </View>
-
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="flex flex-col gap-8 px-gutter pt-4 pb-8"
+      >
         <View className="gap-1">
           <Text variant="headingXl">When do you need it?</Text>
           <Text tone="muted-foreground" variant="bodyMd">
@@ -137,7 +125,7 @@ function DatesBody({ piece }: DatesBodyProps) {
             {error}
           </Text>
         )}
-      </View>
+      </ScrollView>
 
       <View className="gap-4 border-border border-t bg-card px-gutter pt-5 pb-10">
         <Card className="gap-2 p-5">
