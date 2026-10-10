@@ -64,6 +64,7 @@ export default function ProfileScreen() {
   return (
     <View className="flex-1 bg-background">
       <ProductGrid
+        className="flex-1 px-3"
         emptyState={
           <EmptyState
             body="Tap the heart on any piece and it will wait for you here."
