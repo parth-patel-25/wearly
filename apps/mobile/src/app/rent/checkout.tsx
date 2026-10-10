@@ -6,7 +6,7 @@ import type { Fulfillment } from "@features/rental/validations/rental.schema";
 import { countDays } from "@features/rental/validations/rental.schema";
 import { findPiece, formatRupees } from "@shared/data/catalogue";
 import { Chip } from "@wearly/ui-native/badge";
-import { Button, IconButton } from "@wearly/ui-native/button";
+import { Button } from "@wearly/ui-native/button";
 import { Card, Panel } from "@wearly/ui-native/card";
 import { Icon } from "@wearly/ui-native/icon";
 import { Media } from "@wearly/ui-native/media";
@@ -110,18 +110,8 @@ export default function CheckoutScreen() {
     <View className="flex-1 bg-background pt-safe">
       <ScrollView
         className="flex flex-col"
-        contentContainerClassName="flex flex-col gap-8 pb-8"
+        contentContainerClassName="flex flex-col gap-8 pt-4 pb-8"
       >
-        <View className="flex-row items-center justify-between px-gutter pt-4">
-          <IconButton
-            accessibilityLabel="Go back"
-            icon="arrow-left"
-            onPress={() => router.back()}
-          />
-          <Text variant="headingSm">Review</Text>
-          <View className="size-11" />
-        </View>
-
         <Card className="mx-gutter flex-row items-center gap-4 p-4">
           <View className="w-20 overflow-hidden rounded-media">
             <Media aspect="1/1" src={piece.images[0]} tone={piece.gallery[0]} />
