@@ -107,16 +107,19 @@ the light theme. Two options:
 
 #### Regenerating the brand assets
 
-The icon, Android adaptive layers and native splash image are all rendered from
-one SVG so they cannot drift apart:
+The launcher icon, Android adaptive layers, favicons and native splash image
+are all rendered from the flow-mark so they cannot drift apart. Source:
+`apps/mobile/assets/brand/wearly-launcher.svg` (flow-mark geometry on a
+`#FFFBFC` square — the animated in-app splash in `features/splash` is a
+separate instance and is never touched by this):
 
 ```bash
 cd apps/mobile/assets/brand
-rsvg-convert -w 1024 -h 1024 wearly-mark.svg -o ../images/icon.png
+rsvg-convert -w 1024 -h 1024 wearly-launcher.svg -o ../images/icon.png
 ```
 
-The geometry matches `BrandMark` in `packages/ui-native/src/brand-mark.tsx`.
-Update both together, or the launcher icon and the in-app mark stop matching.
+A fresh EAS build + reinstall is required afterwards; OTA never changes the
+OS-level icon or the native splash drawable.
 
 ## Design tokens and cross-platform consistency
 

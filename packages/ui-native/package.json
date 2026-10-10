@@ -27,7 +27,6 @@
     "./calendar": "./src/calendar.tsx",
     "./calendar-cell": "./src/calendar-cell.tsx",
     "./tab-bar": "./src/tab-bar.tsx",
-    "./brand-mark": "./src/brand-mark.tsx",
     "./hero-provider": "./src/hero-provider.tsx",
     "./hero-layer": "./src/hero-layer.tsx"
   },

@@ -410,10 +410,25 @@ matching the existing `./screen` and `./providers` convention.
 | Primitives | `text` `button` `card` `badge` `chip` `avatar` `media` `fields` |
 | Composition | `product-card` `product-grid` `calendar` `tab-bar` `display` `status` |
 | Overlays | `bottom-sheet` `toast` |
-| Brand | `brand-mark` |
+| Brand | _(retired `brand-mark` — the old anchor mark is gone; launcher assets live in `apps/mobile/assets/brand/`)_ |
 | Motion | `motion` `tone` `icon` `icon-glyphs` `control-tokens` |
 | Hero transition | `hero-provider` `hero-layer` |
 | Layout | `screen` `providers` `app-list` |
+
+### Launcher icon
+
+The OS launcher icon is a separate static asset from the animated splash mark —
+the splash (`features/splash`, `assets/images/splash-icon.png`) is frozen and never
+reused as the icon. Source: `apps/mobile/assets/brand/wearly-launcher.svg`, which
+copies the approved flow-mark geometry/gradients (`wearly-flow-mark.svg`) verbatim
+onto a `#FFFBFC` 1024² square with ~22% padding (iOS squircles and Android
+adaptive masks crop the outer fifth; the mark is wide at 2048×1162, so
+edge-to-edge would clip the leaves). Renders: `icon.png` (full-bleed),
+`android-icon-foreground.png` (transparent, mark ~60% centred for the adaptive
+safe zone), `android-icon-background.png` (solid `#FFFBFC`),
+`android-icon-monochrome.png` (flat `#C54B75`, no gradients — themed icons).
+Regenerate with `rsvg-convert -w 1024`. A fresh EAS build + reinstall is required;
+OTA never changes the OS-level icon.
 
 `ProductGrid` wraps `AppList` (FlashList), not `ScrollView`. The catalogue is expected to
 grow past fifty pieces, and a grid that renders every cell up front is how a

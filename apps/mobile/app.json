@@ -28,7 +28,7 @@
         {
           "backgroundColor": "#FFFBFC",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 192
         }
       ],
       "expo-image"
@@ -41,6 +41,9 @@
       "eas": {
         "projectId": "19682dc6-07f0-4217-9d2f-387a2ec72b24"
       }
+    },
+    "ios": {
+      "bundleIdentifier": "com.parthpatel25.wearly"
     }
   }
 }
