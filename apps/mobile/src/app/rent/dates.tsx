@@ -100,8 +100,13 @@ function DatesBody({ piece }: DatesBodyProps) {
   return (
     <View className="flex-1 bg-background pt-safe">
       <ScrollView
+        alwaysBounceVertical={false}
+        bounces={false}
         className="flex-1"
         contentContainerClassName="flex flex-col gap-8 px-gutter pt-4 pb-8"
+        overScrollMode="never"
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       >
         <View className="gap-1">
           <Text variant="headingXl">When do you need it?</Text>

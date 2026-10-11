@@ -109,8 +109,13 @@ export default function CheckoutScreen() {
   return (
     <View className="flex-1 bg-background pt-safe">
       <ScrollView
+        alwaysBounceVertical={false}
+        bounces={false}
         className="flex flex-col"
         contentContainerClassName="flex flex-col gap-8 pt-4 pb-8"
+        overScrollMode="never"
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
       >
         <Card className="mx-gutter flex-row items-center gap-4 p-4">
           <View className="w-20 overflow-hidden rounded-media">
