@@ -40,6 +40,11 @@ Proves the design language and the hero-expansion interaction end to end.
   Facebook social buttons, "Create account" primary); pushed from Profile
   when browsing without an account, and from checkout when a guest tries to
   pay (replaces the AuthSheet modal)
+- [x] Log In / Sign Up tabs — `/auth` with a segmented tab switch (pulled from
+  the sign-in screen's "Log In" → login tab, "Create account" → signup tab);
+  validated email/password fields and a swipe-to-confirm action: white
+  `rounded-button` track, primary ball, the track fills `bg-primary` behind
+  the ball as it travels (`features/auth`)
 - [x] Native component foundation in `packages/ui-native`
 
 **Step 1 is a swipe, steps 2 and 3 are buttons.** Welcome opens on the fashion

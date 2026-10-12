@@ -13,6 +13,7 @@ import type { Href } from "expo-router";
  */
 
 export const ROUTES = {
+  auth: "/auth",
   checkout: "/rent/checkout",
   confirmed: "/rent/confirmed",
   dates: "/rent/dates",
@@ -34,6 +35,10 @@ export const ROUTES = {
 /** Typed navigation target for the dates screen, which needs a query param. */
 export const datesFor = (pieceId: string) =>
   ({ params: { pieceId }, pathname: ROUTES.dates }) as const;
+
+/** Typed navigation target for the auth screen, which opens on a given tab. */
+export const authTab = (tab: "login" | "signup") =>
+  ({ params: { tab }, pathname: ROUTES.auth }) as const;
 
 /** The four bottom-navigation destinations, in order. */
 export const TABS = ["index", "discover", "list", "profile"] as const;
