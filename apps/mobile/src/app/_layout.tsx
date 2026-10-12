@@ -92,6 +92,7 @@ export default function RootLayout() {
                   name="rent/confirmed"
                   options={{ gestureEnabled: false }}
                 />
+                <Stack.Screen name="sign-in" options={{ headerShown: false }} />
               </Stack>
               {/* Above every screen, so the expansion is not clipped by a route. */}
               <HeroLayer />

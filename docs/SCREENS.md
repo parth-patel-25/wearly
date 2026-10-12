@@ -36,6 +36,10 @@ Proves the design language and the hero-expansion interaction end to end.
 - [x] Splash → welcome personalisation (pre-auth, 3 steps: fashion moment, then 2 questions; the handover is a forward push — splash exits left, welcome slides in from the right, `slide_from_right` on the welcome route)
 - [x] Bottom tab bar (Home · Discover · List · Profile)
 - [x] Explain-first authentication gate (§6.1 "no forced login")
+- [x] Sign in / create account — full-screen UI at `/sign-in` (Google +
+  Facebook social buttons, "Create account" primary); pushed from Profile
+  when browsing without an account, and from checkout when a guest tries to
+  pay (replaces the AuthSheet modal)
 - [x] Native component foundation in `packages/ui-native`
 
 **Step 1 is a swipe, steps 2 and 3 are buttons.** Welcome opens on the fashion

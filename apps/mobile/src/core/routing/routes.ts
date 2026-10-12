@@ -26,6 +26,7 @@ export const ROUTES = {
   product: (pieceId: string): `/product/${string}` => `/product/${pieceId}`,
   profile: "/(tabs)/profile",
   rentals: "/(tabs)/rentals",
+  signIn: "/sign-in",
   splash: "/splash",
   welcome: "/welcome",
 } as const satisfies Record<string, Href | ((id: string) => Href)>;

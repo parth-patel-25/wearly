@@ -103,9 +103,18 @@ function ProfileHeader({ completed, percent }: ProfileHeaderProps) {
           {state.isAuthenticated ? (
             <Badge variant="success">Account created</Badge>
           ) : (
-            <Text tone="muted-foreground" variant="caption">
-              Browsing without an account
-            </Text>
+            <View className="gap-2">
+              <Text tone="muted-foreground" variant="caption">
+                Browsing without an account
+              </Text>
+              <Button
+                onPress={() => router.push(ROUTES.signIn)}
+                size="sm"
+                variant="outline"
+              >
+                Sign in
+              </Button>
+            </View>
           )}
         </View>
       </View>

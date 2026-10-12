@@ -1,6 +1,5 @@
 import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
-import { AuthSheet } from "@features/auth/components/auth-sheet";
 import { useRentalDraft } from "@features/rental/providers/rental-draft-provider";
 import type { Fulfillment } from "@features/rental/validations/rental.schema";
 import { countDays } from "@features/rental/validations/rental.schema";
@@ -14,7 +13,7 @@ import { PriceRow } from "@wearly/ui-native/status";
 import { Text } from "@wearly/ui-native/text";
 import { useToast } from "@wearly/ui-native/toast";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ScrollView, View } from "react-native";
 
 /**
@@ -30,8 +29,9 @@ import { ScrollView, View } from "react-native";
  * the fastest way to be trusted is to never do that.
  *
  * Signing in is asked for here, at the moment it is genuinely needed, and only
- * because the next step is a payment. The sheet explains that before it asks for
- * anything.
+ * because the next step is a payment. A guest is pushed to the sign-in screen —
+ * the same route Profile uses — rather than a modal, so there is one sign-in
+ * surface and a back gesture that always works.
  */
 
 const DELIVERY_FEE = 79;
@@ -56,9 +56,8 @@ function ctaLabel(
 export default function CheckoutScreen() {
   const router = useRouter();
   const { draft, set } = useRentalDraft();
-  const { dispatch, state } = useSession();
+  const { state } = useSession();
   const toast = useToast();
-  const [showAuth, setShowAuth] = useState(false);
 
   const piece = findPiece(draft.pieceId ?? "");
 
@@ -103,7 +102,7 @@ export default function CheckoutScreen() {
       router.replace(ROUTES.confirmed);
       return;
     }
-    setShowAuth(true);
+    router.push(ROUTES.signIn);
   };
 
   return (
@@ -209,16 +208,6 @@ export default function CheckoutScreen() {
           {ctaLabel(draft.method, state.isAuthenticated, totals.total)}
         </Button>
       </View>
-
-      <AuthSheet
-        onClose={() => setShowAuth(false)}
-        onSignedIn={(name) => {
-          dispatch({ name, type: "sign-in" });
-          setShowAuth(false);
-        }}
-        open={showAuth}
-        reason="You are one step from paying for this rental. An account is how we hold your booking, your deposit and your refund together."
-      />
     </View>
   );
 }
