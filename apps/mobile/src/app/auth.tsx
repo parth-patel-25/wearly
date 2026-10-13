@@ -1,5 +1,5 @@
-import type { AuthTab } from "@features/auth/components/auth-screen";
 import { AuthScreen } from "@features/auth/components/auth-screen";
+import type { AuthTab } from "@features/auth/components/segmented-tabs";
 import { useLocalSearchParams } from "expo-router";
 
 /**

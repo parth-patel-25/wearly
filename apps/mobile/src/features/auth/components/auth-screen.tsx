@@ -1,15 +1,19 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LoginForm, SignUpForm } from "@features/auth/components/auth-forms";
+import type { AuthTab } from "@features/auth/components/segmented-tabs";
+import { SegmentedTabs } from "@features/auth/components/segmented-tabs";
 import {
   GoogleGlyph,
   SocialButton,
 } from "@features/auth/components/social-button";
 import { IconButton } from "@wearly/ui-native/button";
+import { useSlideIn } from "@wearly/ui-native/motion";
 import { Text } from "@wearly/ui-native/text";
 import { useToneColor } from "@wearly/ui-native/tone";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 /**
  * Auth — log in or sign up, one screen, two tabs.
@@ -19,14 +23,16 @@ import { Pressable, ScrollView, View } from "react-native";
  * link that swaps tabs instead of pushing another screen. One push, no
  * back-stack of near-identical forms.
  *
+ * Switching is a slide, not a swap — the calendar's month-paging contract.
+ * The heading and the form share one `useSlideIn` style keyed to the tab:
+ * signup enters from the right, login from the left, so the direction always
+ * matches the way the pill travelled. The socials and the footer are the same
+ * on both tabs, so they stay put; sliding them would imply they changed.
+ *
  * The tab state lives here, seeded from the route param — `/auth?tab=signup`
  * opens on signup, but which tab is *active* is the screen's own decision.
  * Each tab owns its schema, so a signup password rule never leaks into login.
  */
-
-type AuthTab = "login" | "signup";
-
-export type { AuthTab };
 
 interface TabSpec {
   action: string;
@@ -49,45 +55,6 @@ const TAB_SPEC: Record<AuthTab, TabSpec> = {
     to: "login",
   },
 };
-
-const SEGMENTS: { id: AuthTab; label: string }[] = [
-  { id: "login", label: "Log In" },
-  { id: "signup", label: "Sign Up" },
-];
-
-function SegmentedTabs({
-  active,
-  onChange,
-}: {
-  active: AuthTab;
-  onChange: (tab: AuthTab) => void;
-}) {
-  return (
-    <View className="flex-row gap-1 rounded-pill border border-border bg-muted p-1">
-      {SEGMENTS.map(({ id, label }) => {
-        const isActive = active === id;
-        return (
-          <Pressable
-            accessibilityRole="tab"
-            accessibilityState={{ selected: isActive }}
-            className={`h-10 flex-1 items-center justify-center rounded-pill ${
-              isActive ? "bg-card" : ""
-            }`}
-            key={id}
-            onPress={() => onChange(id)}
-          >
-            <Text
-              tone={isActive ? "foreground" : "muted-foreground"}
-              variant="label"
-            >
-              {label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
 
 function SocialRow() {
   const foreground = useToneColor("foreground");
@@ -121,6 +88,13 @@ export function AuthScreen({ initialTab = "login" }: AuthScreenProps) {
   const router = useRouter();
   const [tab, setTab] = useState<AuthTab>(initialTab);
   const spec = TAB_SPEC[tab];
+  // Direction follows travel: signup is "next" (from the right), login
+  // "previous" (from the left) — and both change together with the tab, so
+  // one effect replay handles every switch.
+  const slideStyle = useSlideIn({
+    direction: tab === "signup" ? 1 : -1,
+    resetKey: tab,
+  });
 
   return (
     <View className="flex-1 bg-background">
@@ -137,19 +111,23 @@ export function AuthScreen({ initialTab = "login" }: AuthScreenProps) {
               onPress={() => router.back()}
               variant="outline"
             />
-            <Text
-              className="text-center"
-              tone="primary-foreground"
-              variant="headingLg"
-            >
-              {spec.heading}
-            </Text>
+            <Animated.View style={slideStyle}>
+              <Text
+                className="text-center"
+                tone="primary-foreground"
+                variant="headingLg"
+              >
+                {spec.heading}
+              </Text>
+            </Animated.View>
           </View>
         </View>
 
-        <View className="-mt-5 flex-col gap-7 rounded-t-5xl bg-background px-gutter pt-6 pb-10">
+        <View className="-mt-5 flex-col gap-7 rounded-t-5xl bg-background px-gutter pt-6 pb-10 shadow-float">
           <SegmentedTabs active={tab} onChange={setTab} />
-          {tab === "login" ? <LoginForm /> : <SignUpForm />}
+          <Animated.View style={slideStyle}>
+            {tab === "login" ? <LoginForm /> : <SignUpForm />}
+          </Animated.View>
           <SocialRow />
 
           <View className="flex-row items-center justify-center gap-1">

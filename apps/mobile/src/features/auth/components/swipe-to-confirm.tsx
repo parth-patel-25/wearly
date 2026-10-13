@@ -24,11 +24,8 @@ import {
  * does it instead.
  *
  * `PanResponder` + classic `Animated`, like the welcome swipe — see
- * `docs/DESIGN_SYSTEM.md` §10 for why this gesture never runs on the UI
- * thread. §10 also requires a future gate to ship a tap path: this control
- * declares the standard `activate` accessibility action, so a screen-reader
- * or switch-control user confirms by their normal activation instead of
- * facing a drag they cannot perform.
+ * `docs/DESIGN_SYSTEM.md` §10. It ships the standard `activate` action, so
+ * a screen-reader user confirms by activation instead of facing a drag.
  */
 
 export interface SwipeToConfirmProps {
@@ -39,6 +36,8 @@ export interface SwipeToConfirmProps {
 }
 
 const BALL_SIZE = 44;
+/** The track's equal end padding — must agree with the ball's `left-1`. */
+const TRACK_INSET = 4;
 /** Both page gutters — must agree with the sheet's `px-gutter` (16 a side). */
 const PAGE_GUTTER = 32;
 /** Release past this fraction of the travel counts as a confirm. */
@@ -61,7 +60,7 @@ export function SwipeToConfirm({ label, onComplete }: SwipeToConfirmProps) {
     setTrackWidth(event.nativeEvent.layout.width);
   }, []);
   const width = trackWidth > 0 ? trackWidth : screen - PAGE_GUTTER;
-  const travel = Math.max(0, width - BALL_SIZE);
+  const travel = Math.max(0, width - BALL_SIZE - TRACK_INSET * 2);
 
   const offset = useRef(new Animated.Value(0)).current;
   const travelled = useRef(0);
@@ -135,6 +134,13 @@ export function SwipeToConfirm({ label, onComplete }: SwipeToConfirmProps) {
     [offset, travel]
   );
 
+  // Glue the fill edge to the ball's left edge; clear of it at rest.
+  const fillWidth = offset.interpolate({
+    extrapolate: "clamp",
+    inputRange: [0, 1, Math.max(travel, 2)],
+    outputRange: [0, 1 + TRACK_INSET, TRACK_INSET + Math.max(travel, 2)],
+  });
+
   return (
     <View
       accessibilityActions={[{ label, name: "activate" }]}
@@ -159,7 +165,7 @@ export function SwipeToConfirm({ label, onComplete }: SwipeToConfirmProps) {
 
       <Animated.View
         className="absolute inset-y-0 left-0 overflow-hidden bg-primary"
-        style={{ width: offset }}
+        style={{ width: fillWidth }}
       >
         {/* Full-track width inside the clipping fill, so this label sits
             exactly over the resting one and is revealed by the same edge. */}
@@ -175,7 +181,7 @@ export function SwipeToConfirm({ label, onComplete }: SwipeToConfirmProps) {
       </Animated.View>
 
       <Animated.View
-        className="absolute top-1 left-0"
+        className="absolute top-1 left-1"
         style={{
           height: BALL_SIZE,
           transform: [{ translateX: offset }],

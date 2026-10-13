@@ -44,7 +44,10 @@ Proves the design language and the hero-expansion interaction end to end.
   the sign-in screen's "Log In" → login tab, "Create account" → signup tab);
   validated email/password fields and a swipe-to-confirm action: white
   `rounded-button` track, primary ball, the track fills `bg-primary` behind
-  the ball as it travels (`features/auth`)
+  the ball as it travels. Switching tabs is a slide, not a swap: the active
+  pill travels between the segments' measured slots and the heading + form
+  enter in the direction of travel (`useSlideIn`, instant under reduced
+  motion) (`features/auth`)
 - [x] Native component foundation in `packages/ui-native`
 
 **Step 1 is a swipe, steps 2 and 3 are buttons.** Welcome opens on the fashion
