@@ -1,5 +1,6 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { LoginForm, SignUpForm } from "@features/auth/components/auth-forms";
+import { BrandMark } from "@features/auth/components/brand-mark";
 import type { AuthTab } from "@features/auth/components/segmented-tabs";
 import { SegmentedTabs } from "@features/auth/components/segmented-tabs";
 import {
@@ -44,13 +45,13 @@ interface TabSpec {
 const TAB_SPEC: Record<AuthTab, TabSpec> = {
   login: {
     action: "Sign up",
-    heading: "Welcome back",
+    heading: "Welcome back - the next look is waiting",
     prompt: "Don't have an account?",
     to: "signup",
   },
   signup: {
     action: "Log In",
-    heading: "Create your account",
+    heading: "Rent designer looks - no closet required",
     prompt: "Already have an account?",
     to: "login",
   },
@@ -105,17 +106,29 @@ export function AuthScreen({ initialTab = "login" }: AuthScreenProps) {
       >
         <View className="rounded-b-3xl bg-primary pt-safe">
           <View className="gap-6 px-gutter pt-4 pb-8">
-            <IconButton
-              accessibilityLabel="Go back"
-              icon="arrow-left"
-              onPress={() => router.back()}
-              variant="outline"
-            />
+            <View className="flex-row items-center">
+              <IconButton
+                accessibilityLabel="Go back"
+                icon="arrow-left"
+                onPress={() => router.back()}
+                variant="outline"
+              />
+              <View className="flex-1 items-center">
+                <View className="flex-row items-center gap-1">
+                  <BrandMark onPrimary />
+                  <Text tone="primary-foreground" variant="headingMd">
+                    early
+                  </Text>
+                </View>
+              </View>
+              {/* Mirrors the back button so the lockup sits on the true centre. */}
+              <View aria-hidden className="size-12" />
+            </View>
             <Animated.View style={slideStyle}>
               <Text
                 className="text-center"
                 tone="primary-foreground"
-                variant="headingLg"
+                variant="headingSm"
               >
                 {spec.heading}
               </Text>

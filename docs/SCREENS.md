@@ -47,7 +47,8 @@ Proves the design language and the hero-expansion interaction end to end.
   the ball as it travels. Switching tabs is a slide, not a swap: the active
   pill travels between the segments' measured slots and the heading + form
   enter in the direction of travel (`useSlideIn`, instant under reduced
-  motion) (`features/auth`)
+  motion); banner row carries the Wearly lockup beside the back button, with
+  the reworded semi-title headings (`features/auth`)
 - [x] Native component foundation in `packages/ui-native`
 
 **Step 1 is a swipe, steps 2 and 3 are buttons.** Welcome opens on the fashion

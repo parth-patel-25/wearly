@@ -464,5 +464,6 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-15 | Auth `/auth` headings reworded as semi-titles: Log In → "Welcome back - the next look is waiting", Sign Up → "Rent designer looks - no closet required", both smaller (`headingSm`) under a banner row that now carries the `Wearly` lockup beside the back button (matching `/sign-in`). |
 | 2026-10-04 | Onboarding step 1 redesigned as the fashion moment (full-bleed hero, headline with a rotated accent pill, swipe-to-continue instead of Next). Steps 2 and 3 are untouched. §6. |
 | 2026-09-29 | Initial spec. Normalised from the original brief; added build phases (§11) and the deviations log (§12). |
