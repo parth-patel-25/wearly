@@ -320,11 +320,19 @@ A beautiful calendar. Clearly communicate start date, end date, duration,
 availability and price. Selected dates are visually obvious. Smooth
 interactions.
 
+No native header on this screen — the Stack header is off for the route, and
+an in-screen row carries the back button and the centred step title
+**"Choose dates"**. The editorial question *"When will you wear it?"* leads
+the scroll beneath it.
+
 ### 7.6 Checkout — simple and trustworthy
 
 Item, duration, rental cost, deposit, delivery/pickup, fees, total. **No
 surprise charges** — the user knows exactly what they are paying before
 confirming.
+
+Like dates, the native Stack header is off for the route; an in-screen row
+carries the back button and the centred step title **"Checkout"**.
 
 ### 7.7 List your clothing
 
@@ -464,6 +472,8 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-15 | Rent dates screen header clarified: native Stack header off (`headerShown: false`, the route is a modal), in-screen row carries outline back · centred `headingSm` "Choose dates" · `size-12` mirror spacer; headline reworded "When do you need it?" → "When will you wear it?". §7.5. |
+| 2026-10-15 | Rent checkout gets the same header contract as dates: `headerShown: false` in the root layout, in-screen row with outline back · centred `headingSm` "Checkout" · `size-12` mirror spacer above the scroll. §7.6. |
 | 2026-10-15 | Auth `/auth` headings reworded as semi-titles: Log In → "Welcome back - the next look is waiting", Sign Up → "Rent designer looks - no closet required", both smaller (`headingSm`) under a banner row that now carries the `Wearly` lockup beside the back button (matching `/sign-in`). |
 | 2026-10-04 | Onboarding step 1 redesigned as the fashion moment (full-bleed hero, headline with a rotated accent pill, swipe-to-continue instead of Next). Steps 2 and 3 are untouched. §6. |
 | 2026-09-29 | Initial spec. Normalised from the original brief; added build phases (§11) and the deviations log (§12). |

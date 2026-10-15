@@ -24,9 +24,9 @@ Proves the design language and the hero-expansion interaction end to end.
 - [x] 06 Filters — bottom sheet
 - [x] 07 Product details — hero expansion from the card
 - [x] 08 Image gallery — full-bleed 3:4 hero image in product detail; header floats over it, content sheet overlaps its bottom edge with `rounded-t-5xl` (multi-frame strip removed 2026-10-06)
-- [x] 11 Date selection — calendar, range selection
+- [x] 11 Date selection — calendar, range selection; Stack header off (`headerShown: false`), in-screen row instead (outline back · centred `headingSm` "Choose dates" · mirror spacer), headline "When will you wear it?"
 - [x] 12 Price breakdown — in checkout
-- [x] 13 Checkout
+- [x] 13 Checkout — Stack header off (`headerShown: false`), in-screen row instead (outline back · centred `headingSm` "Checkout" · mirror spacer)
 - [x] 15 Confirmation
 - [x] 16 Orders / rentals — honest empty state
 - [x] 18 Profile — honest empty state

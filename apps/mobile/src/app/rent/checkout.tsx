@@ -5,7 +5,7 @@ import type { Fulfillment } from "@features/rental/validations/rental.schema";
 import { countDays } from "@features/rental/validations/rental.schema";
 import { findPiece, formatRupees } from "@shared/data/catalogue";
 import { Chip } from "@wearly/ui-native/badge";
-import { Button } from "@wearly/ui-native/button";
+import { Button, IconButton } from "@wearly/ui-native/button";
 import { Card, Panel } from "@wearly/ui-native/card";
 import { Icon } from "@wearly/ui-native/icon";
 import { Media } from "@wearly/ui-native/media";
@@ -50,7 +50,7 @@ function ctaLabel(
   if (method === null) {
     return "Choose delivery or pickup";
   }
-  return isAuthenticated ? `Pay ${formatRupees(total)}` : "Continue to payment";
+  return isAuthenticated ? `Pay ${formatRupees(total)}` : "Continue to sign in";
 }
 
 export default function CheckoutScreen() {
@@ -107,11 +107,30 @@ export default function CheckoutScreen() {
 
   return (
     <View className="flex-1 bg-background pt-safe">
+      {/* The Stack header is off for this route (`headerShown: false` in the
+          root layout), so the row is the screen's header: outline back ·
+          centred `headingSm` step title · `size-12` mirror spacer for a true
+          centre without absolute positioning. */}
+      <View className="flex-row items-center px-gutter pt-4 pb-4">
+        <IconButton
+          accessibilityLabel="Go back"
+          icon="arrow-left"
+          onPress={() => router.back()}
+          variant="outline"
+        />
+        <View className="flex-1 items-center">
+          <Text numberOfLines={1} variant="headingSm">
+            Checkout
+          </Text>
+        </View>
+        <View aria-hidden className="size-12" />
+      </View>
+
       <ScrollView
         alwaysBounceVertical={false}
         bounces={false}
         className="flex flex-col"
-        contentContainerClassName="flex flex-col gap-8 pt-4 pb-8"
+        contentContainerClassName="flex flex-col gap-8 pb-8"
         overScrollMode="never"
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}

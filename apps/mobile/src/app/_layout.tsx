@@ -85,13 +85,13 @@ export default function RootLayout() {
                 />
                 <Stack.Screen
                   name="rent/dates"
-                  options={{ presentation: "modal" }}
+                  options={{ headerShown: false, presentation: "modal" }}
                 />
-                <Stack.Screen name="rent/checkout" />
                 <Stack.Screen
-                  name="sign-in"
+                  name="rent/checkout"
                   options={{ headerShown: false }}
                 />
+                <Stack.Screen name="sign-in" options={{ headerShown: false }} />
                 <Stack.Screen name="auth" options={{ headerShown: false }} />
               </Stack>
               {/* Above every screen, so the expansion is not clipped by a route. */}

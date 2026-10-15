@@ -3,7 +3,7 @@ import { useRentalDraft } from "@features/rental/providers/rental-draft-provider
 import { countDays } from "@features/rental/validations/rental.schema";
 import type { Piece } from "@shared/data/catalogue";
 import { findPiece, formatRupees, rentalSummary } from "@shared/data/catalogue";
-import { Button } from "@wearly/ui-native/button";
+import { Button, IconButton } from "@wearly/ui-native/button";
 import type { CalendarRange } from "@wearly/ui-native/calendar";
 import { Calendar } from "@wearly/ui-native/calendar";
 import { Card } from "@wearly/ui-native/card";
@@ -99,17 +99,36 @@ function DatesBody({ piece }: DatesBodyProps) {
 
   return (
     <View className="flex-1 bg-background pt-safe">
+      {/* The Stack header is off for this route (`headerShown: false` in the
+          root layout), so the row is the screen's header: outline back ·
+          centred `headingSm` step title · `size-12` mirror spacer for a true
+          centre without absolute positioning. */}
+      <View className="flex-row items-center px-gutter pt-4 pb-4">
+        <IconButton
+          accessibilityLabel="Go back"
+          icon="arrow-left"
+          onPress={() => router.back()}
+          variant="outline"
+        />
+        <View className="flex-1 items-center">
+          <Text numberOfLines={1} variant="headingSm">
+            Choose dates
+          </Text>
+        </View>
+        <View aria-hidden className="size-12" />
+      </View>
+
       <ScrollView
         alwaysBounceVertical={false}
         bounces={false}
         className="flex-1"
-        contentContainerClassName="flex flex-col gap-8 px-gutter pt-4 pb-8"
+        contentContainerClassName="flex flex-col gap-8 px-gutter pb-8"
         overScrollMode="never"
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
       >
         <View className="gap-1">
-          <Text variant="headingXl">When do you need it?</Text>
+          <Text variant="headingXl">When will you wear it?</Text>
           <Text tone="muted-foreground" variant="bodyMd">
             {piece.name}
           </Text>
