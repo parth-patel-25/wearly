@@ -2,14 +2,10 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import { AuthField, PasswordField } from "@features/auth/components/auth-field";
 import { RememberMe } from "@features/auth/components/remember-me";
 import { SwipeToConfirm } from "@features/auth/components/swipe-to-confirm";
-import { useSignIn } from "@features/auth/hooks/use-signin";
-import type {
-  LoginInput,
-  SignUpInput,
-} from "@features/auth/validations/auth.schema";
+import { useAuth } from "@features/auth/hooks/use-auth";
 import {
+  type LoginInput,
   LoginSchema,
-  SignUpSchema,
 } from "@features/auth/validations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Text } from "@wearly/ui-native/text";
@@ -20,18 +16,17 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, View } from "react-native";
 
 /**
- * The two auth forms.
+ * Login form.
  *
- * Each tab owns its own form, validation and submit path — swapping tabs
- * swaps schemas, so a signup password rule never leaks into login. The swipe
- * control *is* the submit button: releasing past the threshold runs the full
- * zod check, and a failure toasts the first message while the inline field
- * errors show exactly where. A valid submit flips the session and returns via
- * `useSignIn`.
+ * The swipe control *is* the submit button: releasing past the threshold runs
+ * the full zod check, and a failure toasts the first message while the inline
+ * field errors show exactly where. A valid submit calls Better Auth — the
+ * server rejects soft-deleted and unverified accounts, and the error comes
+ * back through the same toast.
  */
 
 export function LoginForm() {
-  const signIn = useSignIn();
+  const { signIn } = useAuth();
   const toast = useToast();
   const muted = useToneColor("muted-foreground");
   const { control, handleSubmit } = useForm<LoginInput>({
@@ -41,7 +36,7 @@ export function LoginForm() {
   });
 
   const submit = handleSubmit(
-    (values) => signIn(values.email, "Welcome back"),
+    (values) => signIn(values, "Welcome back"),
     (errors: FieldErrors<LoginInput>) => {
       toast.show(
         errors.email?.message ??
@@ -111,84 +106,6 @@ export function LoginForm() {
       </View>
 
       <SwipeToConfirm label="Swipe to Login" onComplete={submit} />
-    </View>
-  );
-}
-
-export function SignUpForm() {
-  const signIn = useSignIn();
-  const toast = useToast();
-  const muted = useToneColor("muted-foreground");
-  const { control, handleSubmit } = useForm<SignUpInput>({
-    defaultValues: { confirmPassword: "", email: "", password: "" },
-    mode: "onBlur",
-    resolver: zodResolver(SignUpSchema),
-  });
-
-  const submit = handleSubmit(
-    (values) => signIn(values.email, "Welcome"),
-    (errors: FieldErrors<SignUpInput>) => {
-      toast.show(
-        errors.email?.message ??
-          errors.password?.message ??
-          errors.confirmPassword?.message ??
-          "Check the highlighted fields",
-        "error"
-      );
-    }
-  );
-
-  return (
-    <View className="gap-5">
-      <Controller
-        control={control}
-        name="email"
-        render={({ field: { onBlur, onChange, value }, fieldState }) => (
-          <AuthField
-            autoCapitalize="none"
-            autoComplete="email"
-            error={fieldState.error?.message}
-            keyboardType="email-address"
-            label="Email"
-            leading={<FontAwesome6 color={muted} name="envelope" size={16} />}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            placeholder="Enter your email"
-            value={value}
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        name="password"
-        render={({ field: { onBlur, onChange, value }, fieldState }) => (
-          <PasswordField
-            autoComplete="new-password"
-            error={fieldState.error?.message}
-            label="Password"
-            onBlur={onBlur}
-            onChangeText={onChange}
-            placeholder="Enter your password"
-            value={value}
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        name="confirmPassword"
-        render={({ field: { onBlur, onChange, value }, fieldState }) => (
-          <PasswordField
-            error={fieldState.error?.message}
-            label="Confirm password"
-            onBlur={onBlur}
-            onChangeText={onChange}
-            placeholder="Confirm your password"
-            value={value}
-          />
-        )}
-      />
-
-      <SwipeToConfirm label="Swipe to Sign up" onComplete={submit} />
     </View>
   );
 }

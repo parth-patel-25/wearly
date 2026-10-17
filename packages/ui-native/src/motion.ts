@@ -182,6 +182,7 @@ export function useSlideIn({
   const opacity = useSharedValue(shouldAnimate ? 0 : 1);
   const offset = useSharedValue(shouldAnimate ? direction * distance : 0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: resetKey is an intentional trigger — same-direction paging must replay the entrance
   useEffect(() => {
     if (!shouldAnimate) {
       return;

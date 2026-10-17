@@ -31,7 +31,9 @@
           "imageWidth": 192
         }
       ],
-      "expo-image"
+      "expo-image",
+      "expo-secure-store",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true

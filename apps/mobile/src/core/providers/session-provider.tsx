@@ -1,21 +1,17 @@
 import type { Dispatch, ReactNode } from "react";
 import { createContext, useContext, useMemo, useReducer } from "react";
+import { authClient } from "@/lib/auth-client";
 
 /**
  * Session state.
  *
- * One context, one reducer, four facts: whether there is an account, who it
- * belongs to, what is saved, and what is currently being rented. That is the
- * whole cross-screen state of the prototype.
- *
- * Deliberately a `useReducer` in context rather than a store library: this is one
- * small, synchronous surface with no async and no persistence, and a global store
- * would be infrastructure with nothing to do. It is also the seam where a real
- * store would go once the API exists — the reducer's actions already read like
- * API calls.
- *
- * In-memory only. A reload signs you out, which is honest for a prototype and
- * nothing is pretending otherwise.
+ * One context, one reducer, four *local* facts: what is saved, what is
+ * currently being rented, and the two pre-auth personalise answers. Whether
+ * there is an account and whose it is are not local facts — they come from
+ * the Better Auth session (`authClient.useSession`, cookie in SecureStore),
+ * so `isAuthenticated` and `name` are derived on every read and the reducer
+ * never carries them. A reload keeps you signed in now; favourites and the
+ * last rental stay local, because they belong to this device either way.
  */
 
 export interface ConfirmedRental {
@@ -25,43 +21,39 @@ export interface ConfirmedRental {
   start: string;
 }
 
-export interface SessionState {
+/** Device-local state the auth session knows nothing about. */
+interface LocalState {
   favourites: readonly string[];
-  isAuthenticated: boolean;
   /** The most recent rental, kept so My Rentals has something real to show. */
   lastRental: ConfirmedRental | null;
-  name: string | null;
   /** Answers collected before anyone was asked to sign up. */
   stylingFor: string | null;
   wears: string | null;
 }
 
+export interface SessionState extends LocalState {
+  isAuthenticated: boolean;
+  name: string | null;
+}
+
 export type SessionAction =
   | { rental: ConfirmedRental; type: "rent-confirmed" }
-  | { type: "sign-in"; name: string }
-  | { type: "sign-out" }
   | { pieceId: string; type: "toggle-favourite" }
   | { style: string; field: "stylingFor" | "wears"; type: "personalise" };
 
-const INITIAL: SessionState = {
+const INITIAL: LocalState = {
   favourites: [],
-  isAuthenticated: false,
   lastRental: null,
-  name: null,
   stylingFor: null,
   wears: null,
 };
 
-function reducer(state: SessionState, action: SessionAction): SessionState {
+function reducer(state: LocalState, action: SessionAction): LocalState {
   switch (action.type) {
     case "personalise":
       return { ...state, [action.field]: action.style };
     case "rent-confirmed":
       return { ...state, lastRental: action.rental };
-    case "sign-in":
-      return { ...state, isAuthenticated: true, name: action.name };
-    case "sign-out":
-      return { ...state, isAuthenticated: false, name: null };
     case "toggle-favourite":
       return {
         ...state,
@@ -82,7 +74,17 @@ interface SessionApi {
 const SessionContext = createContext<SessionApi | null>(null);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, INITIAL);
+  const [local, dispatch] = useReducer(reducer, INITIAL);
+  const { data } = authClient.useSession();
+
+  const state = useMemo<SessionState>(
+    () => ({
+      ...local,
+      isAuthenticated: Boolean(data),
+      name: data?.user.name ?? null,
+    }),
+    [data, local]
+  );
   const api = useMemo<SessionApi>(() => ({ dispatch, state }), [state]);
 
   return (

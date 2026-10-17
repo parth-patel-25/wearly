@@ -8,8 +8,8 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./src/*"],
-      "@wearly/ui/*": ["../../packages/ui/src/*"],
-      "@wearly/shared/*": ["../../packages/shared/src/*"]
+      "@features/*": ["./src/features/*"],
+      "@wearly/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": [

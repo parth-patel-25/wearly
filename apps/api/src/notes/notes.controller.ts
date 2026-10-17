@@ -10,6 +10,7 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
+import { AllowAnonymous } from "@thallesp/nestjs-better-auth";
 import {
   createNoteSchema,
   idSchema,
@@ -26,6 +27,9 @@ import type {
 import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
 import { NotesService } from "./notes.service.js";
 
+// Notes are still the public prototype slice; scoping them by session is a
+// separate task (docs/auth-and-database.md §4 Step 5).
+@AllowAnonymous()
 @Controller("notes")
 export class NotesController {
   constructor(private readonly notes: NotesService) {}

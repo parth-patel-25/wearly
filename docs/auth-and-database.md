@@ -1,12 +1,35 @@
 # Decision: database (Drizzle + Postgres) and authentication (Better Auth)
 
-**Status:** agreed, not yet implemented
-**Decided:** 2026-09-27
+**Status:** agreed, implementation in progress — tracked in
+[auth-and-admin-plan.md](auth-and-admin-plan.md)
+**Decided:** 2026-09-27 · **Amended:** 2026-10-15
 **Applies to:** `apps/api` (NestJS), `apps/web` (Next.js), `apps/mobile` (Expo)
 
-This is the record of *what we decided* and *how to implement it later*. Nothing
-here is wired up yet — `apps/api` currently uses an in-memory store so the shared
-contract can be exercised end to end.
+This is the record of *what we decided* and *how to implement it*. Nothing
+here was wired up at the time of writing — `apps/api` currently uses an
+in-memory store so the shared contract can be exercised end to end.
+
+## Amendment — 2026-10-15 (Supabase hosting + admin panel)
+
+The implementation pass confirmed the following additions on top of the original
+decision (auth framework unchanged — still **Better Auth**):
+
+| Concern | Choice |
+| --- | --- |
+| Hosting | **Supabase** Postgres (`DATABASE_URL` session pooler, port 5432). The "Hosting — still open" options below are now closed. |
+| Sign-up methods | Email + password, **Google** OAuth, **Facebook** OAuth, email verification via **Resend** |
+| Clients | Web **and** Mobile both get real auth this pass |
+| Roles | `user` → `admin` → `super_admin`, via the Better Auth **admin plugin** with custom access control |
+| Admin surface | Web-only panel at `/admin`; all admin operations go through Nest-owned `/api/admin/*` (never the raw Better Auth `/admin/*` in the browser) |
+| Super-admin | Seeded directly in the database; only super-admin can invite/revoke admins (true email invites, hashed single-use tokens, 7-day expiry) |
+| Soft delete | `user.deleted_at` (Better Auth `additionalFields`); blocks session creation, revokes existing sessions, visible in admin with Restore |
+| Hard delete | Permanent via Better Auth `auth.api.removeUser` (auth account + row) |
+
+RLS is **not** used — the API is the only database consumer (Supabase
+anon/service keys unused). `packages/shared` stays ORM-free.
+
+Step-by-step checklist for building all of this:
+**[auth-and-admin-plan.md](auth-and-admin-plan.md)**.
 
 ---
 
@@ -230,8 +253,70 @@ export const authClient = createAuthClient({
 ```
 
 Extra mobile dependencies: `expo-secure-store` (session storage),
-`expo-web-browser` + `expo-linking` + `expo-constants` (social sign-in deep
-links), and `expo-network`.
+`expo-web-browser` + `expo-linking` + `expo-constants` (Facebook's system
+browser flow), `expo-network`, and
+`@react-native-google-signin/google-signin` (native Google Sign-In).
+
+### Mobile Google sign-in — native Google Sign-In SDK
+
+Google sign-in on mobile uses **Google Identity Services** via
+`@react-native-google-signin/google-signin` — no browser, no OAuth
+redirect. (An earlier `expo-auth-session` browser flow was abandoned:
+Google's Oct 2023 policy disables custom-URI-scheme redirects on new
+Android OAuth clients by default, which produced
+`Error 400: invalid_request` + "Access blocked — OAuth 2.0 policy for
+keeping apps secure" even with the Advanced Settings opt-in.)
+
+1. `useGoogleSignIn` (`features/auth/hooks/use-google-sign-in.ts`) calls
+   `GoogleSignin.configure({ webClientId: EXPO_PUBLIC_GOOGLE_CLIENT_ID })`
+   once, then on tap `hasPlayServices` + `signIn()` — Play Services shows
+   the native account picker and returns an **ID token**
+   (`result.data.idToken`; its `aud` claim is the configured client ID).
+2. The app posts `authClient.signIn.social({ provider: "google", idToken })`
+   to the API. Better Auth verifies the token cryptographically against
+   Google's JWKS (`issuer` + `audience = GOOGLE_CLIENT_ID`) — no secret
+   involved (`@better-auth/core` google provider `idToken` config).
+3. A session cookie is minted and stored in SecureStore via `expoClient`.
+
+**Google Console prerequisites:**
+
+- **Android client** (package `com.parthpatel25.wearly` + the **debug
+  SHA-1**) — Play Services refuses sign-in without a matching Android
+  client (native error code 10 / `DEVELOPER_ERROR`). The debug SHA-1
+  (project keystore `android/app/debug.keystore`, standard RN debug
+  fingerprint) is:
+  `5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25`
+  (read it with
+  `keytool -list -v -keystore android/app/debug.keystore -alias androiddebugkey -storepass android`).
+- **Web client** (`wearly-web`, same project) — the `webClientId` that
+  mints the ID token; both env vars point at its Client ID (origins
+  `http://localhost:3000`, no redirect URIs — unused by the native flow).
+  The secret is stored but unused for idToken verification.
+- **Consent screen** — publish it, or add the signing-in account under
+  *Test users* while it is in Testing.
+
+**Env contract**:
+
+| Variable | Where it is read | Must be |
+|---|---|---|
+| `GOOGLE_CLIENT_ID` | API (root `.env`, `apps/api/src/auth.ts`) | the client ID the app signs with (token audience) |
+| `GOOGLE_CLIENT_SECRET` | API (root `.env`) | unused for the mobile flow; empty is fine |
+| `EXPO_PUBLIC_GOOGLE_CLIENT_ID` | mobile app (`apps/mobile/.env`) | same client ID (SDK `webClientId`) |
+
+Expo inlines `EXPO_PUBLIC_*` from **`apps/mobile/.env`** (the app project
+root), not the repo-root `.env` — keep the Google var next to
+`EXPO_PUBLIC_API_URL` there. A missing var degrades to a "Google sign-in
+is not configured" toast.
+
+`buildSocialProviders` registers `google` when `GOOGLE_CLIENT_ID` alone
+exists — the secret is only required for browser code flows (Facebook still
+uses the system-browser flow and keeps ID+secret gating).
+
+Gotcha: the API's `GOOGLE_CLIENT_ID` must equal the SDK's `webClientId`,
+otherwise verification fails with `Invalid id token` (audience mismatch).
+
+iOS: `promptGoogleSignIn` toasts "not available on this platform yet" —
+an iOS OAuth client + `iosClientId` wiring is pending.
 
 ### Step 7 — authenticated requests from the mobile app
 

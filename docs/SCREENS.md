@@ -48,7 +48,13 @@ Proves the design language and the hero-expansion interaction end to end.
   pill travels between the segments' measured slots and the heading + form
   enter in the direction of travel (`useSlideIn`, instant under reduced
   motion); banner row carries the Wearly lockup beside the back button, with
-  the reworded semi-title headings (`features/auth`)
+  the reworded semi-title headings (`features/auth`). The social pair under
+  the form is Google + Facebook (Apple removed 2026-10-15 — the API
+  configures only `google` and `facebook` providers; shared `FacebookGlyph`
+  in `social-button.tsx`). Google uses the native Google Sign-In SDK
+  (`use-google-sign-in.ts` + `@react-native-google-signin/google-signin`,
+  idToken flow — no browser/redirect); Facebook still opens the system
+  browser
 - [x] Native component foundation in `packages/ui-native`
 
 **Step 1 is a swipe, steps 2 and 3 are buttons.** Welcome opens on the fashion
@@ -100,3 +106,61 @@ Two-sided marketplace. Friendly and guided, never a seller dashboard.
 - [ ] 23 Set price
 - [ ] 24 Set availability
 - [ ] 25 Listing published
+
+## Mobile — real auth (`apps/mobile`)
+
+Phase 4 of `docs/auth-and-admin-plan.md` — replacing the prototype's fake
+sign-in with Better Auth (`expoClient` + SecureStore, scheme `wearly`).
+
+- [x] Deps: `better-auth`, `@better-auth/expo`, `expo-secure-store`,
+  `expo-network` (`expo-web-browser` / `expo-linking` / `expo-constants` present)
+- [x] `src/lib/auth-client.ts` — `createAuthClient` + `expoClient({ scheme: "wearly", storage: SecureStore })`
+- [x] Real session — `authClient.useSession` behind the existing
+  `SessionProvider` (favourites, rentals, personalise stay local state)
+- [x] Login wired — `signIn.email`; sign-up wired — `signUp.email` with a
+  `name` field added to `SignUpSchema` (Better Auth requires it)
+- [x] Social buttons wired — Google via native Google Sign-In SDK
+  (`signIn.social({ idToken })`,
+  `@react-native-google-signin/google-signin`); Facebook via the
+  system-browser `signIn.social` (Apple removed; no server provider)
+- [x] Email verification — `wearly://verify-email` deep link (server keeps a
+  `wearly://` callback instead of rewriting it to the web origin)
+- [x] Post-verify screen — `/verify-email` route (success + `?error=` states)
+
+## Web — auth + admin panel (`apps/web`)
+
+Auth wiring and the admin surface live in the web app (see
+`docs/auth-and-admin-plan.md` for the build checklist).
+
+**Entry + showcase:**
+
+- [x] Root `/` — auth gate: no session cookie → redirect `/sign-in`; session
+  cookie → redirect `/admin` (role still enforced by the admin shell)
+- [x] `/design-system` — showcase page (hero, featured pieces, how-it-works);
+  theme toggle in the header
+- [x] `/design-system/tokens` — token reference (colours, foundations,
+  controls, surfaces, overlays, states); anchor links from the showcase footer
+
+**Auth (real backend, Supabase + Better Auth):**
+
+- [x] Sign in — `/sign-in` (email + password only — OAuth buttons removed;
+  `?next=` redirect; "Create one" sign-up link hidden when `next` points at
+  `/admin` — admin is invite-only)
+- [x] Sign up — `/sign-up` (validated email/password, first-error toast +
+  inline errors); still reachable for invitees whose email has no account yet
+  (invite landing links here)
+- [x] Verify email — `/verify-email` + Better Auth verification callback route
+- [x] Session wiring — `authClient.useSession` on web (admin shell, invite landing);
+  mobile parity still pending (Phase 4)
+
+**Admin (`/admin`, gated by session + role):**
+
+- [x] Admin layout — soft sidebar with rose accent (`DESIGN_SYSTEM.md` §11);
+  tabs: Users, Invites, Design system (navigates to `/design-system`)
+- [x] Users list — `/admin/users`: search, pagination, include-deleted toggle,
+  role/status badges, confirmation dialogs for soft delete / hard delete / restore
+- [x] Admin invites — `/admin/invites`: invite-by-email form, pending list,
+  revoke (super-admin only)
+- [x] Invite landing — `/admin/invite/:token`: validate token; signed out →
+  "Sign in to accept" plus "Create an account" (`/sign-up?next=…`) so
+  new-email invitees can register; accept → role becomes `admin`

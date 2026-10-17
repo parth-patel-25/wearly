@@ -32,6 +32,23 @@ function fireLight(): void {
   });
 }
 
+/** The optional glyph — one branch per icon family, never nested. */
+function OptionGlyph({
+  color,
+  icon,
+}: {
+  color: string;
+  icon?: OptionIconName;
+}) {
+  if (icon === undefined) {
+    return null;
+  }
+  if (icon.family === "fontawesome6") {
+    return <FontAwesome6 color={color} name={icon.name} size={26} />;
+  }
+  return <MaterialCommunityIcons color={color} name={icon.name} size={28} />;
+}
+
 /**
  * One large selectable answer.
  *
@@ -70,11 +87,7 @@ export function OptionCard({
       onPressOut={onPressOut}
       style={animatedStyle}
     >
-      {icon === undefined ? null : icon.family === "fontawesome6" ? (
-        <FontAwesome6 color={iconColor} name={icon.name} size={26} />
-      ) : (
-        <MaterialCommunityIcons color={iconColor} name={icon.name} size={28} />
-      )}
+      <OptionGlyph color={iconColor} icon={icon} />
       <Text className="text-center" tone={control.tone} variant="buttonLg">
         {label}
       </Text>

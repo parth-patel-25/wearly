@@ -5,18 +5,16 @@ import { z } from "zod";
  *
  * Context-aware rules: logging in only needs the credentials the user already
  * has, while signing up is where a password gets its strength requirements —
- * asking for uppercase, lowercase and a number on the login screen would be
- * asking people to prove a policy they set in the past.
- *
- * The confirm-password mismatch is pathed onto `confirmPassword` rather than
- * left at the root, so it surfaces as an inline field error *and* as the first
- * message in the failure toast instead of a shapeless root error.
+ * and the `name` field, which Better Auth requires on `signUpEmail`. Emails
+ * are trimmed and lowercased before the format check so " Foo@Bar.com " and
+ * "foo@bar.com" are one account, matching the web schemas.
  */
 
 const EMAIL = z
   .string()
   .min(1, "Enter your email")
-  .email("That does not look like an email");
+  .transform((value) => value.trim().toLowerCase())
+  .pipe(z.email("That does not look like an email"));
 
 const HAS_LOWER = /[a-z]/;
 const HAS_NUMBER = /[0-9]/;
@@ -34,6 +32,10 @@ export const SignUpSchema = z
   .object({
     confirmPassword: z.string().min(1, "Confirm your password"),
     email: EMAIL,
+    name: z
+      .string()
+      .min(1, "Enter your name")
+      .max(80, "Use at most 80 characters"),
     password: z
       .string()
       .min(8, "Use at least 8 characters")

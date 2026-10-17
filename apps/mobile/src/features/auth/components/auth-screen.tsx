@@ -1,16 +1,17 @@
-import { FontAwesome6 } from "@expo/vector-icons";
-import { LoginForm, SignUpForm } from "@features/auth/components/auth-forms";
 import { BrandMark } from "@features/auth/components/brand-mark";
+import { LoginForm } from "@features/auth/components/login-form";
 import type { AuthTab } from "@features/auth/components/segmented-tabs";
 import { SegmentedTabs } from "@features/auth/components/segmented-tabs";
+import { SignUpForm } from "@features/auth/components/sign-up-form";
 import {
+  FacebookGlyph,
   GoogleGlyph,
   SocialButton,
 } from "@features/auth/components/social-button";
+import { useAuth } from "@features/auth/hooks/use-auth";
 import { IconButton } from "@wearly/ui-native/button";
 import { useSlideIn } from "@wearly/ui-native/motion";
 import { Text } from "@wearly/ui-native/text";
-import { useToneColor } from "@wearly/ui-native/tone";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
@@ -58,7 +59,7 @@ const TAB_SPEC: Record<AuthTab, TabSpec> = {
 };
 
 function SocialRow() {
-  const foreground = useToneColor("foreground");
+  const { socialSignIn } = useAuth();
 
   return (
     <View className="gap-4">
@@ -70,10 +71,15 @@ function SocialRow() {
         <View className="h-px flex-1 bg-border" />
       </View>
       <View className="gap-3">
-        <SocialButton icon={<GoogleGlyph />} label="Sign in with Google" />
         <SocialButton
-          icon={<FontAwesome6 color={foreground} name="apple" size={18} />}
-          label="Sign in with Apple"
+          icon={<GoogleGlyph />}
+          label="Sign in with Google"
+          onPress={() => socialSignIn("google")}
+        />
+        <SocialButton
+          icon={<FacebookGlyph />}
+          label="Sign in with Facebook"
+          onPress={() => socialSignIn("facebook")}
         />
       </View>
     </View>

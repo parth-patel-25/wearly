@@ -12,7 +12,7 @@ Bun is the package manager and task runner; Node runs the apps.
 | Lint / format | Ultracite (Biome 2.5) — single root `biome.jsonc` |
 | Web | Next.js 16.3 (App Router), Tailwind CSS v4, shadcn/ui, HeroUI v3 |
 | Mobile | Expo SDK 57, React Native 0.86, Expo Router, Uniwind 1.12, HeroUI Native 1.0 |
-| API | NestJS 12 (ESM), zod validation, no database yet |
+| API | NestJS 12 (ESM), zod validation, Better Auth at `/api/auth/*` |
 | Contracts | `@wearly/shared` — zod schemas + inferred types + typed fetch client |
 | Design | `packages/design-tokens` + Satoshi (self-hosted, ITF FFL) |
 
@@ -25,13 +25,15 @@ apps/
   api/       NestJS REST API (ESM)
 packages/
   shared/        zod schemas, API types, route constants, typed client
+  db/            Drizzle schema + client (Supabase Postgres; API-only)
   design-tokens/ colour / radius / type / spacing / motion tokens
   ui/            shadcn/ui components (web)
   ui-native/     shared native providers and layout primitives
   tsconfig/      base TypeScript configs
 docs/
   DESIGN_SYSTEM.md    the design system: philosophy, tokens, rules, do/don't
-  auth-and-database.md   planned Drizzle + Postgres + Better Auth work
+  auth-and-database.md   the Drizzle + Supabase + Better Auth decision record
+  auth-and-admin-plan.md phased build checklist (auth + admin panel)
 ```
 
 ## Getting started
@@ -217,14 +219,20 @@ CLI imports `cn` from the official `shadcn-ui/cn` package rather than a local
 
 ## Roadmap: database and auth
 
-Database and authentication are **agreed but not implemented**. The full decision
-record — versions, rationale, step-by-step plan, gotchas and a definition of
-done — lives in **[docs/auth-and-database.md](docs/auth-and-database.md)**.
+Database and authentication are **agreed; implementation in progress**. The full
+decision record — versions, rationale, step-by-step plan, gotchas and a definition
+of done — lives in **[docs/auth-and-database.md](docs/auth-and-database.md)**;
+the phased build checklist (tick as each phase lands) lives in
+**[docs/auth-and-admin-plan.md](docs/auth-and-admin-plan.md)**.
 
-Short version: **PostgreSQL + Drizzle** (`postgres.js`, drizzle-kit migrations) and
-**Better Auth**, served from `apps/api` at `/api/auth/*` so web and mobile share
-one session. The auth server deliberately lives in Nest rather than Next, because
-the mobile app already talks to Nest and there is only one origin to authorise.
+Short version: **Supabase-hosted PostgreSQL + Drizzle** (`postgres.js`, drizzle-kit
+migrations, new `packages/db`) and **Better Auth**, served from `apps/api` at
+`/api/auth/*` so web and mobile share one session. The auth server deliberately
+lives in Nest rather than Next, because the mobile app already talks to Nest and
+there is only one origin to authorise. Sign-up covers email + password, Google and
+Facebook OAuth, with email verification via Resend. A web-only **admin panel** at
+`/admin` (users list, soft/hard delete with confirmation, restore, email invites
+for the `admin` role) talks to Nest-owned `/api/admin/*` endpoints.
 
 `apps/api` uses an in-memory store for `NotesService` purely to exercise the
 contract. Replace its method bodies with Drizzle queries once that document is

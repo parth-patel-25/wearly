@@ -93,6 +93,10 @@ export default function RootLayout() {
                 />
                 <Stack.Screen name="sign-in" options={{ headerShown: false }} />
                 <Stack.Screen name="auth" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="verify-email"
+                  options={{ headerShown: false }}
+                />
               </Stack>
               {/* Above every screen, so the expansion is not clipped by a route. */}
               <HeroLayer />

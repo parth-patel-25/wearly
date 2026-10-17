@@ -1,3 +1,4 @@
+import { FontAwesome6 } from "@expo/vector-icons";
 import { AnimatedPressable, usePressScale } from "@wearly/ui-native/motion";
 import { Text } from "@wearly/ui-native/text";
 import type { ReactNode } from "react";
@@ -10,8 +11,11 @@ import Svg, { Path } from "react-native-svg";
  * label and carries its own brand artwork, which the in-house `Icon` glyph set
  * has no glyphs for. Google gets its original four colours — the FontAwesome
  * free `google` glyph is a single path, and monochrome blue is not the Google
- * mark.
+ * mark. Facebook is the brand blue `f`, the one server-side provider besides
+ * Google, so Apple never appears in this pair.
  */
+
+const FACEBOOK_COLOR = "#1877F2";
 
 export function GoogleGlyph() {
   return (
@@ -36,12 +40,17 @@ export function GoogleGlyph() {
   );
 }
 
+export function FacebookGlyph() {
+  return <FontAwesome6 color={FACEBOOK_COLOR} name="facebook" size={18} />;
+}
 interface SocialButtonProps {
   icon: ReactNode;
   label: string;
+  /** Wired to Better Auth `signIn.social`; omitted only where not yet bound. */
+  onPress?: () => void;
 }
 
-export function SocialButton({ icon, label }: SocialButtonProps) {
+export function SocialButton({ icon, label, onPress }: SocialButtonProps) {
   const { animatedStyle, onPressIn, onPressOut } = usePressScale(0.97);
 
   return (
@@ -49,6 +58,7 @@ export function SocialButton({ icon, label }: SocialButtonProps) {
       accessibilityLabel={label}
       accessibilityRole="button"
       className="h-touch w-full flex-row items-center justify-center gap-3 rounded-button border border-border bg-card px-6 active:bg-muted"
+      onPress={onPress}
       onPressIn={onPressIn}
       onPressOut={onPressOut}
       style={animatedStyle}

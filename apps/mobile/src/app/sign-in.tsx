@@ -1,10 +1,11 @@
 import { authTab } from "@core/routing/routes";
-import { FontAwesome6 } from "@expo/vector-icons";
 import { BrandMark } from "@features/auth/components/brand-mark";
 import {
+  FacebookGlyph,
   GoogleGlyph,
   SocialButton,
 } from "@features/auth/components/social-button";
+import { useAuth } from "@features/auth/hooks/use-auth";
 import { Button, IconButton } from "@wearly/ui-native/button";
 import { Screen } from "@wearly/ui-native/screen";
 import { Text } from "@wearly/ui-native/text";
@@ -29,18 +30,18 @@ import { Pressable, View } from "react-native";
  * login tab, where the fields and the swipe control live.
  */
 
-const FACEBOOK_COLOR = "#1877F2";
-
 const SOCIALS = [
-  { icon: <GoogleGlyph />, label: "Sign in with Google" },
+  { icon: <GoogleGlyph />, label: "Sign in with Google", provider: "google" },
   {
-    icon: <FontAwesome6 color={FACEBOOK_COLOR} name="facebook" size={18} />,
+    icon: <FacebookGlyph />,
     label: "Sign in with Facebook",
+    provider: "facebook",
   },
 ] as const;
 
 export default function SignInScreen() {
   const router = useRouter();
+  const { socialSignIn } = useAuth();
 
   return (
     <Screen
@@ -70,7 +71,12 @@ export default function SignInScreen() {
 
         <View className="gap-3">
           {SOCIALS.map((social) => (
-            <SocialButton key={social.label} {...social} />
+            <SocialButton
+              icon={social.icon}
+              key={social.label}
+              label={social.label}
+              onPress={() => socialSignIn(social.provider)}
+            />
           ))}
         </View>
 
