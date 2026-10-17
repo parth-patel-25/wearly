@@ -41,10 +41,11 @@ export function SignInForm() {
         toast.error(error.message ?? "Could not sign in");
         return;
       }
-      // Full replace so the sign-in entry leaves the history stack — the
-      // browser Back button can no longer return a signed-in user to sign-in.
-      // (A client-side push could also race the freshly-set cookie.)
-      window.location.replace(next?.startsWith("/") ? next : "/");
+      // Full replace straight to the destination (skip `/`, which would just
+      // 307 to `/admin`): the sign-in entry leaves the history stack, so a
+      // signed-in user cannot Back into sign-in, and a fresh sign-in leaves
+      // only the dashboard entry.
+      window.location.replace(next?.startsWith("/") ? next : "/admin");
     } finally {
       setIsSubmitting(false);
     }

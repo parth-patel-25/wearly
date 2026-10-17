@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { type ReactNode, useCallback, useEffect } from "react";
+import { type ReactNode, useCallback, useEffect, useRef } from "react";
 import { WearlyLogo } from "@/components/wearly-logo";
 import { authClient } from "@/lib/auth-client";
 
@@ -36,9 +36,34 @@ const NAV_ITEMS = [
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const pathnameRef = useRef(pathname);
   const { data, error, isPending, refetch } = authClient.useSession();
   const role = data?.user?.role;
   const isAdmin = role === "admin" || role === "super_admin";
+
+  useEffect(() => {
+    pathnameRef.current = pathname;
+  }, [pathname]);
+
+  // A Back press that lands on the same dashboard URL is a stale or duplicated
+  // history entry (re-login lands on the same route as the pre-sign-out one),
+  // which the browser renders as a "refresh". Cancel those so Back is a no-op
+  // on the dashboard; a different URL (an internal page) is allowed through.
+  useEffect(() => {
+    let cancelNext = false;
+    const handlePopState = () => {
+      if (cancelNext) {
+        cancelNext = false;
+        return;
+      }
+      if (window.location.pathname === pathnameRef.current) {
+        cancelNext = true;
+        window.history.forward();
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
 
   const handleSignOut = useCallback(() => {
     // Full replace so the signed-in admin entry is not left in history, and a
