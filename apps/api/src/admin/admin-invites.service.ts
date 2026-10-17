@@ -90,15 +90,22 @@ export class AdminInvitesService {
 
     const origin = process.env.WEB_ORIGIN ?? "http://localhost:3000";
     const link = `${origin}/admin/invite/${token}`;
-    await sendEmail({
-      html: emailLayout(
-        "Admin invitation",
-        `You have been invited as a Wearly admin: <a href="${link}">Accept invitation</a> (valid for ${INVITE_TTL_DAYS} days).`
-      ),
-      subject: "You have been invited to Wearly Admin",
-      text: `Accept your Wearly admin invitation (valid for ${INVITE_TTL_DAYS} days): ${link}`,
-      to: email,
-    });
+    try {
+      await sendEmail({
+        html: emailLayout(
+          "Admin invitation",
+          `You have been invited as a Wearly admin: <a href="${link}">Accept invitation</a> (valid for ${INVITE_TTL_DAYS} days).`
+        ),
+        subject: "You have been invited to Wearly Admin",
+        text: `Accept your Wearly admin invitation (valid for ${INVITE_TTL_DAYS} days): ${link}`,
+        to: email,
+      });
+    } catch (error) {
+      // A failed send must not strand the invite as pending: drop the row so
+      // the address stays retryable instead of tripping the pending guard.
+      await db.delete(adminInvites).where(eq(adminInvites.id, row.id));
+      throw error;
+    }
 
     return toAdminInvite(row);
   }
