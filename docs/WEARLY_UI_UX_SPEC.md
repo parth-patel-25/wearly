@@ -459,10 +459,10 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | `AGENTS.md` says | Prototype does | Why |
 | --- | --- | --- |
-| Toast via `sonner` | HeroUI Native `toast` | Already a dependency. A second toast system would be duplicate infrastructure. |
+| Toast via `sonner` | Custom `ui-native` `Toast` on mobile (`toast.tsx` + `toast-view.tsx` + `toast-motion.ts` + `toast-drag.ts`); `sonner` on web | HeroUI Native's toast cannot be imported without its absent peer deps (`DESIGN_SYSTEM.md` §16); the shared, token-based surface is the infrastructure instead. |
 | Global state via `zustand` | Context + `useReducer` | One small session surface. Zustand is unjustified at this size. |
 | All API calls via React Query | No network layer | The prototype is mock data. Adding a query client to fetch nothing is cargo cult. |
-| Every input: `zod` + `react-hook-form` + `sonner` | `zod` + `react-hook-form` + HeroUI `toast` | Same guarantee, existing dependency. |
+| Every input: `zod` + `react-hook-form` + `sonner` | `zod` + `react-hook-form` + `useToast` / `sonner` | Same guarantee, existing shared dependency. |
 | 80% test coverage | None | **Not met.** The repository has no test runner at all. Verification is typecheck + lint + `expo export`. Flagged, not ignored. |
 | Flexbox only, never absolute | One absolute layer | The hero-expansion overlay is a transient animation layer, not layout. See `DESIGN_SYSTEM.md` §10. |
 
@@ -472,6 +472,7 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-17 | Toasts made on-theme and rounded on both platforms, and mobile toasts gained swipe-to-dismiss. See `DESIGN_SYSTEM.md` §9 for the skin contract and the change-log entry for the mechanism. |
 | 2026-10-15 | Rent dates screen header clarified: native Stack header off (`headerShown: false`, the route is a modal), in-screen row carries outline back · centred `headingSm` "Choose dates" · `size-12` mirror spacer; headline reworded "When do you need it?" → "When will you wear it?". §7.5. |
 | 2026-10-15 | Rent checkout gets the same header contract as dates: `headerShown: false` in the root layout, in-screen row with outline back · centred `headingSm` "Checkout" · `size-12` mirror spacer above the scroll. §7.6. |
 | 2026-10-15 | Auth `/auth` headings reworded as semi-titles: Log In → "Welcome back - the next look is waiting", Sign Up → "Rent designer looks - no closet required", both smaller (`headingSm`) under a banner row that now carries the `Wearly` lockup beside the back button (matching `/sign-in`). |

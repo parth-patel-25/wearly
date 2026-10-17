@@ -543,6 +543,40 @@ Heavy borders and dense rows are what make a dashboard feel like a spreadsheet.
 28px radius, generous padding, `max-w-lg`. A scrim soft enough that the dialog
 stays the focus. On mobile, prefer a bottom sheet at 32px.
 
+### Toasts
+
+One shape on both platforms: a `rounded-card` surface (24px), a hairline
+`border-border`, a soft `shadow-float`, the status `-background` / `-foreground`
+token pair, and a `bodySm` line. The tone is carried by both the surface **and**
+a `bg-card` disc holding the status glyph, so it is never colour alone.
+
+**Web.** Sonner renders the toast; the Wearly skin is applied in two layers.
+Sonner exposes its palette as CSS variables, so `Toaster` sets `--normal-bg`,
+`--normal-text`, `--normal-border` and `--border-radius` inline from tokens
+(inline wins over Sonner's own runtime-injected stylesheet). The silhouette
+Sonner *hard-codes* — padding, gap, elevation, type — is overridden by an
+unlayered `.toaster [data-sonner-toast]` block in `apps/web/src/app/globals.css`;
+it is deliberately **not** inside an `@layer`, because an unlayered rule has to
+beat Sonner's unlayered injected stylesheet, and specificity (`.toaster` +
+`[data-sonner-toast][data-styled]`) is what wins. Each `data-type` maps its
+variables to the matching soft status pair. `richColors` is **off** — its
+saturated fills are the stock look the tokens exist to replace — and the
+overlapping corner close button is dropped in favour of auto-dismiss plus
+Sonner's own swipe.
+
+**Mobile.** Three small modules, split by concern: `toast-view.tsx` is only the
+surface, `toast-motion.ts` owns its lifecycle, and `toast-drag.ts` owns the
+release decision. A `visible` shared value drives entrance (fade + rise + scale,
+`DURATION.base` / `EASE_OUT`), exit, and the scrim-free layering, all on the UI
+thread. A `Pan` with `minDistance(12)` tracks the finger 1:1, fades as it
+travels, and on release either springs home (`SPRING.press`) or leaves along the
+dominant axis past 110px / 850px·s⁻¹. The surface asks to close and the provider
+unmounts it only after the exit animation signals `hasClosed` — so dismissal is
+a transition, never a pop. Top offset is
+`insets.top + 12`, so it clears the notch on every device. Reduced motion lands
+the state without movement. It leaves three ways: swipe, tap (the whole surface
+is a `Pressable`), and the 4s auto-dismiss clock.
+
 ---
 
 ## 10. Mobile rules
@@ -949,6 +983,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-17 | Toasts are themed on both platforms. Web: `Toaster` (`apps/web/src/components/toaster.tsx`) drops `richColors`, sets Sonner's colour variables inline from tokens, and `globals.css` overrides the hard-coded silhouette under `.toaster` (unlayered, so it beats Sonner's injected sheet) — `rounded-card`, `border-border`, `shadow-float`, `bodySm`, and per-`data-type` soft status pairs; the corner close button is removed. Mobile: `toast.tsx` split into a provider plus `toast-view.tsx` (surface), `toast-motion.ts` (entrance/exit/swipe on the UI thread) and `toast-drag.ts` (the release worklet) — a `Pan` (`minDistance(12)`) tracks the finger, fades as it travels, and springs back or leaves past 110px/850px·s⁻¹; the provider unmounts only after the exit animation, so dismissal is a transition not a pop. Top offset is `insets.top + 12`; reduced motion respected. §9. |
 | 2026-10-17 | Web auth gate hardened: `hasSessionCookie()` (server) is shared by `/` and `/sign-in`, and a client `RequireSignedOut` guard re-checks the session on mount and on `pageshow` with `persisted` — so the browser back/forward cache can no longer restore the sign-in form for a signed-in user. Sign-in/out use full `window.location.replace` navigations, so the cookie is committed before the gate runs (fixes the "click sign-in twice" race) and the sign-in entry leaves the history stack (Back can no longer return a signed-in user to sign-in). |
 | 2026-10-17 | Web admin shell: sidebar nav items and the sign-out/retry controls carry lucide icons (active item's icon is `primary` per §11); the sidebar header is now the approved Wearly flow mark (`WearlyLogo`, simple + `ADMIN PANEL` caption) instead of a bare "Admin". Design system nav item opens in a new tab (`target="_blank" rel="noopener noreferrer"`, trailing `ExternalLink` glyph). Users search no longer flashes: the header/search stay mounted and only the table region shows a loader (`keepPreviousData` + `isFetching`), so the input never unmounts mid-search. Auth screen (sign-in/sign-up) centres the logo mark (`size="lg"`) above the card with a centred `heading-lg` title; the logo is not a link, so the title no longer navigates to `/design-system`. The mobile flow-mark SVG is copied to `apps/web/public/brand/` with a dark-stop variant, swapped by the `.dark` class. |
 | 2026-10-15 | Rent dates screen: native Stack header switched off for the modal route (`headerShown: false` in the root layout) so only one header renders — the in-screen row (outline back · centred `headingSm` "Choose dates" · `size-12` mirror spacer, `pt-safe` + `pt-4`, same contract as product detail). Headline moves below it: "When will you wear it?". |
