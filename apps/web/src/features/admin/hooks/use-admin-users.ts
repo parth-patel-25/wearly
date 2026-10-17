@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { browserApi } from "@/lib/api-browser";
 
 export interface ListUsersParams {
@@ -13,6 +13,9 @@ export interface ListUsersParams {
 /** Cached, paginated user list for the admin panel. */
 export function useAdminUsers(params: ListUsersParams) {
   return useQuery({
+    // Keep the previous page while a new search/offset loads so the table does
+    // not blank out (and the search box never unmounts) on every keystroke.
+    placeholderData: keepPreviousData,
     queryFn: () =>
       browserApi.admin.listUsers({
         includeDeleted: params.includeDeleted,

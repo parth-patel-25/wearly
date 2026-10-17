@@ -5,7 +5,7 @@ import { Button } from "@wearly/ui/components/ui/button";
 import { Input } from "@wearly/ui/components/ui/input";
 import { Label } from "@wearly/ui/components/ui/label";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import type { FieldErrors } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -19,7 +19,6 @@ function firstError(errors: FieldErrors<SignInInput>): string {
 }
 
 export function SignInForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,8 +41,10 @@ export function SignInForm() {
         toast.error(error.message ?? "Could not sign in");
         return;
       }
-      router.push(next?.startsWith("/") ? next : "/");
-      router.refresh();
+      // Full replace so the sign-in entry leaves the history stack — the
+      // browser Back button can no longer return a signed-in user to sign-in.
+      // (A client-side push could also race the freshly-set cookie.)
+      window.location.replace(next?.startsWith("/") ? next : "/");
     } finally {
       setIsSubmitting(false);
     }

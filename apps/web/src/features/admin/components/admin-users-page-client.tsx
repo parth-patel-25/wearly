@@ -2,7 +2,13 @@
 
 import { Input } from "@wearly/ui/components/ui/input";
 import { Skeleton } from "@wearly/ui/components/ui/skeleton";
-import { type ChangeEvent, useCallback, useEffect, useState } from "react";
+import {
+  type ChangeEvent,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { authClient } from "@/lib/auth-client";
 import { UsersTable } from "../components/users-table";
 import { useAdminUsers } from "../hooks/use-admin-users";
@@ -12,6 +18,11 @@ const PAGE_SIZE = 20;
 /**
  * Users list page. Owns search / pagination / include-deleted state; the
  * table is a pure renderer (Rule 1: narrow props, no feature object).
+ *
+ * The header and search box stay mounted across requests — only the table
+ * region shows a loader (Rule 7: loading belongs to the operation that owns
+ * it). `keepPreviousData` in the hook keeps the last rows visible while the
+ * next search resolves, so the search box never flashes or loses focus.
  */
 export function AdminUsersPageClient() {
   const { data: session } = authClient.useSession();
@@ -29,7 +40,7 @@ export function AdminUsersPageClient() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const { data, isPending, error } = useAdminUsers({
+  const { data, error, isFetching, isPending } = useAdminUsers({
     includeDeleted,
     limit: PAGE_SIZE,
     offset,
@@ -51,20 +62,25 @@ export function AdminUsersPageClient() {
     []
   );
 
+  let table: ReactNode;
   if (isPending) {
-    return (
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-11 w-full max-w-sm" />
-        <Skeleton className="h-96" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
+    table = <Skeleton className="h-96" />;
+  } else if (error) {
+    table = (
       <p className="text-body-sm text-destructive" role="alert">
         Could not load users. {error.message}
       </p>
+    );
+  } else {
+    table = (
+      <UsersTable
+        currentUserId={session?.user.id ?? ""}
+        isLoading={isFetching}
+        offset={offset}
+        onOffsetChange={setOffset}
+        total={data?.total ?? 0}
+        users={data?.items ?? []}
+      />
     );
   }
 
@@ -91,13 +107,7 @@ export function AdminUsersPageClient() {
         value={search}
       />
 
-      <UsersTable
-        currentUserId={session?.user.id ?? ""}
-        offset={offset}
-        onOffsetChange={setOffset}
-        total={data?.total ?? 0}
-        users={data?.items ?? []}
-      />
+      {table}
     </div>
   );
 }

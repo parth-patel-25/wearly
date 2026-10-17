@@ -156,9 +156,13 @@ Auth wiring and the admin surface live in the web app (see
 **Admin (`/admin`, gated by session + role):**
 
 - [x] Admin layout — soft sidebar with rose accent (`DESIGN_SYSTEM.md` §11);
-  tabs: Users, Invites, Design system (navigates to `/design-system`)
-- [x] Users list — `/admin/users`: search, pagination, include-deleted toggle,
-  role/status badges, confirmation dialogs for soft delete / hard delete / restore
+  Wearly flow-mark logo + `ADMIN PANEL` caption up top; tabs: Users, Invites,
+  Design system — each with an icon. Design system opens `/design-system` in a
+  new tab (`target="_blank"`, trailing external-link glyph)
+- [x] Users list — `/admin/users`: search (debounced, header stays mounted and
+  only the table shows a loader via `keepPreviousData`), pagination,
+  include-deleted toggle, role/status badges, confirmation dialogs for soft
+  delete / hard delete / restore
 - [x] Admin invites — `/admin/invites`: invite-by-email form, pending list,
   revoke (super-admin only)
 - [x] Invite landing — `/admin/invite/:token`: validate token; signed out →

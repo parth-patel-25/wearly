@@ -2,15 +2,29 @@
 
 import { Button } from "@wearly/ui/components/ui/button";
 import { Skeleton } from "@wearly/ui/components/ui/skeleton";
+import {
+  ExternalLink,
+  LogOut,
+  Mail,
+  Palette,
+  RefreshCw,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect } from "react";
+import { WearlyLogo } from "@/components/wearly-logo";
 import { authClient } from "@/lib/auth-client";
 
 const NAV_ITEMS = [
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/invites", label: "Invites" },
-  { href: "/design-system", label: "Design system" },
+  { href: "/admin/users", icon: Users, label: "Users" },
+  { href: "/admin/invites", icon: Mail, label: "Invites" },
+  {
+    href: "/design-system",
+    icon: Palette,
+    label: "Design system",
+    newTab: true,
+  },
 ] as const;
 
 /**
@@ -27,11 +41,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const isAdmin = role === "admin" || role === "super_admin";
 
   const handleSignOut = useCallback(() => {
+    // Full replace so the signed-in admin entry is not left in history, and a
+    // stale client/RSC cache cannot bounce the user back into the shell before
+    // the cleared cookie is seen.
     authClient.signOut().then(() => {
-      router.push("/sign-in");
-      router.refresh();
+      window.location.replace("/sign-in");
     });
-  }, [router]);
+  }, []);
 
   const handleRetry = useCallback(() => {
     refetch();
@@ -78,9 +94,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-full flex-1">
       <aside className="flex w-56 shrink-0 flex-col gap-1 border-border border-r p-4">
-        <p className="px-3 pb-4 text-label text-muted-foreground uppercase">
-          Admin
-        </p>
+        <div className="flex items-center gap-2 px-3 pb-4">
+          <WearlyLogo href="/admin/users" size="sm" />
+          <span className="text-label text-muted-foreground uppercase">
+            Admin panel
+          </span>
+        </div>
         {NAV_ITEMS.map((item) => {
           // Design system lives outside /admin — never mark it active from an
           // admin pathname, or the user would be stranded with no back link.
@@ -88,17 +107,31 @@ export function AdminShell({ children }: { children: ReactNode }) {
             item.href === "/design-system"
               ? pathname === item.href
               : pathname.startsWith(item.href);
+          const Icon = item.icon;
+          const opensInNewTab = "newTab" in item && item.newTab;
           return (
             <Link
-              className={`rounded-md px-3 py-2 text-body-sm transition-colors duration-150 ${
+              className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-body-sm transition-colors duration-150 ${
                 isActive
                   ? "bg-accent font-medium text-accent-foreground"
                   : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
               }`}
               href={item.href}
               key={item.href}
+              rel={opensInNewTab ? "noopener noreferrer" : undefined}
+              target={opensInNewTab ? "_blank" : undefined}
             >
-              {item.label}
+              <Icon
+                aria-hidden="true"
+                className={isActive ? "size-4 text-primary" : "size-4"}
+              />
+              <span>{item.label}</span>
+              {opensInNewTab ? (
+                <ExternalLink
+                  aria-hidden="true"
+                  className="ml-auto size-3.5 opacity-60"
+                />
+              ) : null}
             </Link>
           );
         })}
@@ -107,20 +140,24 @@ export function AdminShell({ children }: { children: ReactNode }) {
             {data.user.email}
           </p>
           <Button
+            className="justify-start"
             onClick={handleSignOut}
             size="sm"
             type="button"
             variant="ghost"
           >
+            <LogOut aria-hidden="true" />
             Sign out
           </Button>
           {error ? (
             <Button
+              className="justify-start"
               onClick={handleRetry}
               size="sm"
               type="button"
               variant="outline"
             >
+              <RefreshCw aria-hidden="true" />
               Retry session
             </Button>
           ) : null}
