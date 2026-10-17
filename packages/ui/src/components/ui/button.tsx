@@ -17,7 +17,7 @@ import { Slot } from "radix-ui"
 const buttonVariants = cva(
   [
     "inline-flex shrink-0 items-center justify-center gap-2 rounded-button",
-    "text-button whitespace-nowrap select-none",
+    "text-button whitespace-nowrap select-none cursor-pointer",
     // Motion: a short ease-out on colour only, so press feedback feels tactile
     // without a transform that could shift surrounding layout.
     "transition-[background-color,color,border-color,box-shadow,opacity]",

@@ -74,7 +74,7 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             className={cn(
-              "absolute top-4 right-4 flex size-8 items-center justify-center rounded-badge text-muted-foreground",
+              "absolute top-4 right-4 flex size-8 items-center justify-center rounded-badge text-muted-foreground cursor-pointer",
               "transition-colors duration-150 ease-out",
               "hover:bg-accent hover:text-accent-foreground",
               "focus-visible:ring-4 focus-visible:ring-ring/25 focus-visible:outline-none"
