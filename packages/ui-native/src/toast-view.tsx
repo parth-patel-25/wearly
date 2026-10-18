@@ -3,6 +3,7 @@ import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import type { IconName } from "./icon";
 import { Icon } from "./icon";
 import { Text } from "./text";
 import type { ToastCloseHandle } from "./toast-motion";
@@ -11,37 +12,50 @@ import { useToastMotion } from "./toast-motion";
 /**
  * The toast surface.
  *
- * The presentation only: which tone classes, which icon, how the disc and the
- * text sit on the card. Everything about movement and dismissal lives in
- * `toast-motion.ts`, so this file is just the thing you see.
+ * The presentation only: the pill, the leading rose disc, the glyph and the
+ * message. Everything about movement and dismissal lives in `toast-motion.ts`,
+ * so this file is just the thing you see.
  *
- * The surface is token-coloured and the message is a `*-foreground` pair, so it
- * stays legible in both themes without a single hex value. A `card` disc behind
- * the status glyph carries the tone by shape as well, never colour alone.
+ * One surface serves all four tones. `bg-card` (white in light) carries the
+ * design system's neutral hairline `border-border` and a soft `shadow-float`,
+ * and a `bg-primary` disc with a white `primary-foreground` glyph — the brand
+ * rose, no second palette. The border is the quiet neutral one, never the rose:
+ * it edges the pill without pulling the eye off the message. The tone is told
+ * apart by its **icon** and by the word prepended to the accessibility label,
+ * never by colour alone, so it survives a colour-blind or screen-reader user.
+ * The message is `bodyMd`/`font-medium` in `foreground` and wraps rather than
+ * truncating: an error is never cut off to save a line.
  */
 
-export type ToastTone = "error" | "info" | "success";
+export type ToastTone = "error" | "info" | "success" | "warning";
 
 export interface ToastMessage {
+  /** Milliseconds before auto-dismiss. Ignored when `persistent` is true. */
+  duration?: number;
   id: number;
+  /** Hold until the user taps or swipes it away. */
+  persistent?: boolean;
   text: string;
   tone: ToastTone;
 }
 
-const TONE = {
-  error: {
-    surface: "bg-destructive-background",
-    text: "destructive-foreground",
-  },
-  info: { surface: "bg-info-background", text: "info-foreground" },
-  success: { surface: "bg-success-background", text: "success-foreground" },
-} as const;
-
 const ICON = {
   error: "close",
-  info: "sparkles",
+  info: "info",
   success: "check",
-} as const;
+  warning: "triangle-alert",
+} as const satisfies Record<ToastTone, IconName>;
+
+/** Read out with the message so the status is not carried by colour alone. */
+const TONE_LABEL = {
+  error: "Error",
+  info: "Information",
+  success: "Success",
+  warning: "Warning",
+} as const satisfies Record<ToastTone, string>;
+
+const SURFACE =
+  "flex-row items-center gap-3.5 rounded-pill border border-border bg-card py-3 pl-3 pr-6 shadow-float";
 
 interface ToastViewProps {
   closeRef: ToastCloseHandle;
@@ -53,9 +67,10 @@ export function ToastView({ closeRef, message, onDismissed }: ToastViewProps) {
   const insets = useSafeAreaInsets();
   const { close, pan, surfaceStyle } = useToastMotion({
     closeRef,
+    duration: message.duration,
     onDismissed,
+    persistent: message.persistent,
   });
-  const tone = TONE[message.tone];
 
   return (
     <View
@@ -67,16 +82,24 @@ export function ToastView({ closeRef, message, onDismissed }: ToastViewProps) {
         <Animated.View className="w-full max-w-md" style={surfaceStyle}>
           <Pressable
             accessibilityHint="Dismisses this message"
-            accessibilityLabel={message.text}
+            accessibilityLabel={`${TONE_LABEL[message.tone]}: ${message.text}`}
             accessibilityLiveRegion="polite"
             accessibilityRole="alert"
-            className={`flex-row items-center gap-3 rounded-card border border-border px-4 py-3.5 shadow-float ${tone.surface}`}
+            className={SURFACE}
             onPress={close}
           >
-            <View className="size-9 items-center justify-center rounded-pill bg-card">
-              <Icon name={ICON[message.tone]} size="sm" tone={tone.text} />
+            <View className="size-9 items-center justify-center rounded-pill bg-primary">
+              <Icon
+                name={ICON[message.tone]}
+                size="sm"
+                tone="primary-foreground"
+              />
             </View>
-            <Text className="flex-1" tone={tone.text} variant="bodySm">
+            <Text
+              className="flex-1 font-medium"
+              tone="foreground"
+              variant="bodyMd"
+            >
               {message.text}
             </Text>
           </Pressable>

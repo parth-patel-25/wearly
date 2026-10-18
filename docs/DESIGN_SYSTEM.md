@@ -545,10 +545,10 @@ stays the focus. On mobile, prefer a bottom sheet at 32px.
 
 ### Toasts
 
-One shape on both platforms: a `rounded-card` surface (24px), a hairline
-`border-border`, a soft `shadow-float`, the status `-background` / `-foreground`
-token pair, and a `bodySm` line. The tone is carried by both the surface **and**
-a `bg-card` disc holding the status glyph, so it is never colour alone.
+A toast floats above the app and says one thing. Both platforms share the same
+contract — a token-coloured surface, a soft `shadow-float`, one message, and
+dismissal by time, tap and swipe — but not the same silhouette: web leans on the
+soft status pair, mobile on the brand's most recognisable shape.
 
 **Web.** Sonner renders the toast; the Wearly skin is applied in two layers.
 Sonner exposes its palette as CSS variables, so `Toaster` sets `--normal-bg`,
@@ -564,18 +564,39 @@ saturated fills are the stock look the tokens exist to replace — and the
 overlapping corner close button is dropped in favour of auto-dismiss plus
 Sonner's own swipe.
 
-**Mobile.** Three small modules, split by concern: `toast-view.tsx` is only the
-surface, `toast-motion.ts` owns its lifecycle, and `toast-drag.ts` owns the
-release decision. A `visible` shared value drives entrance (fade + rise + scale,
-`DURATION.base` / `EASE_OUT`), exit, and the scrim-free layering, all on the UI
-thread. A `Pan` with `minDistance(12)` tracks the finger 1:1, fades as it
-travels, and on release either springs home (`SPRING.press`) or leaves along the
-dominant axis past 110px / 850px·s⁻¹. The surface asks to close and the provider
-unmounts it only after the exit animation signals `hasClosed` — so dismissal is
-a transition, never a pop. Top offset is
+**Mobile — the surface.** A pill, not a card. `bg-card` (white in light), the
+system's neutral hairline `border-border`, `rounded-pill` corners, and a soft
+`shadow-float`. The border is deliberately the quiet neutral one rather than the
+brand rose — it edges the pill without pulling the eye off the message, so the
+edge never competes with the content. A leading `bg-primary` disc — the same
+rose a primary button is filled with — holds a white `primary-foreground`
+glyph, so the toast is unmistakably Wearly without a second palette. The message
+is `bodyMd` at
+`font-medium` in `foreground` and it **wraps rather than truncates**: an error is
+never cut off to save a line. The badge stays vertically centred against a
+one-or two-line message.
+
+Four tones — success, error, warning and information — share that one surface
+and are told apart by their **icon** (check, x, triangle-alert, info), never by
+colour. The tone word is also read out with the message (`"Error: …"`), so the
+status survives for a screen-reader or colour-blind user. `show(text, tone, {
+duration, persistent })` is the whole API: transient by default (4s), the
+duration overridable, and `persistent: true` holds it up until the user
+dismisses it. A toast arriving while one is up **replaces** it rather than
+stacking, so the screen never grows a column of them.
+
+**Mobile — the mechanism.** Three small modules, split by concern:
+`toast-view.tsx` is only the surface, `toast-motion.ts` owns its lifecycle, and
+`toast-drag.ts` owns the release decision. A `visible` shared value drives
+entrance (fade + rise + scale, `DURATION.base` / `EASE_OUT`), exit, and the
+scrim-free layering, all on the UI thread. A `Pan` with `minDistance(12)` tracks
+the finger 1:1, fades as it travels, and on release either springs home
+(`SPRING.press`) or leaves along the dominant axis past 110px / 850px·s⁻¹. The
+surface asks to close and the provider unmounts it only after the exit animation
+signals `hasClosed` — so dismissal is a transition, never a pop. Top offset is
 `insets.top + 12`, so it clears the notch on every device. Reduced motion lands
 the state without movement. It leaves three ways: swipe, tap (the whole surface
-is a `Pressable`), and the 4s auto-dismiss clock.
+is a `Pressable`), and the auto-dismiss clock.
 
 ---
 
@@ -983,6 +1004,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-18 | Mobile toast redesigned as a brand pill: `bg-card` surface, neutral hairline `border-border`, `rounded-pill`, `shadow-float`, and a leading `bg-primary` disc carrying a white `primary-foreground` glyph; the message is `bodyMd`/`font-medium`/`foreground` and wraps instead of truncating. Four tones — success, error, warning, information — share the one surface and differ only by icon (new `triangle-alert` and `info` glyphs) and the tone word in the accessibility label, so status is never colour alone. `show(text, tone, { duration, persistent })` adds an overridable auto-dismiss and a hold-until-dismissed mode; a new toast still replaces the current one rather than stacking. §9. |
 | 2026-10-17 | Toasts are themed on both platforms. Web: `Toaster` (`apps/web/src/components/toaster.tsx`) drops `richColors`, sets Sonner's colour variables inline from tokens, and `globals.css` overrides the hard-coded silhouette under `.toaster` (unlayered, so it beats Sonner's injected sheet) — `rounded-card`, `border-border`, `shadow-float`, `bodySm`, and per-`data-type` soft status pairs; the corner close button is removed. Mobile: `toast.tsx` split into a provider plus `toast-view.tsx` (surface), `toast-motion.ts` (entrance/exit/swipe on the UI thread) and `toast-drag.ts` (the release worklet) — a `Pan` (`minDistance(12)`) tracks the finger, fades as it travels, and springs back or leaves past 110px/850px·s⁻¹; the provider unmounts only after the exit animation, so dismissal is a transition not a pop. Top offset is `insets.top + 12`; reduced motion respected. §9. |
 | 2026-10-17 | Web auth gate hardened: `hasSessionCookie()` (server) is shared by `/` and `/sign-in`, and a client `RequireSignedOut` guard re-checks the session on mount and on `pageshow` with `persisted` — so the browser back/forward cache can no longer restore the sign-in form for a signed-in user. Sign-in/out use full `window.location.replace` navigations, so the cookie is committed before the gate runs (fixes the "click sign-in twice" race) and the sign-in entry leaves the history stack (Back can no longer return a signed-in user to sign-in). |
 | 2026-10-17 | Web admin shell: sidebar nav items and the sign-out/retry controls carry lucide icons (active item's icon is `primary` per §11); the sidebar header is now the approved Wearly flow mark (`WearlyLogo`, simple + `ADMIN PANEL` caption) instead of a bare "Admin". Design system nav item opens in a new tab (`target="_blank" rel="noopener noreferrer"`, trailing `ExternalLink` glyph). Users search no longer flashes: the header/search stay mounted and only the table region shows a loader (`keepPreviousData` + `isFetching`), so the input never unmounts mid-search. Auth screen (sign-in/sign-up) centres the logo mark (`size="lg"`) above the card with a centred `heading-lg` title; the logo is not a link, so the title no longer navigates to `/design-system`. The mobile flow-mark SVG is copied to `apps/web/public/brand/` with a dark-stop variant, swapped by the `.dark` class. |

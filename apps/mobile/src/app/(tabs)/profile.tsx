@@ -9,6 +9,7 @@ import { Card, Panel } from "@wearly/ui-native/card";
 import { EmptyState, ProgressBar } from "@wearly/ui-native/display";
 import { ProductGrid } from "@wearly/ui-native/product-grid";
 import { Text } from "@wearly/ui-native/text";
+import { useToast } from "@wearly/ui-native/toast";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
 import { View } from "react-native";
@@ -96,6 +97,8 @@ function ProfileHeader({ completed, percent }: ProfileHeaderProps) {
 
   return (
     <View className="gap-8 pt-6 pb-2">
+      <ToastPreview />
+
       <View className="flex-row items-center gap-4">
         <Avatar name={state.name ?? undefined} size="xl" />
         <View className="flex-1 gap-1">
@@ -197,6 +200,49 @@ function ProfileHeader({ completed, percent }: ProfileHeaderProps) {
           The listing flow is the next build phase. This prototype has no
           listings and no lender dashboard.
         </Text>
+      </View>
+    </View>
+  );
+}
+
+// TEMP: toast redesign preview. Delete this block (and its `ToastPreview` usage
+// above) once the four tones have been reviewed on device.
+function ToastPreview() {
+  const toast = useToast();
+  return (
+    <View className="gap-3">
+      <Text variant="headingSm">Toast preview</Text>
+      <View className="flex-row flex-wrap gap-2">
+        <Button
+          onPress={() => toast.show("Saved to your wardrobe", "success")}
+          size="sm"
+          variant="outline"
+        >
+          Success
+        </Button>
+        <Button
+          onPress={() => toast.show("Could not save your changes", "error")}
+          size="sm"
+          variant="outline"
+        >
+          Error
+        </Button>
+        <Button
+          onPress={() => toast.show("Payment method expires soon", "warning")}
+          size="sm"
+          variant="outline"
+        >
+          Warning
+        </Button>
+        <Button
+          onPress={() =>
+            toast.show("Rentals refresh when you open the app", "info")
+          }
+          size="sm"
+          variant="outline"
+        >
+          Info
+        </Button>
       </View>
     </View>
   );

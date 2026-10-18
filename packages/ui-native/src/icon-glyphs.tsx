@@ -177,6 +177,12 @@ export const GLYPHS = {
       {...filled(c)}
     />
   ),
+  info: (c) => (
+    <>
+      <Path d="M12 11v5.5" {...stroke(c)} />
+      <Path d="M12 7.5h.01" {...stroke(c)} />
+    </>
+  ),
   lock: (c) => (
     <>
       <Rect height="11" rx="2.5" width="18" x="3" y="10" {...stroke(c)} />
@@ -235,6 +241,16 @@ export const GLYPHS = {
         d="M18.5 15.5 19.5 18l2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1 1-2.5Z"
         {...stroke(c)}
       />
+    </>
+  ),
+  "triangle-alert": (c) => (
+    <>
+      <Path
+        d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+        {...stroke(c)}
+      />
+      <Path d="M12 9v4" {...stroke(c)} />
+      <Path d="M12 17h.01" {...stroke(c)} />
     </>
   ),
   truck: (c) => (

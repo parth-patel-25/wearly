@@ -14,22 +14,35 @@ import { ToastView } from "./toast-view";
 /**
  * Toasts.
  *
- * A small, honest notification system: a queue, a visible region, and an error
- * path that always says what went wrong. Validation failures are surfaced here
- * as well as inline on the field, because a field error alone is easy to miss.
+ * A small, honest notification system: one visible region and an error path
+ * that always says what went wrong. Validation failures are surfaced here as
+ * well as inline on the field, because a field error alone is easy to miss.
  *
  * The provider owns *which* message is up; the surface owns *how* it leaves.
  * `dismiss` asks the surface to close and only drops the message once its exit
  * animation reports back, so a dismissal is never a pop. A `show` while one is
  * already up swaps the two directly — the new message's clock starts fresh, and
- * the outgoing surface is replaced rather than left to overlap it.
+ * the outgoing surface is replaced rather than left to overlap it. A single
+ * slot, deliberately: toasts never stack into an uncontrolled column.
+ *
+ * `show` takes a tone (success, error, warning or information) and optional
+ * behaviour — an overridable auto-dismiss `duration`, or `persistent` to hold
+ * the message until the user dismisses it.
  */
 
 export type { ToastMessage, ToastTone } from "./toast-view";
 
+/** Optional per-message behaviour. */
+export interface ToastOptions {
+  /** Milliseconds before auto-dismiss. Ignored when `persistent` is true. */
+  duration?: number;
+  /** Keep the message up until the user dismisses it. */
+  persistent?: boolean;
+}
+
 interface ToastApi {
   dismiss: () => void;
-  show: (text: string, tone?: ToastTone) => void;
+  show: (text: string, tone?: ToastTone, options?: ToastOptions) => void;
 }
 
 const ToastContext = createContext<ToastApi | null>(null);
@@ -40,10 +53,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const nextId = useRef(0);
   const closeRef = useRef<(() => void) | null>(null);
 
-  const show = useCallback((text: string, tone: ToastTone = "info") => {
-    nextId.current += 1;
-    setMessage({ id: nextId.current, text, tone });
-  }, []);
+  const show = useCallback(
+    (text: string, tone: ToastTone = "info", options: ToastOptions = {}) => {
+      nextId.current += 1;
+      setMessage({
+        duration: options.duration,
+        id: nextId.current,
+        persistent: options.persistent,
+        text,
+        tone,
+      });
+    },
+    []
+  );
 
   const dismiss = useCallback(() => {
     closeRef.current?.();

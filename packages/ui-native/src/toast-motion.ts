@@ -30,7 +30,7 @@ import {
  */
 
 /** How long a toast rests before it leaves on its own. */
-const VISIBLE_MS = 4000;
+const DEFAULT_VISIBLE_MS = 4000;
 /** How far above its resting spot the surface begins. */
 const ENTER_DISTANCE = 14;
 
@@ -41,10 +41,20 @@ export interface ToastCloseHandle {
 
 interface ToastMotionOptions {
   closeRef: ToastCloseHandle;
+  /** Auto-dismiss delay. Defaults to `DEFAULT_VISIBLE_MS`. */
+  duration?: number;
   onDismissed: () => void;
+  /** When true the auto-dismiss clock never starts; only the user closes it. */
+  persistent?: boolean;
 }
 
-export function useToastMotion({ closeRef, onDismissed }: ToastMotionOptions) {
+export function useToastMotion({
+  closeRef,
+  duration,
+  onDismissed,
+  persistent,
+}: ToastMotionOptions) {
+  const visibleMs = duration ?? DEFAULT_VISIBLE_MS;
   const { width } = useWindowDimensions();
   const reduceMotion = useReducedMotion();
 
@@ -96,12 +106,22 @@ export function useToastMotion({ closeRef, onDismissed }: ToastMotionOptions) {
     if (reduceMotion !== true) {
       visible.value = withTiming(1, TOAST_TIMING);
     }
-    timer.current = setTimeout(close, VISIBLE_MS);
+    if (persistent !== true) {
+      timer.current = setTimeout(close, visibleMs);
+    }
     return () => {
       closeRef.current = null;
       clearTimer();
     };
-  }, [clearTimer, close, closeRef, reduceMotion, visible]);
+  }, [
+    clearTimer,
+    close,
+    closeRef,
+    persistent,
+    reduceMotion,
+    visible,
+    visibleMs,
+  ]);
 
   const pan = useMemo(() => {
     const context: PanContext = {
