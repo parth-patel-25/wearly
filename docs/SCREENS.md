@@ -126,6 +126,17 @@ sign-in with Better Auth (`expoClient` + SecureStore, scheme `wearly`).
 - [x] Email verification — `wearly://verify-email` deep link (server keeps a
   `wearly://` callback instead of rewriting it to the web origin)
 - [x] Post-verify screen — `/verify-email` route (success + `?error=` states)
+- [x] Post-auth navigation — after any successful sign-in (email, Google,
+  Facebook) the session store is hydrated (`refetch()` awaited via
+  `SessionProvider`) *before* navigating, so the destination never
+  flashes the guest state while Better Auth's async `/get-session` is still
+  in flight. Navigation uses `router.dismissAll()` to pop the entire
+  auth stack (sign-in + auth) back to the tabs, rather than `router.back()`
+  which only pops one screen and stranded the user on `/sign-in` when they
+  had gone Profile → Sign-in → Auth.
+- [x] Google account picker — `GoogleSignin.signOut()` is called before
+  `signIn()` so the device always shows the account chooser instead of
+  silently reusing the last-selected account.
 
 ## Web — auth + admin panel (`apps/web`)
 

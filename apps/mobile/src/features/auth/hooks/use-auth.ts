@@ -4,6 +4,7 @@ import type {
 } from "@features/auth/validations/auth.schema";
 import { useToast } from "@wearly/ui-native/toast";
 import { useRouter } from "expo-router";
+import { useSession } from "@/core/providers/session-provider";
 import { authClient } from "@/lib/auth-client";
 import { useGoogleSignIn } from "./use-google-sign-in";
 
@@ -28,6 +29,7 @@ export type SocialProvider = "facebook" | "google";
 export function useAuth() {
   const router = useRouter();
   const toast = useToast();
+  const { refreshSession } = useSession();
   const { promptGoogleSignIn } = useGoogleSignIn();
 
   const signIn = async (
@@ -43,9 +45,15 @@ export function useAuth() {
       toast.show(error.message ?? "Could not sign in", "error");
       return;
     }
+    // Hydrate the shared session store before navigating so the destination
+    // does not flash guest state while /get-session is still in flight.
+    await refreshSession();
     const name = data?.user.name;
     toast.show(name ? `${greeting}, ${name}` : greeting, "success");
-    router.back();
+    // dismissAll pops the whole auth stack (sign-in + auth) back to the tabs.
+    // router.back() only pops one screen, which stranded the user on
+    // /sign-in when they had gone Profile → Sign-in → Auth.
+    router.dismissAll();
   };
 
   const signUp = async (values: SignUpInput) => {
@@ -83,8 +91,12 @@ export function useAuth() {
       toast.show("Sign in was cancelled", "info");
       return;
     }
+    // Hydrate the shared session store before navigating so the destination
+    // does not flash guest state while /get-session is still in flight.
+    await refreshSession();
     toast.show("Welcome to Wearly", "success");
-    router.back();
+    // dismissAll pops the whole auth stack (sign-in + auth) back to the tabs.
+    router.dismissAll();
   };
 
   return { signIn, signUp, socialSignIn };

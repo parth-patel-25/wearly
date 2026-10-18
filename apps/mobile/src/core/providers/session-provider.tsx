@@ -68,6 +68,13 @@ function reducer(state: LocalState, action: SessionAction): LocalState {
 
 interface SessionApi {
   dispatch: Dispatch<SessionAction>;
+  /**
+   * Re-fetch the Better Auth session and resolve only once the shared session
+   * store holds the fresh data. Auth success handlers await this before
+   * navigating, so the destination screen never renders the guest state while
+   * `/get-session` is still in flight (the source of the post-sign-in flash).
+   */
+  refreshSession: () => Promise<void>;
   state: SessionState;
 }
 
@@ -75,7 +82,7 @@ const SessionContext = createContext<SessionApi | null>(null);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [local, dispatch] = useReducer(reducer, INITIAL);
-  const { data } = authClient.useSession();
+  const { data, refetch } = authClient.useSession();
 
   const state = useMemo<SessionState>(
     () => ({
@@ -85,7 +92,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }),
     [data, local]
   );
-  const api = useMemo<SessionApi>(() => ({ dispatch, state }), [state]);
+  const api = useMemo<SessionApi>(
+    () => ({ dispatch, refreshSession: refetch, state }),
+    [refetch, state]
+  );
 
   return (
     <SessionContext.Provider value={api}>{children}</SessionContext.Provider>

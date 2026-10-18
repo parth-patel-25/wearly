@@ -6,6 +6,7 @@ import {
 import { useToast } from "@wearly/ui-native/toast";
 import { useRouter } from "expo-router";
 import { Platform } from "react-native";
+import { useSession } from "@/core/providers/session-provider";
 import { authClient } from "@/lib/auth-client";
 import { createLogger } from "@/shared/lib/logger";
 
@@ -59,6 +60,7 @@ function describeError(err: unknown): string {
 export function useGoogleSignIn() {
   const router = useRouter();
   const toast = useToast();
+  const { refreshSession } = useSession();
 
   const promptGoogleSignIn = async () => {
     if (Platform.OS !== "android") {
@@ -75,6 +77,11 @@ export function useGoogleSignIn() {
     try {
       await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
+      });
+      // Clear the cached Google session so the SDK always shows the account
+      // chooser instead of silently reusing the last-selected account.
+      await GoogleSignin.signOut().catch(() => {
+        /* no prior session to clear */
       });
       const result = await GoogleSignin.signIn();
       if (result.type === "cancelled") {
@@ -97,8 +104,16 @@ export function useGoogleSignIn() {
         toast.show(error.message ?? "Could not sign in with google", "error");
         return;
       }
+      // The session cookie is written asynchronously by the expo plugin and
+      // Better Auth schedules its own /get-session refetch. Navigate only once
+      // the shared session store is hydrated, so the destination screen never
+      // flashes the guest state before flipping to authenticated.
+      await refreshSession();
       toast.show("Welcome to Wearly", "success");
-      router.back();
+      // dismissAll pops the whole auth stack (sign-in + auth) back to the
+      // tabs. router.back() only pops one screen, which stranded the user on
+      // /sign-in when they had gone Profile → Sign-in → Auth.
+      router.dismissAll();
     } catch (err) {
       if (isErrorWithCode(err) && err.code === statusCodes.SIGN_IN_CANCELLED) {
         return;
