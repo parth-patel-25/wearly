@@ -7,7 +7,7 @@ import type {
   AdminInvite,
   AdminUser,
 } from "@wearly/shared/api/types";
-import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
+import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe.js";
 import { AdminInvitesService } from "./admin-invites.service.js";
 
 /**

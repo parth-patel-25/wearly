@@ -12,6 +12,7 @@ import type {
   ListAdminUsersQuery,
   ListAdminUsersResponse,
 } from "@wearly/shared/api/types";
+import { ROLES } from "@wearly/shared/enums";
 import {
   and,
   desc,
@@ -22,7 +23,7 @@ import {
   type SQLWrapper,
   sql,
 } from "drizzle-orm";
-import type { auth } from "../auth.js";
+import type { auth } from "../../core/auth/auth.js";
 import { type Actor, canActOnUser, rethrowAsHttp } from "./admin-policy.js";
 import { toAdminUser } from "./admin-users.helpers.js";
 
@@ -150,7 +151,7 @@ export class AdminUsersService {
     if (actor.id === target.id) {
       throw new ForbiddenException("You cannot modify your own account here");
     }
-    if (target.role === "super_admin") {
+    if (target.role === ROLES.SUPER_ADMIN) {
       throw new ForbiddenException(
         "Super-admin accounts cannot be modified from the panel"
       );

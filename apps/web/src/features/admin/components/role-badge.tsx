@@ -1,16 +1,17 @@
 import type { UserRole } from "@wearly/shared/api/types";
+import { ROLES } from "@wearly/shared/enums";
 import { Badge } from "@wearly/ui/components/ui/badge";
 
 const ROLE_LABEL: Record<UserRole, string> = {
-  admin: "Admin",
-  super_admin: "Super admin",
-  user: "User",
+  [ROLES.ADMIN]: "Admin",
+  [ROLES.SUPER_ADMIN]: "Super admin",
+  [ROLES.USER]: "User",
 };
 
 const ROLE_VARIANT: Record<UserRole, "default" | "secondary" | "outline"> = {
-  admin: "default",
-  super_admin: "secondary",
-  user: "outline",
+  [ROLES.ADMIN]: "default",
+  [ROLES.SUPER_ADMIN]: "secondary",
+  [ROLES.USER]: "outline",
 };
 
 export function RoleBadge({ role }: { role: UserRole }) {

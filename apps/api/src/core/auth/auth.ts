@@ -9,13 +9,15 @@ import {
   userRelations,
   verification,
 } from "@wearly/db/schema/auth";
+import { ROLES } from "@wearly/shared/enums";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { admin } from "better-auth/plugins/admin";
 import { userAc } from "better-auth/plugins/admin/access";
+import { isProduction } from "../config/env.js";
+import { emailLayout, sendEmail } from "../email/email.js";
 import { ac, adminRole, superAdminRole } from "./auth.roles.js";
-import { emailLayout, sendEmail } from "./email/email.js";
 
 type SocialProviders = NonNullable<BetterAuthOptions["socialProviders"]>;
 
@@ -63,7 +65,7 @@ function trustedOrigins(): string[] {
     "wearly://",
     process.env.WEB_ORIGIN ?? "http://localhost:3000",
   ];
-  if (process.env.NODE_ENV !== "production") {
+  if (!isProduction()) {
     origins.push("exp://", "exp://**", "exp://192.168.*.*:*/**");
   }
   return origins;
@@ -162,9 +164,13 @@ export const auth = betterAuth({
     expo(),
     admin({
       ac,
-      adminRoles: ["admin", "super_admin"],
-      defaultRole: "user",
-      roles: { admin: adminRole, super_admin: superAdminRole, user: userAc },
+      adminRoles: [ROLES.ADMIN, ROLES.SUPER_ADMIN],
+      defaultRole: ROLES.USER,
+      roles: {
+        [ROLES.ADMIN]: adminRole,
+        [ROLES.SUPER_ADMIN]: superAdminRole,
+        [ROLES.USER]: userAc,
+      },
     }),
   ],
   socialProviders: buildSocialProviders(),

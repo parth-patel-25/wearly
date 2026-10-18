@@ -1,4 +1,4 @@
-import "./load-env.js";
+import "./core/config/load-env.js";
 
 import { Logger } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
@@ -6,6 +6,8 @@ import { AppModule } from "./app.module.js";
 
 const PORT = Number(process.env.PORT ?? 4000);
 const API_PREFIX = "api";
+/** Non-zero exit code when the API fails to boot. */
+const EXIT_FAILURE = 1;
 
 // The web app and Expo apps run on different origins in development.
 const ALLOWED_ORIGINS = [
@@ -45,5 +47,5 @@ bootstrap().catch((error: unknown) => {
     error instanceof Error ? (error.stack ?? error.message) : String(error),
     "Bootstrap"
   );
-  process.exit(1);
+  process.exit(EXIT_FAILURE);
 });

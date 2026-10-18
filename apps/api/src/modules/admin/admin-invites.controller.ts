@@ -7,12 +7,13 @@ import type {
   CreateAdminInviteInput,
   ListAdminInvitesResponse,
 } from "@wearly/shared/api/types";
-import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
+import { SUPER_ADMIN_ROLES } from "@wearly/shared/enums";
+import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe.js";
 import { AdminInvitesService } from "./admin-invites.service.js";
 
 /** Invite management (list / create / revoke) is super-admin only. */
 @Controller("admin/invites")
-@Roles(["super_admin"])
+@Roles([...SUPER_ADMIN_ROLES])
 export class AdminInvitesController {
   constructor(private readonly invites: AdminInvitesService) {}
 

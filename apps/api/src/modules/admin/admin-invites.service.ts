@@ -14,8 +14,9 @@ import {
 } from "@wearly/db/schema/admin-invites";
 import { user } from "@wearly/db/schema/auth";
 import type { AdminInvite, AdminUser } from "@wearly/shared/api/types";
+import { ROLES } from "@wearly/shared/enums";
 import { desc, eq } from "drizzle-orm";
-import { emailLayout, sendEmail } from "../email/email.js";
+import { emailLayout, sendEmail } from "../../core/email/email.js";
 import {
   hashToken,
   inviteStatus,
@@ -51,8 +52,8 @@ export class AdminInvitesService {
       .limit(1);
     const [found] = existingUser;
     if (found && !found.deleted_at) {
-      const role = found.role ?? "user";
-      if (role === "admin" || role === "super_admin") {
+      const role = found.role ?? ROLES.USER;
+      if (role === ROLES.ADMIN || role === ROLES.SUPER_ADMIN) {
         throw new ConflictException("This user is already an admin");
       }
     }
@@ -79,7 +80,7 @@ export class AdminInvitesService {
         email,
         expiresAt,
         invitedBy: actor.id,
-        role: "admin",
+        role: ROLES.ADMIN,
         tokenHash: hashToken(token),
       })
       .returning();
@@ -155,7 +156,8 @@ export class AdminInvitesService {
     // The valid token + email match IS the authorization here, so promote
     // directly — the admin plugin's permission-checked setRole would (rightly)
     // reject a plain user elevating themselves.
-    const role = row.role === "super_admin" ? "super_admin" : "admin";
+    const role =
+      row.role === ROLES.SUPER_ADMIN ? ROLES.SUPER_ADMIN : ROLES.ADMIN;
     await db.update(user).set({ role }).where(eq(user.id, session.userId));
 
     await db

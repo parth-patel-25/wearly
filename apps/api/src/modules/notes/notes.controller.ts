@@ -24,7 +24,7 @@ import type {
   Note,
   UpdateNoteInput,
 } from "@wearly/shared/api/types";
-import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
+import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe.js";
 import { NotesService } from "./notes.service.js";
 
 // Notes are still the public prototype slice; scoping them by session is a

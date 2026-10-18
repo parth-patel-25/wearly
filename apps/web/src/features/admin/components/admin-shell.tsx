@@ -1,5 +1,6 @@
 "use client";
 
+import { ROLES } from "@wearly/shared/enums";
 import { Button } from "@wearly/ui/components/ui/button";
 import { Skeleton } from "@wearly/ui/components/ui/skeleton";
 import {
@@ -39,7 +40,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const pathnameRef = useRef(pathname);
   const { data, error, isPending, refetch } = authClient.useSession();
   const role = data?.user?.role;
-  const isAdmin = role === "admin" || role === "super_admin";
+  const isAdmin = role === ROLES.ADMIN || role === ROLES.SUPER_ADMIN;
 
   useEffect(() => {
     pathnameRef.current = pathname;

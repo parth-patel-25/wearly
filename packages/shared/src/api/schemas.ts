@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { INVITE_STATUSES, USER_ROLES } from "../enums/index.js";
 
 /** Shape returned by `GET /api/health`. */
 export const healthResponseSchema = z.object({
@@ -67,8 +68,8 @@ export type ErrorResponse = z.infer<typeof errorResponseSchema>;
 /* ------------------------------------------------------------------ admin */
 
 /** Role model shared by the API guards and the admin UI. */
-export const userRoleSchema = z.enum(["user", "admin", "super_admin"]);
-export type UserRole = z.infer<typeof userRoleSchema>;
+export const userRoleSchema = z.enum(USER_ROLES);
+export type { UserRole } from "../enums/index.js";
 
 /** A user row as the admin endpoints return it. `role` is always filled
  * server-side (`row.role ?? "user"`), so it is required here. */
@@ -107,13 +108,8 @@ export type ListAdminUsersResponse = z.infer<
 >;
 
 /** Lifecycle state of an admin invite, computed by the API. */
-export const adminInviteStatusSchema = z.enum([
-  "pending",
-  "accepted",
-  "revoked",
-  "expired",
-]);
-export type AdminInviteStatus = z.infer<typeof adminInviteStatusSchema>;
+export const adminInviteStatusSchema = z.enum(INVITE_STATUSES);
+export type { AdminInviteStatus } from "../enums/index.js";
 
 /** An admin invitation as the admin endpoints return it (never the token). */
 export const adminInviteSchema = z.object({

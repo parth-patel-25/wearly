@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpStatus,
   Injectable,
   type PipeTransform,
 } from "@nestjs/common";
@@ -25,7 +26,7 @@ export class ZodValidationPipe<T> implements PipeTransform<unknown, T> {
           path: issue.path.join("."),
         })),
         message: "Validation failed",
-        statusCode: 400,
+        statusCode: HttpStatus.BAD_REQUEST,
       });
     }
 

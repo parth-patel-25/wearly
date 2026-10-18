@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ROLES } from "@wearly/shared/enums";
 import { Button } from "@wearly/ui/components/ui/button";
 import { Input } from "@wearly/ui/components/ui/input";
 import { Label } from "@wearly/ui/components/ui/label";
@@ -34,7 +35,7 @@ type InviteEmailInput = z.infer<typeof InviteEmailSchema>;
  */
 export function AdminInvitesPageClient() {
   const { data: session } = authClient.useSession();
-  const isSuperAdmin = session?.user.role === "super_admin";
+  const isSuperAdmin = session?.user.role === ROLES.SUPER_ADMIN;
   const { data, isPending, error } = useAdminInvites(true);
   const { create, revoke } = useInviteActions();
   const [revokeTarget, setRevokeTarget] = useState<ConfirmAction | null>(null);

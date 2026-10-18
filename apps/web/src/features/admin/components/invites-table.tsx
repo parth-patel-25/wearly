@@ -1,6 +1,7 @@
 "use client";
 
 import type { AdminInvite, AdminInviteStatus } from "@wearly/shared/api/types";
+import { INVITE_STATUS } from "@wearly/shared/enums";
 import { Badge } from "@wearly/ui/components/ui/badge";
 import { Button } from "@wearly/ui/components/ui/button";
 import {
@@ -17,10 +18,10 @@ const STATUS_VARIANT: Record<
   AdminInviteStatus,
   "info" | "success" | "destructive" | "warning"
 > = {
-  accepted: "success",
-  expired: "warning",
-  pending: "info",
-  revoked: "destructive",
+  [INVITE_STATUS.ACCEPTED]: "success",
+  [INVITE_STATUS.EXPIRED]: "warning",
+  [INVITE_STATUS.PENDING]: "info",
+  [INVITE_STATUS.REVOKED]: "destructive",
 };
 
 function formatDate(iso: string): string {
@@ -76,7 +77,7 @@ function InviteRow({
       </TableCell>
       {isSuperAdmin ? (
         <TableCell>
-          {invite.status === "pending" ? (
+          {invite.status === INVITE_STATUS.PENDING ? (
             <Button
               disabled={revokePending}
               onClick={handleRevoke}

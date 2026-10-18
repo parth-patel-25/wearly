@@ -1,5 +1,6 @@
 "use client";
 
+import { INVITE_STATUS, ROLES } from "@wearly/shared/enums";
 import { Button } from "@wearly/ui/components/ui/button";
 import { Skeleton } from "@wearly/ui/components/ui/skeleton";
 import Link from "next/link";
@@ -57,7 +58,7 @@ export function InviteLandingClient({ token }: { token: string }) {
   let action: ReactNode;
   if (session) {
     if (session.user.email?.toLowerCase() === invite.email.toLowerCase()) {
-      if (invite.status === "pending") {
+      if (invite.status === INVITE_STATUS.PENDING) {
         action = (
           <Button
             aria-busy={accepting}
@@ -111,7 +112,10 @@ export function InviteLandingClient({ token }: { token: string }) {
       <h1 className="text-foreground text-heading-sm">You're invited</h1>
       <p className="mt-2 text-body-sm text-muted-foreground">
         {invite.email} has been invited to join the Wearly admin team as{" "}
-        <strong>{invite.role === "admin" ? "an admin" : invite.role}</strong>.
+        <strong>
+          {invite.role === ROLES.ADMIN ? "an admin" : invite.role}
+        </strong>
+        .
       </p>
       {action}
     </div>

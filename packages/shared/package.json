@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./enums": {
+      "types": "./dist/enums/index.d.ts",
+      "default": "./dist/enums/index.js"
+    },
     "./api/routes": {
       "types": "./dist/api/routes.d.ts",
       "default": "./dist/api/routes.js"

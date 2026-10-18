@@ -1,6 +1,7 @@
 "use client";
 
 import type { AdminUser } from "@wearly/shared/api/types";
+import { ROLES } from "@wearly/shared/enums";
 import { Button } from "@wearly/ui/components/ui/button";
 import { useCallback, useState } from "react";
 import { useUserActions } from "../hooks/use-admin-actions";
@@ -57,7 +58,7 @@ export function UserRowActions({ currentUserId, user }: UserRowActionsProps) {
     setOpen(true);
   }, [hardDelete, user.email, user.id]);
 
-  const locked = user.id === currentUserId || user.role === "super_admin";
+  const locked = user.id === currentUserId || user.role === ROLES.SUPER_ADMIN;
 
   if (locked) {
     return <span className="text-body-sm text-muted-foreground">—</span>;

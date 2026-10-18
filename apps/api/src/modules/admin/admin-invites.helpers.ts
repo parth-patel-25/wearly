@@ -8,6 +8,7 @@ import type {
   AdminInviteStatus,
   UserRole,
 } from "@wearly/shared/api/types";
+import { INVITE_STATUS } from "@wearly/shared/enums";
 
 export function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
@@ -15,12 +16,12 @@ export function hashToken(token: string): string {
 
 export function inviteStatus(row: AdminInviteRow): AdminInviteStatus {
   if (row.acceptedAt) {
-    return "accepted";
+    return INVITE_STATUS.ACCEPTED;
   }
   if (row.revokedAt) {
-    return "revoked";
+    return INVITE_STATUS.REVOKED;
   }
-  return isInviteActive(row) ? "pending" : "expired";
+  return isInviteActive(row) ? INVITE_STATUS.PENDING : INVITE_STATUS.EXPIRED;
 }
 
 export function toAdminInvite(

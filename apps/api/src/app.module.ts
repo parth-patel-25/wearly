@@ -2,11 +2,11 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { AuthModule } from "@thallesp/nestjs-better-auth";
-import { AdminModule } from "./admin/admin.module.js";
-import { auth } from "./auth.js";
-import { LoggingInterceptor } from "./common/logging.interceptor.js";
-import { HealthModule } from "./health/health.module.js";
-import { NotesModule } from "./notes/notes.module.js";
+import { LoggingInterceptor } from "./common/interceptors/logging.interceptor.js";
+import { auth } from "./core/auth/auth.js";
+import { AdminModule } from "./modules/admin/admin.module.js";
+import { HealthModule } from "./modules/health/health.module.js";
+import { NotesModule } from "./modules/notes/notes.module.js";
 
 @Module({
   imports: [

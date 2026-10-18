@@ -26,6 +26,55 @@ src/
         └── index.tsx     # Feature entry point
 ```
 
+### API Backend (`apps/api`) — MANDATORY
+
+`apps/api` uses the `common` / `core` / `modules` split:
+
+```
+apps/api/src/
+├── common/     # Cross-cutting Nest building blocks
+│   ├── interceptors/
+│   ├── pipes/
+│   ├── filters/
+│   ├── guards/
+│   └── decorators/
+├── core/       # App-wide infrastructure (auth/, config/, email/)
+├── modules/    # Feature-based business domains (admin/, health/, notes/)
+├── app.module.ts
+└── main.ts
+```
+
+- Feature code lives under `modules/[feature]/`, never at the `src/` root.
+- `dto/` and `entities/` are **not** duplicated here: DTOs are Zod schemas in
+  `packages/shared/src/api/schemas.ts`, entities are Drizzle tables in
+  `packages/db/src/schema`.
+- `common/` holds domain-agnostic framework building blocks.
+- `core/` holds singletons/config that the whole app depends on (auth, env,
+  email).
+
+## Enums Rules (MANDATORY)
+
+- **ALL enumerated values live in `packages/shared/src/enums/`**, exported via
+  `@wearly/shared/enums`.
+- One concern per file (`roles.ts`, `invite-status.ts`, `environment.ts`) with a
+  barrel `index.ts`.
+- Use the **const-object + derived-union** pattern — **NEVER** the TypeScript
+  `enum` keyword:
+
+```ts
+export const ROLES = { ADMIN: "admin", SUPER_ADMIN: "super_admin", USER: "user" } as const;
+export const USER_ROLES = [ROLES.USER, ROLES.ADMIN, ROLES.SUPER_ADMIN] as const;
+export type UserRole = (typeof USER_ROLES)[number];
+```
+
+- **NEVER hardcode an enum literal** (`"admin"`, `"super_admin"`, `"pending"`,
+  `"production"`) in API services, controllers or front-ends — import the member.
+- Zod schemas build from the enum tuple: `z.enum(USER_ROLES)`.
+- Environment checks read `NODE_ENVS` via `isProduction()` in
+  `apps/api/src/core/config/env.ts`; never compare a bare `"production"` string.
+- Use `HttpStatus` from `@nestjs/common` for HTTP status codes; never a bare
+  number like `400`.
+
 ## File Size Rules
 
 ### MAX 200 Lines Per File

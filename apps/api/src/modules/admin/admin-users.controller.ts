@@ -18,7 +18,8 @@ import type {
   ListAdminUsersQuery,
   ListAdminUsersResponse,
 } from "@wearly/shared/api/types";
-import { ZodValidationPipe } from "../common/zod-validation.pipe.js";
+import { ADMIN_ROLES } from "@wearly/shared/enums";
+import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe.js";
 import type { Actor } from "./admin-policy.js";
 import type { RequestHeaders } from "./admin-users.service.js";
 import { AdminUsersService } from "./admin-users.service.js";
@@ -35,7 +36,7 @@ function toActor(session: UserSession): Actor {
 }
 
 @Controller("admin/users")
-@Roles(["admin", "super_admin"])
+@Roles([...ADMIN_ROLES])
 export class AdminUsersController {
   constructor(private readonly users: AdminUsersService) {}
 

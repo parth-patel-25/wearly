@@ -1,11 +1,5 @@
 import { HttpException } from "@nestjs/common";
-import type { UserRole } from "@wearly/shared/api/types";
-
-/** Roles that may access `/api/admin/*` at all. */
-export const ADMIN_ROLES: readonly UserRole[] = ["admin", "super_admin"];
-
-/** Roles that may create/revoke other admins (invites, demotions). */
-export const SUPER_ADMIN_ROLES: readonly UserRole[] = ["super_admin"];
+import { ROLES } from "@wearly/shared/enums";
 
 export interface Actor {
   id: string;
@@ -18,11 +12,11 @@ export interface Target {
 }
 
 export function isSuperAdmin(actor: Actor): boolean {
-  return actor.role === "super_admin";
+  return actor.role === ROLES.SUPER_ADMIN;
 }
 
 export function isAdmin(actor: Actor): boolean {
-  return actor.role === "admin" || actor.role === "super_admin";
+  return actor.role === ROLES.ADMIN || actor.role === ROLES.SUPER_ADMIN;
 }
 
 /**
@@ -36,10 +30,10 @@ export function canActOnUser(actor: Actor, target: Target): boolean {
   if (actor.id === target.id) {
     return false;
   }
-  if (target.role === "super_admin") {
+  if (target.role === ROLES.SUPER_ADMIN) {
     return false;
   }
-  if (target.role === "admin") {
+  if (target.role === ROLES.ADMIN) {
     return isSuperAdmin(actor);
   }
   return isAdmin(actor);

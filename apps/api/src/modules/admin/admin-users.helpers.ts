@@ -1,5 +1,6 @@
 import type { user } from "@wearly/db/schema/auth";
 import type { AdminUser, UserRole } from "@wearly/shared/api/types";
+import { ROLES } from "@wearly/shared/enums";
 
 /** Maps a `user` table row to the admin API response shape. */
 export function toAdminUser(row: typeof user.$inferSelect): AdminUser {
@@ -12,7 +13,7 @@ export function toAdminUser(row: typeof user.$inferSelect): AdminUser {
     id: row.id,
     image: row.image,
     name: row.name,
-    role: (row.role ?? "user") as UserRole,
+    role: (row.role ?? ROLES.USER) as UserRole,
     updatedAt: row.updatedAt.toISOString(),
   };
 }

@@ -100,6 +100,55 @@ New package: `packages/db` (schema + drizzle client), consumed only by
 `apps/api`. `packages/shared` stays dependency-free of the ORM — it must remain
 importable by the browser and by React Native.
 
+### `apps/api` source layout
+
+`apps/api/src` follows the `common` / `core` / `modules` split used by the
+client apps (`shared` / `core` / `features`):
+
+```
+apps/api/src/
+├── common/               # Cross-cutting Nest building blocks
+│   ├── interceptors/     # e.g. logging.interceptor.ts
+│   └── pipes/            # e.g. zod-validation.pipe.ts
+├── core/                 # App-wide infrastructure
+│   ├── auth/             # Better Auth config + role definitions
+│   ├── config/           # env loading, environment helpers
+│   └── email/            # transactional email
+├── modules/              # Feature-based business domains
+│   ├── admin/            # admin users + invites
+│   ├── health/
+│   └── notes/
+├── app.module.ts         # Root module wiring feature modules
+└── main.ts               # Bootstrap
+```
+
+Two reference layers are **not** duplicated here because the monorepo already
+provides them:
+
+| NestJS reference layer | Wearly equivalent |
+|---|---|
+| `shared/` (mailer, prisma) | `packages/shared`, `packages/db` |
+| `core/database` + `modules/*/entities` | `packages/db/src/schema` (Drizzle) |
+| `modules/*/dto` | Zod schemas in `packages/shared/src/api/schemas.ts` |
+
+#### Shared enums
+
+Enumerated values (roles, invite status, environment names) live in
+`packages/shared/src/enums/`, are exported as `@wearly/shared/enums`, and follow
+the const-object + derived-union pattern rather than the TypeScript `enum`
+keyword:
+
+```ts
+export const ROLES = { ADMIN: "admin", SUPER_ADMIN: "super_admin", USER: "user" } as const;
+export const USER_ROLES = [ROLES.USER, ROLES.ADMIN, ROLES.SUPER_ADMIN] as const;
+export type UserRole = (typeof USER_ROLES)[number];
+```
+
+The Zod schemas in `../api/schemas.ts` build from these tuples
+(`z.enum(USER_ROLES)`), so the runtime validator, the static type and both
+clients share one source. Never re-type `"admin"`, `"super_admin"`, `"user"`,
+`"pending"`, `"production"`, etc. — import the member.
+
 ---
 
 ## 4. Implementation plan
