@@ -12,7 +12,11 @@ export function Providers({ children }: { children: ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            refetchOnWindowFocus: false,
+            // Tab focus is the web's "screen became visible" moment: stale
+            // queries refetch instead of showing a cached page the user has
+            // been away from. Route changes stay cheap — only queries that
+            // remount (staleTime 0) refetch, still-mounted shells keep cache.
+            refetchOnWindowFocus: true,
             retry: 1,
           },
         },

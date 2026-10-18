@@ -1,3 +1,4 @@
+import { QueryProvider } from "@core/providers/query-provider";
 import { SessionProvider } from "@core/providers/session-provider";
 import { useThemeOverride } from "@core/theme/use-theme-override";
 import { RentalDraftProvider } from "@features/rental/providers/rental-draft-provider";
@@ -52,58 +53,68 @@ export default function RootLayout() {
   }
 
   return (
-    <AppProviders>
-      <SessionProvider>
-        <RentalDraftProvider>
-          <ToastProvider>
-            <HeroProvider>
-              <StatusBar style={theme === "dark" ? "light" : "dark"} />
-              <Stack
-                screenOptions={{
-                  // The hero expansion is the transition. A slide underneath it
-                  // would fight it, so screen changes are a quiet fade.
-                  animation: "fade",
-                  contentStyle: { backgroundColor: background },
-                }}
-              >
-                <Stack.Screen
-                  name="splash"
-                  options={{ animation: "none", headerShown: false }}
-                />
-                <Stack.Screen
-                  name="welcome"
-                  options={{
-                    animation: "slide_from_right",
-                    headerShown: false,
+    // Outermost: the query client owns the focus events, so every provider and
+    // screen below it is covered by refetch-on-focus.
+    <QueryProvider>
+      <AppProviders>
+        <SessionProvider>
+          <RentalDraftProvider>
+            <ToastProvider>
+              <HeroProvider>
+                <StatusBar style={theme === "dark" ? "light" : "dark"} />
+                <Stack
+                  screenOptions={{
+                    // The hero expansion is the transition. A slide underneath it
+                    // would fight it, so screen changes are a quiet fade.
+                    animation: "fade",
+                    contentStyle: { backgroundColor: background },
                   }}
-                />
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="product/[id]"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="rent/dates"
-                  options={{ headerShown: false, presentation: "modal" }}
-                />
-                <Stack.Screen
-                  name="rent/checkout"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen name="sign-in" options={{ headerShown: false }} />
-                <Stack.Screen name="auth" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="verify-email"
-                  options={{ headerShown: false }}
-                />
-              </Stack>
-              {/* Above every screen, so the expansion is not clipped by a route. */}
-              <HeroLayer />
-            </HeroProvider>
-          </ToastProvider>
-        </RentalDraftProvider>
-      </SessionProvider>
-    </AppProviders>
+                >
+                  <Stack.Screen
+                    name="splash"
+                    options={{ animation: "none", headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="welcome"
+                    options={{
+                      animation: "slide_from_right",
+                      headerShown: false,
+                    }}
+                  />
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="product/[id]"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="rent/dates"
+                    options={{ headerShown: false, presentation: "modal" }}
+                  />
+                  <Stack.Screen
+                    name="rent/checkout"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="sign-in"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen name="auth" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="verify-email"
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+                {/* Above every screen, so the expansion is not clipped by a route. */}
+                <HeroLayer />
+              </HeroProvider>
+            </ToastProvider>
+          </RentalDraftProvider>
+        </SessionProvider>
+      </AppProviders>
+    </QueryProvider>
   );
 }

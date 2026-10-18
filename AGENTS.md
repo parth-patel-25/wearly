@@ -661,6 +661,22 @@ function List({ items }: { items: Item[] }) {
 - Implement proper caching strategies
 - Handle loading and error states
 
+### Refetch-on-Focus (MANDATORY)
+- Both apps run TanStack Query with `refetchOnWindowFocus: true` as the default
+- **Web** (`apps/web/src/app/providers.tsx`): the window/tab focus event is enough;
+  do not invalidate every query on client-side navigation
+- **Mobile** (`apps/mobile/src/core/providers/query-provider.tsx`): there is no
+  window, so `useFocusRefetch()` fires `focusManager.onFocus()` on route change
+  and on `AppState` → `active`, which is the direct equivalent of tab focus
+- **Mobile** must also feed `expo-network`'s `isConnected` into Better Auth's
+  online manager (`use-auth-online-state.ts`). Better Auth seeds that manager
+  from `navigator.onLine`, which React Native does not define, so without the
+  shim every session focus refetch is silently dropped as "offline"
+- Every screen that needs fresh data must reach it through `useQuery`; do not
+  hand-roll `useState` + `useEffect` fetches that miss the focus refetch
+- Opt out per query with `refetchOnWindowFocus: false` or a `staleTime`, never by
+  disabling the app-wide default
+
 ## Import Rules
 
 ### Path Aliases

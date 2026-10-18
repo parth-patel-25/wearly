@@ -14,6 +14,7 @@ Bun is the package manager and task runner; Node runs the apps.
 | Mobile | Expo SDK 57, React Native 0.86, Expo Router, Uniwind 1.12, HeroUI Native 1.0 |
 | API | NestJS 12 (ESM), zod validation, Better Auth at `/api/auth/*` |
 | Contracts | `@wearly/shared` — zod schemas + inferred types + typed fetch client |
+| Server state | TanStack Query 5 — refetch on window / screen focus |
 | Design | `packages/design-tokens` + Satoshi (self-hosted, ITF FFL) |
 
 ## Layout
@@ -185,6 +186,42 @@ Responses are validated on the client too, so a breaking change fails
 type-checking first and surfaces as a typed `ApiError` at runtime. Each module
 has its own subpath export (`@wearly/shared/api/schemas`, `/types`, `/routes`,
 `/client`) — there are no barrel files.
+
+## Data fetching and refetch policy
+
+Server state goes through **TanStack Query** in both apps; `@wearly/shared` only
+supplies the typed functions the `queryFn` calls. Defaults are declared once per
+app and both apps agree on them:
+
+| App | Where | Focus trigger |
+| --- | --- | --- |
+| `apps/web` | `src/app/providers.tsx` | window / tab focus (`visibilitychange`) |
+| `apps/mobile` | `src/core/providers/query-provider.tsx` | screen focus (route change) + `AppState` → `active` |
+
+```ts
+new QueryClient({
+  defaultOptions: { queries: { refetchOnWindowFocus: true, retry: 1 } },
+});
+```
+
+- **Web:** switching browser tabs refetches active, stale queries. Client-side
+  navigation refetches whatever remounts (default `staleTime: 0`); still-mounted
+  shells keep their cache instead of re-requesting on every route change.
+- **Mobile:** there is no window, so `useFocusRefetch()`
+  (`src/core/providers/use-focus-refetch.ts`) calls `focusManager.onFocus()` when
+  the route changes and when the app returns to the foreground. Home → Profile
+  therefore refetches exactly the way tab focus does on the web. The same bridge
+  pokes Better Auth's focus manager so `authClient.useSession()` refreshes too.
+- **Mobile's second shim:** Better Auth refuses a focus refetch when its own
+  online manager says the device is offline, and it seeds that manager from
+  `navigator.onLine` — which React Native does not define. `useAuthOnlineState()`
+  (`src/core/providers/use-auth-online-state.ts`) feeds it `expo-network`'s
+  `isConnected` instead. Without it every session focus refetch is caught and
+  silently dropped, and a user deleted in the admin panel keeps looking signed
+  in on Profile until the app restarts.
+
+Opt a query out with `refetchOnWindowFocus: false`, and give it a `staleTime`
+if focus refetching is too eager for that screen.
 
 ## Adding shadcn/ui components
 

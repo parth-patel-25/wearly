@@ -129,6 +129,15 @@
 - [x] Extend `createApiClient` in `packages/shared` with cookie/headers support
   — not needed this pass: no authenticated API calls from mobile (catalogue is
   local); revisit when a mobile screen calls `/api/*` as a user
+- [x] Query layer — `@tanstack/react-query` + `src/core/providers/query-provider.tsx`
+  with `refetchOnWindowFocus: true`, bridged to screen focus / `AppState` by
+  `use-focus-refetch.ts` (mirrors the web's window-focus refetch; see README
+  §Data fetching and refetch policy)
+- [x] Focus refetch actually reaches the network — Better Auth gates the session
+  refetch on its online manager, which seeds itself from `navigator.onLine` and
+  finds nothing on React Native, so every focus event was caught and discarded
+  (a user deleted from `/admin/users` still looked signed in on mobile Profile).
+  `use-auth-online-state.ts` feeds it `expo-network`'s `isConnected` instead.
 
 ## Phase 5 — Verification
 
