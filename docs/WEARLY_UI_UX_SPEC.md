@@ -363,6 +363,20 @@ dates. Large cards, clear status indicators. Not a dashboard.
 Profile image, name, verification status where applicable, style preferences,
 rentals, listings, saved items, settings. Clean.
 
+**Phase 1 (implemented).** Order top to bottom: identity (provider photo or a
+rose monogram, display name, account email — no "account created" badge), a
+compact completion bar that counts only achievable steps and can reach 100%,
+the style answers when they exist, the saved-pieces grid, a "Lend with Wearly"
+invitation to the List destination, then Account (edit display name, sign out
+with confirmation) and About (help, configured legal links, app version).
+
+Saved pieces are device-local and the screen says so; it never implies account
+sync. Privacy and terms rows appear only when `EXPO_PUBLIC_PRIVACY_URL` /
+`EXPO_PUBLIC_TERMS_URL` are configured — no placeholder is presented as an
+official policy. Phase 2/3 destinations (rentals, listings, addresses,
+notifications, payments) are not shown until their infrastructure exists; see
+`docs/PROFILE_PHASES.md`.
+
 ### 7.11 Empty states
 
 No blank screens, ever.

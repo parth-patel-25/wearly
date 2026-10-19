@@ -29,7 +29,10 @@ Proves the design language and the hero-expansion interaction end to end.
 - [x] 13 Checkout — Stack header off (`headerShown: false`), in-screen row instead (outline back · centred `headingSm` "Checkout" · mirror spacer)
 - [x] 15 Confirmation
 - [x] 16 Orders / rentals — honest empty state
-- [x] 18 Profile — honest empty state
+- [x] 18 Profile — Phase 1 complete: identity (photo + initials fallback, name,
+  email), editable display name via Better Auth, saved-pieces grid, account and
+  sign-out, help/legal configuration hooks and app version. Progress reaches
+  100% through achievable steps only. See `docs/PROFILE_PHASES.md` for Phase 2/3.
 
 **Connective tissue, not signature screens:**
 
@@ -95,7 +98,8 @@ The bar keeps one sliding pill across all four; see `DESIGN_SYSTEM.md` §10.
 - [ ] 17 Tracking
 - [ ] 19 Reviews — must ship as an honest empty state, never fabricated
 - [ ] 20 Seller profile
-- [ ] Profile completion (progressive, §6.2)
+- [ ] Profile completion (progressive, §6.2) — progress logic fixed in Phase 1
+  (`docs/PROFILE_PHASES.md`); the Phase 2 profile destinations are still pending
 
 ## Phase 3 — The listing flow
 

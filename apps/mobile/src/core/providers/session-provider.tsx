@@ -9,9 +9,10 @@ import { authClient } from "@/lib/auth-client";
  * currently being rented, and the two pre-auth personalise answers. Whether
  * there is an account and whose it is are not local facts — they come from
  * the Better Auth session (`authClient.useSession`, cookie in SecureStore),
- * so `isAuthenticated` and `name` are derived on every read and the reducer
- * never carries them. A reload keeps you signed in now; favourites and the
- * last rental stay local, because they belong to this device either way.
+ * so `isAuthenticated`, `name`, `email` and `image` are derived on every read
+ * and the reducer never carries them. A reload keeps you signed in now;
+ * favourites and the last rental stay local, because they belong to this
+ * device either way.
  */
 
 export interface ConfirmedRental {
@@ -32,7 +33,12 @@ interface LocalState {
 }
 
 export interface SessionState extends LocalState {
+  /** The account's email, when the session exposes it. */
+  email: string | null;
+  /** Profile photo from the auth provider, when it exposes one. */
+  image: string | null;
   isAuthenticated: boolean;
+  /** The account's display name. Editable through Better Auth. */
   name: string | null;
 }
 
@@ -87,6 +93,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const state = useMemo<SessionState>(
     () => ({
       ...local,
+      email: data?.user.email ?? null,
+      image: data?.user.image ?? null,
       isAuthenticated: Boolean(data),
       name: data?.user.name ?? null,
     }),

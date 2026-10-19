@@ -27,6 +27,8 @@ export interface ProductGridProps {
   className?: string;
   emptyState: ReactElement;
   favourites: ReadonlySet<string>;
+  /** Rendered below the grid rows. Defaults to a small bottom spacer. */
+  footer?: ReactElement;
   header?: ReactElement;
   items: readonly ProductGridItem[];
   onFavourite: (id: string) => void;
@@ -37,6 +39,7 @@ export function ProductGrid({
   className = "flex-1 px-gutter",
   emptyState,
   favourites,
+  footer,
   header,
   items,
   onFavourite,
@@ -58,7 +61,7 @@ export function ProductGrid({
       className={className}
       data={items}
       emptyState={emptyState}
-      footer={<View className="h-10" />}
+      footer={footer ?? <View className="h-10" />}
       header={header}
       keyExtractor={(item) => item.id}
       numColumns={2}

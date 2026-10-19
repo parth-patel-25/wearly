@@ -1,4 +1,7 @@
+import { Image } from "expo-image";
+import { type ReactNode, useState } from "react";
 import { View } from "react-native";
+import { withUniwind } from "uniwind";
 
 import { Icon } from "./icon";
 import type { TextVariant } from "./text";
@@ -7,11 +10,17 @@ import { Text } from "./text";
 /**
  * Avatars.
  *
- * There is no profile photo in the prototype, so the fallback is a soft rose
- * circle with the person's initials. Monograms are honest — they never imply a
- * photo that does not exist — and they keep the profile screen from turning into
- * a row of broken images.
+ * A photo when the account has one, and a soft rose monogram when it does not.
+ * Monograms are honest — they never imply a photo that does not exist — and
+ * they keep a row of avatars from turning into broken images when a provider
+ * gives no picture. A photo that fails to load falls back to the monogram
+ * rather than leaving a hole.
+ *
+ * `expo-image` does not accept `className` directly, so it is wrapped through
+ * `withUniwind` once at module scope, exactly as `media.tsx` does.
  */
+
+const StyledImage = withUniwind(Image);
 
 const SIZES = {
   lg: { className: "size-14", icon: "md", text: "bodyMd" },
@@ -25,6 +34,8 @@ export type AvatarSize = keyof typeof SIZES;
 export interface AvatarProps {
   name?: string;
   size?: AvatarSize;
+  /** Profile photo. Absent or failed falls back to the monogram. */
+  src?: string;
 }
 
 const WORD_SPLIT = /\s+/;
@@ -37,30 +48,46 @@ function initialsOf(name: string): string {
   return (first + last).toUpperCase();
 }
 
-export function Avatar({ name, size = "md" }: AvatarProps) {
+export function Avatar({ name, size = "md", src }: AvatarProps) {
+  const [failed, setFailed] = useState(false);
   const initials = name === undefined ? "" : initialsOf(name);
   const hasInitials = initials.length > 0;
+  const showPhoto = src !== undefined && src.length > 0 && !failed;
+
+  let content: ReactNode;
+  if (showPhoto) {
+    content = (
+      <StyledImage
+        className="h-full w-full"
+        contentFit="cover"
+        onError={() => setFailed(true)}
+        source={{ uri: src }}
+        transition={200}
+      />
+    );
+  } else if (hasInitials) {
+    content = (
+      <Text tone="accent-foreground" variant={SIZES[size].text as TextVariant}>
+        {initials}
+      </Text>
+    );
+  } else {
+    content = (
+      <Icon
+        name="user"
+        size={SIZES[size].icon as "lg" | "md" | "sm"}
+        tone="accent-foreground"
+      />
+    );
+  }
 
   return (
     <View
       accessibilityLabel={name}
       accessibilityRole="image"
-      className={`${SIZES[size].className} items-center justify-center rounded-avatar bg-accent`}
+      className={`${SIZES[size].className} items-center justify-center overflow-hidden rounded-avatar bg-accent`}
     >
-      {hasInitials ? (
-        <Text
-          tone="accent-foreground"
-          variant={SIZES[size].text as TextVariant}
-        >
-          {initials}
-        </Text>
-      ) : (
-        <Icon
-          name="user"
-          size={SIZES[size].icon as "lg" | "md" | "sm"}
-          tone="accent-foreground"
-        />
-      )}
+      {content}
     </View>
   );
 }
