@@ -17,11 +17,10 @@ import { ProfileStyle } from "./profile-style";
  */
 
 export interface ProfileHeaderProps {
-  onEditName: () => void;
   onSignIn: () => void;
 }
 
-export function ProfileHeader({ onEditName, onSignIn }: ProfileHeaderProps) {
+export function ProfileHeader({ onSignIn }: ProfileHeaderProps) {
   const { state } = useSession();
 
   const profileState: ProfileState = {
@@ -37,7 +36,6 @@ export function ProfileHeader({ onEditName, onSignIn }: ProfileHeaderProps) {
         image={state.image}
         isAuthenticated={state.isAuthenticated}
         name={state.name}
-        onEditName={onEditName}
         onSignIn={onSignIn}
       />
 

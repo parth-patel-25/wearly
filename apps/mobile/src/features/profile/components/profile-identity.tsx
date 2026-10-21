@@ -21,7 +21,6 @@ export interface ProfileIdentityProps {
   image: string | null;
   isAuthenticated: boolean;
   name: string | null;
-  onEditName: () => void;
   onSignIn: () => void;
 }
 
@@ -30,7 +29,6 @@ export function ProfileIdentity({
   image,
   isAuthenticated,
   name,
-  onEditName,
   onSignIn,
 }: ProfileIdentityProps) {
   if (!isAuthenticated) {
@@ -65,11 +63,6 @@ export function ProfileIdentity({
             {email}
           </Text>
         ) : null}
-      </View>
-      <View className="w-24">
-        <Button onPress={onEditName} size="sm" variant="outline">
-          Edit
-        </Button>
       </View>
     </View>
   );

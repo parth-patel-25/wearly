@@ -26,6 +26,7 @@ export function HomeIntroCard({
   return (
     <View className="bg-card px-gutter pt-3">
       <HomeHeader
+        image={state.image}
         name={state.name ?? "Romina"}
         onNotifications={onNotifications}
         onProfile={onProfile}

@@ -13,6 +13,7 @@ import { Pressable, View } from "react-native";
  */
 
 interface HomeHeaderProps {
+  image: string | null;
   name: string | null;
   onNotifications: () => void;
   onProfile: () => void;
@@ -30,6 +31,7 @@ function greetingFor(date = new Date()): string {
 }
 
 export function HomeHeader({
+  image,
   name,
   onNotifications,
   onProfile,
@@ -46,7 +48,7 @@ export function HomeHeader({
         accessibilityRole="button"
         onPress={onProfile}
       >
-        <Avatar name={name ?? undefined} size="lg" />
+        <Avatar name={name ?? undefined} size="lg" src={image ?? undefined} />
       </Pressable>
       <View className="flex-1 justify-center gap-0">
         {/* `buttonLg` (16px, medium) keeps the medium weight one step down —

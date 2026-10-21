@@ -62,12 +62,7 @@ export default function ProfileScreen() {
             onSignOut={() => setSignOutOpen(true)}
           />
         }
-        header={
-          <ProfileHeader
-            onEditName={() => setEditNameOpen(true)}
-            onSignIn={() => router.push(ROUTES.signIn)}
-          />
-        }
+        header={<ProfileHeader onSignIn={() => router.push(ROUTES.signIn)} />}
         items={items}
         onFavourite={onFavourite}
         onOpen={(id) => router.push(ROUTES.product(id))}

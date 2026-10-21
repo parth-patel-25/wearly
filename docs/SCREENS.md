@@ -78,7 +78,8 @@ grid. `ROUTES.home` is `/(tabs)`; the old `homeLegacy`/`homeV2`/`homeV3` keys
 and their screens are gone (git history preserves them).
 
 **Two-card Home (2026-10-05).** Two full-bleed white cards with a `bg-muted`
-gap between: header (greeting + search) rounded bottom-only, content sheet
+gap between: header (provider photo avatar with monogram fallback, greeting,
+search) rounded bottom-only, content sheet
 rounded top-only. Greeting scrolls away, search stays pinned — same order,
 same content, tab bar unchanged. Sheet bottom is flush: scroll container
 carries no extra padding (`pb-0`), inner sheet keeps `px-5 pt-5 pb-4` so the

@@ -271,6 +271,8 @@ Home navigates to Discover with query passthrough (no local filtering).
 Home layout (2026-10-05): two full-bleed white cards separated by a `bg-muted`
 gap — the header card on top (greeting + search, rounded on the bottom corners
 only) and the content sheet below (rounded on the top corners only). The
+header avatar shows the provider photo when there is one, falling back to the
+name monogram. The
 greeting scrolls away but the search strip stays pinned; at rest the two white
 blocks read as one header card. The sheet holds everything else in the
 existing order, followed by the recommended grid. Sheet bottom is flush
@@ -364,7 +366,8 @@ Profile image, name, verification status where applicable, style preferences,
 rentals, listings, saved items, settings. Clean.
 
 **Phase 1 (implemented).** Order top to bottom: identity (provider photo or a
-rose monogram, display name, account email — no "account created" badge), a
+rose monogram, display name, account email — no "account created" badge, no
+header edit action; editing lives in Account), a
 compact completion bar that counts only achievable steps and can reach 100%,
 the style answers when they exist, the saved-pieces grid, a "Lend with Wearly"
 invitation to the List destination, then Account (edit display name, sign out
