@@ -19,7 +19,30 @@ import {
   TabsList,
   TabsTrigger,
 } from "@wearly/ui/components/ui/tabs";
+import { toast } from "sonner";
 import { Section } from "./section";
+
+function showSuccess() {
+  toast.success("Invite sent to priya@example.com");
+}
+
+function showError() {
+  toast.error("Could not send the invite");
+}
+
+function showWarning() {
+  toast.warning("This piece is only available through Sunday");
+}
+
+function showInfo() {
+  toast.info("New listings near you appear here first");
+}
+
+function showLongError() {
+  toast.error(
+    "Could not update the listing — the photos are still uploading, so we saved your changes as a draft and will retry shortly"
+  );
+}
 
 export function OverlaysSection() {
   return (
@@ -94,6 +117,30 @@ export function OverlaysSection() {
             14 owners are waiting for you to respond.
           </TabsContent>
         </Tabs>
+      </Section>
+
+      <Section
+        description="One pill above the page: card surface, hairline border, rose disc with a white glyph. Tone is carried by the icon, never by colour alone. Dismisses after 4s or on swipe."
+        id="toasts"
+        title="Toasts"
+      >
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={showSuccess} variant="soft">
+            Success
+          </Button>
+          <Button onClick={showError} variant="destructive">
+            Error
+          </Button>
+          <Button onClick={showWarning} variant="outline">
+            Warning
+          </Button>
+          <Button onClick={showInfo} variant="outline">
+            Info
+          </Button>
+          <Button onClick={showLongError} variant="outline">
+            Long message
+          </Button>
+        </div>
       </Section>
     </>
   );

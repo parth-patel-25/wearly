@@ -133,12 +133,12 @@
 }
 
 /**
- * Sonner toasts — the Wearly silhouette.
+ * Sonner toasts — the Wearly pill.
  *
  * Sonner injects its stylesheet at runtime and keeps the layout, position and
  * the enter/swipe/exit animation. It exposes colour as variables (set inline by
  * `Toaster`) but hard-codes radius, padding, elevation and type, so those are
- * overridden here.
+ * overridden here to draw the same pill the mobile surface does.
  *
  * These rules are deliberately **not** in an `@layer`: Sonner's injected sheet
  * is unlayered, and an unlayered rule outside every layer would be needed just
@@ -149,17 +149,20 @@
   font-family: var(--wearly-font-sans);
 }
 
+/* The pill: `bg-card`, neutral hairline, `rounded-pill`, `shadow-float`, and
+   the mobile rhythm — 12px on three sides with 24px trailing. */
 .toaster [data-sonner-toast][data-styled="true"] {
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  font-size: var(--wearly-text-body-sm);
+  gap: 0.875rem;
+  padding: 0.75rem 1.5rem 0.75rem 0.75rem;
+  font-size: var(--wearly-text-body-md);
   line-height: var(--wearly-leading-normal);
-  border-radius: var(--wearly-radius-card);
+  border-radius: var(--wearly-radius-pill);
   box-shadow: var(--wearly-shadow-lg);
 }
 
-/* The status glyph sits on a `card` disc, the same as the mobile surface, so
-   the tone reads by shape and not by colour alone. */
+/* The glyph sits on the brand-rose disc in `primary-foreground`, the same
+   pairing a primary button uses. Tone is told apart by the icon itself, never
+   by surface colour, so all four `data-type`s share this one disc. */
 .toaster [data-sonner-toast][data-styled="true"] [data-icon] {
   display: flex;
   flex-shrink: 0;
@@ -167,12 +170,19 @@
   justify-content: center;
   width: 2.25rem;
   height: 2.25rem;
-  background-color: var(--wearly-card);
+  margin: 0;
+  color: var(--wearly-primary-foreground);
+  background-color: var(--wearly-primary);
   border-radius: var(--wearly-radius-pill);
 }
 
+/* Sonner nudges the glyph by -1px; the disc is a circle, so centre it truly. */
+.toaster [data-sonner-toast][data-styled="true"] [data-icon] svg {
+  margin: 0;
+}
+
 .toaster [data-sonner-toast][data-styled="true"] [data-title] {
-  font-size: var(--wearly-text-body-sm);
+  font-size: var(--wearly-text-body-md);
   font-weight: var(--wearly-weight-medium);
   line-height: var(--wearly-leading-normal);
 }
@@ -180,50 +190,4 @@
 .toaster [data-sonner-toast][data-styled="true"] [data-description] {
   color: inherit;
   opacity: 0.85;
-}
-
-/**
- * Status surfaces reuse the same `-background` / `-foreground` token pairs the
- * mobile toast uses, so a success reads identically on both platforms. The
- * border is a faint tint of the status foreground rather than a neutral
- * hairline. `default` needs no rule — the popover pair is already the base.
- */
-.toaster [data-sonner-toast][data-type="success"] {
-  --normal-bg: var(--wearly-success-background);
-  --normal-text: var(--wearly-success-foreground);
-  --normal-border: color-mix(
-    in oklab,
-    var(--wearly-success-foreground) 18%,
-    transparent
-  );
-}
-
-.toaster [data-sonner-toast][data-type="error"] {
-  --normal-bg: var(--wearly-destructive-background);
-  --normal-text: var(--wearly-destructive-foreground);
-  --normal-border: color-mix(
-    in oklab,
-    var(--wearly-destructive-foreground) 18%,
-    transparent
-  );
-}
-
-.toaster [data-sonner-toast][data-type="warning"] {
-  --normal-bg: var(--wearly-warning-background);
-  --normal-text: var(--wearly-warning-foreground);
-  --normal-border: color-mix(
-    in oklab,
-    var(--wearly-warning-foreground) 18%,
-    transparent
-  );
-}
-
-.toaster [data-sonner-toast][data-type="info"] {
-  --normal-bg: var(--wearly-info-background);
-  --normal-text: var(--wearly-info-foreground);
-  --normal-border: color-mix(
-    in oklab,
-    var(--wearly-info-foreground) 18%,
-    transparent
-  );
 }

@@ -489,6 +489,7 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-21 | Web toasts rebuilt as the mobile brand pill (card surface, neutral hairline border, pill radius, rose disc with a white icon, tone carried by icon alone), and the token reference gained a Toasts section that fires each tone. See `DESIGN_SYSTEM.md` §9. |
 | 2026-10-18 | Mobile toast rebuilt as a brand pill (white `bg-card`, neutral hairline `border-border`, `rounded-pill`, `shadow-float`, rose disc with a white icon) with four tones — success, error, warning, information — told apart by icon and spoken label, plus optional `duration` and `persistent` per message. See `DESIGN_SYSTEM.md` §9. |
 | 2026-10-17 | Toasts made on-theme and rounded on both platforms, and mobile toasts gained swipe-to-dismiss. See `DESIGN_SYSTEM.md` §9 for the skin contract and the change-log entry for the mechanism. |
 | 2026-10-15 | Rent dates screen header clarified: native Stack header off (`headerShown: false`, the route is a modal), in-screen row carries outline back · centred `headingSm` "Choose dates" · `size-12` mirror spacer; headline reworded "When do you need it?" → "When will you wear it?". §7.5. |

@@ -13,5 +13,6 @@ export const showcaseNav = [
   { id: "tables", label: "Tables" },
   { id: "dialogs", label: "Dialogs" },
   { id: "tabs", label: "Tabs" },
+  { id: "toasts", label: "Toasts" },
   { id: "states", label: "States" },
 ] as const;

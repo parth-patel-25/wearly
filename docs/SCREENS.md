@@ -155,7 +155,8 @@ Auth wiring and the admin surface live in the web app (see
 - [x] `/design-system` — showcase page (hero, featured pieces, how-it-works);
   theme toggle in the header
 - [x] `/design-system/tokens` — token reference (colours, foundations,
-  controls, surfaces, overlays, states); anchor links from the showcase footer
+  controls, surfaces, overlays (dialogs, tabs, toasts), states); anchor links
+  from the showcase footer
 
 **Auth (real backend, Supabase + Better Auth):**
 

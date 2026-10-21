@@ -547,22 +547,30 @@ stays the focus. On mobile, prefer a bottom sheet at 32px.
 
 A toast floats above the app and says one thing. Both platforms share the same
 contract — a token-coloured surface, a soft `shadow-float`, one message, and
-dismissal by time, tap and swipe — but not the same silhouette: web leans on the
-soft status pair, mobile on the brand's most recognisable shape.
+dismissal by time and swipe (plus a tap on mobile) — and, since 2026-10-21, the
+same silhouette: the brand pill.
 
 **Web.** Sonner renders the toast; the Wearly skin is applied in two layers.
 Sonner exposes its palette as CSS variables, so `Toaster` sets `--normal-bg`,
-`--normal-text`, `--normal-border` and `--border-radius` inline from tokens
-(inline wins over Sonner's own runtime-injected stylesheet). The silhouette
-Sonner *hard-codes* — padding, gap, elevation, type — is overridden by an
-unlayered `.toaster [data-sonner-toast]` block in `apps/web/src/app/globals.css`;
-it is deliberately **not** inside an `@layer`, because an unlayered rule has to
-beat Sonner's unlayered injected stylesheet, and specificity (`.toaster` +
-`[data-sonner-toast][data-styled]`) is what wins. Each `data-type` maps its
-variables to the matching soft status pair. `richColors` is **off** — its
-saturated fills are the stock look the tokens exist to replace — and the
-overlapping corner close button is dropped in favour of auto-dismiss plus
-Sonner's own swipe.
+`--normal-text`, `--normal-border` and `--border-radius` inline from tokens —
+`card`, `foreground`, `border` and the `pill` radius (inline wins over Sonner's
+own runtime-injected stylesheet). The silhouette Sonner *hard-codes* — padding,
+gap, elevation, type — is overridden by an unlayered
+`.toaster [data-sonner-toast]` block in `apps/web/src/app/globals.css`; it is
+deliberately **not** inside an `@layer`, because an unlayered rule has to beat
+Sonner's unlayered injected stylesheet, and specificity (`.toaster` +
+`[data-sonner-toast][data-styled]`) is what wins. That block draws the same pill
+the mobile surface uses: 12px padding on three sides with 24px trailing, a 14px
+gap, `bodyMd` at `font-medium`, `rounded-pill` and `shadow-float`. The glyph sits
+on a `bg-primary` disc in `primary-foreground`, drawn by lucide `Check` / `X` /
+`TriangleAlert` / `Info` passed to Sonner's `icons` prop, so the shapes match
+mobile's bare glyphs rather than Sonner's circle-enclosed defaults. All four
+`data-type`s share that one card surface — the per-type soft status pair is gone
+— because tone is carried by the icon alone, exactly as on mobile. `richColors`
+is **off** — its saturated fills are the stock look the tokens exist to replace —
+and the overlapping corner close button is dropped in favour of auto-dismiss
+plus Sonner's own swipe. A **Toasts** section on the token reference
+(`/design-system/tokens#toasts`) fires each tone for manual inspection.
 
 **Mobile — the surface.** A pill, not a card. `bg-card` (white in light), the
 system's neutral hairline `border-border`, `rounded-pill` corners, and a soft
@@ -1004,6 +1012,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-21 | Web toasts adopt the mobile brand pill. `Toaster` maps Sonner's variables to `card` / `foreground` / `border` and the `pill` radius, and the unlayered `.toaster` block sets the mobile silhouette — 12px/24px padding, 14px gap, `bodyMd`/medium, `shadow-float` — with the glyph on a `bg-primary` disc in `primary-foreground`. The per-`data-type` status pairs are removed: tone is icon-only, via lucide `Check`/`X`/`TriangleAlert`/`Info` passed through Sonner's `icons` prop. A new Toasts section on `/design-system/tokens#toasts` fires each tone. §9. |
 | 2026-10-18 | Mobile toast redesigned as a brand pill: `bg-card` surface, neutral hairline `border-border`, `rounded-pill`, `shadow-float`, and a leading `bg-primary` disc carrying a white `primary-foreground` glyph; the message is `bodyMd`/`font-medium`/`foreground` and wraps instead of truncating. Four tones — success, error, warning, information — share the one surface and differ only by icon (new `triangle-alert` and `info` glyphs) and the tone word in the accessibility label, so status is never colour alone. `show(text, tone, { duration, persistent })` adds an overridable auto-dismiss and a hold-until-dismissed mode; a new toast still replaces the current one rather than stacking. §9. |
 | 2026-10-17 | Toasts are themed on both platforms. Web: `Toaster` (`apps/web/src/components/toaster.tsx`) drops `richColors`, sets Sonner's colour variables inline from tokens, and `globals.css` overrides the hard-coded silhouette under `.toaster` (unlayered, so it beats Sonner's injected sheet) — `rounded-card`, `border-border`, `shadow-float`, `bodySm`, and per-`data-type` soft status pairs; the corner close button is removed. Mobile: `toast.tsx` split into a provider plus `toast-view.tsx` (surface), `toast-motion.ts` (entrance/exit/swipe on the UI thread) and `toast-drag.ts` (the release worklet) — a `Pan` (`minDistance(12)`) tracks the finger, fades as it travels, and springs back or leaves past 110px/850px·s⁻¹; the provider unmounts only after the exit animation, so dismissal is a transition not a pop. Top offset is `insets.top + 12`; reduced motion respected. §9. |
 | 2026-10-17 | Web auth gate hardened: `hasSessionCookie()` (server) is shared by `/` and `/sign-in`, and a client `RequireSignedOut` guard re-checks the session on mount and on `pageshow` with `persisted` — so the browser back/forward cache can no longer restore the sign-in form for a signed-in user. Sign-in/out use full `window.location.replace` navigations, so the cookie is committed before the gate runs (fixes the "click sign-in twice" race) and the sign-in entry leaves the history stack (Back can no longer return a signed-in user to sign-in). |
