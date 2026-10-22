@@ -36,10 +36,8 @@ export function HomeHeader({
   onNotifications,
   onProfile,
 }: HomeHeaderProps) {
-  const firstName = name?.split(" ")[0];
-  const greeting = firstName
-    ? `${greetingFor()}, ${firstName} 👋`
-    : `${greetingFor()} 👋`;
+  const firstName = name?.split(" ")[0] ?? "Style lover";
+  const greeting = `${greetingFor()}, ${firstName} 👋`;
 
   return (
     <View className="flex-row items-center gap-3">
