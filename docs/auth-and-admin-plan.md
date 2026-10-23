@@ -10,7 +10,7 @@
 | --- | --- |
 | DB | Supabase Postgres (hosting only) + Drizzle in `packages/db` |
 | Auth | Better Auth mounted in NestJS at `/api/auth/*` (per `docs/auth-and-database.md`) |
-| Methods | Email+password, Google OAuth, Facebook OAuth, email verification via Resend |
+| Methods | Email+password, Google OAuth, Facebook OAuth, 6-digit email verification via Resend |
 | Clients | Web + Mobile (web also hosts the admin panel) |
 | Roles | `user` → `admin` → `super_admin` (custom access control on Better Auth admin plugin) |
 | Super-admin | Seeded directly in DB (parthpatelaa19@gmail.com); can email-invite / revoke other admins |
@@ -85,7 +85,7 @@
   - [x] `POST /api/admin/invites` (super-admin; sends Resend email)
   - [x] `GET /api/admin/invites` · `DELETE /api/admin/invites/:id`
   - [x] `GET /api/admin/invites/:token` (validate) · `POST /api/admin/invites/accept`
-- [x] Resend email sender + templates (verify email, admin invite)
+- [x] Resend email sender + templates (6-digit verification code, admin invite)
 - [x] `scripts/seed-super-admin.ts` — reads `ADMIN_EMAIL`/`ADMIN_PASSWORD` from env,
   signs up / promotes to `super_admin` (never committed credentials)
 - [x] Policy checks: super-admin protected from delete/demotion; only super-admin manages
@@ -100,7 +100,7 @@
   - [x] `/sign-in` page — zod schema in `validations/`, first-error toast + inline errors
   - [x] `/sign-up` page — same validation rules
   - [x] Google + Facebook buttons (`signIn.social`) with `?next=` redirect support
-  - [x] `/verify-email` page + Better Auth verification callback route
+  - [x] `/verify-email` page — email-OTP code form (resend + verify)
 - [x] `src/features/admin/`:
   - [x] `/admin` layout — soft sidebar, rose accent (DESIGN_SYSTEM §11)
   - [x] `/admin/users` — Table, search, pagination, include-deleted toggle, role/status
@@ -124,8 +124,13 @@
 - [x] Replace fake `use-signin` + in-memory `SessionProvider` with real session
   (favourites etc. stay local state; `isAuthenticated`/`name` are derived from
   `authClient.useSession`)
-- [x] Email-verification deep link via `wearly://` scheme (server keeps a
-  `wearly://` callback; `/verify-email` route shows success + `?error=` states)
+- [x] Email verification via 6-digit OTP (`emailOTP` plugin,
+  `overrideDefaultEmailVerification`) — sign-up pushes
+  `/verify-email?email=`, which verifies the code and returns to sign-in. A
+  code avoids the `localhost` link Gmail filters as spam and needs no deep
+  link or `adb reverse`. Duplicate sign-ups also send a fresh code through
+  `emailAndPassword.onExistingUserSignUp`, so retrying an email that already
+  has an account still lands on a usable code screen.
 - [x] Extend `createApiClient` in `packages/shared` with cookie/headers support
   — not needed this pass: no authenticated API calls from mobile (catalogue is
   local); revisit when a mobile screen calls `/api/*` as a user
@@ -149,13 +154,12 @@ Automated gates:
 
 Live API smoke — run 2026-10-16 against the real Supabase DB (`.env` holds the
 credentials; never committed). API started with `RESEND_API_KEY=` empty so
-verification links print to the console instead of bouncing off the Resend
+verification codes print to the console instead of bouncing off the Resend
 sandbox.
 
-- [x] Manual: sign-up → verify email → sign-in — email path verified via the
-  printed link (`GET /api/auth/verify-email?token=…` → 302 → sign-in 200).
-  Google/Facebook OAuth **not** exercised: no client secret / app credentials
-  yet.
+- [x] Manual: sign-up → 6-digit code → sign-in. With no API key the code
+  prints to the console; with Resend it arrives by email. Google/Facebook
+  OAuth **not** exercised: no client secret / app credentials yet.
 - [x] Manual: super-admin seed login → user list (`GET /api/admin/users` 200,
   seed row present)
 - [x] Manual: soft delete → user blocked from sign-in (403 `This account has
@@ -168,9 +172,10 @@ sandbox.
 - [x] Manual: non-admin receives 403 on `/api/admin/*`
 - [x] Manual: revoked invite — token lookup reports `status: "revoked"`,
   accept → 409
-- [x] Real Resend delivery — sandbox account only delivers to the account
-  owner's own address; a verified sending domain is needed before real
-  inboxes receive mail.
+- [x] Real Resend delivery — `patelsindustries.com` is verified in Resend and
+  `EMAIL_FROM` is `Wearly <no-reply@patelsindustries.com>`. Verification mail
+  carries a 6-digit code, not a `localhost` link, so Gmail no longer has a
+  phishing-shaped URL to filter and no `adb reverse` is needed to verify.
 
 Fixed during smoke testing:
 
@@ -196,10 +201,21 @@ Prerequisites state:
       provider stays hidden until both are set
 - [ ] Facebook App ID + secret (requires HTTPS redirect URI — may need
       tunnel/domain); not configured
-- [x] `RESEND_API_KEY` + verified sender address — key in place, but the
-      sandbox sender only reaches the account owner's own inbox; verify a
-      domain for real delivery
+- [x] `RESEND_API_KEY` + verified sender domain — `patelsindustries.com`
+      verified; `EMAIL_FROM="Wearly <no-reply@patelsindustries.com>"`
 - [x] `BETTER_AUTH_SECRET` (generated with `openssl rand -base64 32`)
+
+### Resend sender runbook
+
+1. Verify the sending domain in Resend (DKIM/SPF records plus a DMARC record)
+   and wait for the dashboard status to read **Verified**.
+2. Set `EMAIL_FROM` to an address on that domain — the shared
+   `onboarding@resend.dev` sender only delivers to the Resend account owner.
+3. Verification emails contain only a 6-digit code, so `BETTER_AUTH_URL` no
+   longer needs to be publicly reachable to complete sign-up. It must still be
+   correct for OAuth callbacks and invite links.
+4. Restart the API after changing env values. The Resend message id is logged
+   on send, which makes dashboard correlation easy.
 
 ## Risks / notes
 

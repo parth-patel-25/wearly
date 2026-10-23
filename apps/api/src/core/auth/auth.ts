@@ -1,4 +1,5 @@
 import { expo } from "@better-auth/expo";
+import { Logger } from "@nestjs/common";
 import { db } from "@wearly/db/client";
 import {
   account,
@@ -13,11 +14,14 @@ import { ROLES } from "@wearly/shared/enums";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
+import { emailOTP } from "better-auth/plugins";
 import { admin } from "better-auth/plugins/admin";
 import { userAc } from "better-auth/plugins/admin/access";
 import { isProduction } from "../config/env.js";
 import { emailLayout, sendEmail } from "../email/email.js";
 import { ac, adminRole, superAdminRole } from "./auth.roles.js";
+
+const logger = new Logger("Auth");
 
 type SocialProviders = NonNullable<BetterAuthOptions["socialProviders"]>;
 
@@ -98,6 +102,52 @@ function unwrapUser(record: unknown): unknown {
   return record;
 }
 
+type OtpType =
+  | "sign-in"
+  | "email-verification"
+  | "forget-password"
+  | "change-email";
+
+const OTP_COPY: Record<
+  OtpType,
+  { action: string; subject: string; title: string }
+> = {
+  "change-email": {
+    action: "confirm your new email",
+    subject: "Confirm your new Wearly email",
+    title: "Confirm your new email",
+  },
+  "email-verification": {
+    action: "verify your email",
+    subject: "Your Wearly verification code",
+    title: "Confirm your email",
+  },
+  "forget-password": {
+    action: "reset your password",
+    subject: "Reset your Wearly password",
+    title: "Reset your password",
+  },
+  "sign-in": {
+    action: "sign in",
+    subject: "Your Wearly sign-in code",
+    title: "Sign in to Wearly",
+  },
+};
+
+/** A code-only email: Gmail treats a `localhost` verification link as spam. */
+function otpEmail(type: OtpType, otp: string) {
+  const copy = OTP_COPY[type];
+  const body = `<p style="margin:0 0 16px">Use this code to ${copy.action}:</p>
+<p style="margin:0 0 16px;font-size:32px;font-weight:700;letter-spacing:8px">${otp}</p>
+<p style="margin:0">The code expires in 10 minutes. If you did not request it, you can ignore this email.</p>`;
+
+  return {
+    html: emailLayout(copy.title, body),
+    subject: copy.subject,
+    text: `Use this code to ${copy.action}: ${otp}\n\nThe code expires in 10 minutes. If you did not request it, you can ignore this email.`,
+  };
+}
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema: authSchema }),
   databaseHooks: {
@@ -120,30 +170,29 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
+    // With `requireEmailVerification`, a duplicate sign-up deliberately returns
+    // a generic success instead of `USER_ALREADY_EXISTS` (anti-enumeration).
+    // That path skips the normal sign-up email, so the client would land on the
+    // code screen with no code. Send a fresh OTP for the existing account too;
+    // this keeps "swipe to sign up" working for accounts created earlier.
+    async onExistingUserSignUp({ user }) {
+      logger.log(
+        `Existing account ${user.id} signed up again; sending verification OTP`
+      );
+      await auth.api.sendVerificationOTP({
+        body: { email: user.email, type: "email-verification" },
+      });
+    },
     requireEmailVerification: true,
   },
   emailVerification: {
+    // With the email-OTP override below, both hooks send a six-digit code
+    // instead of a link. A code avoids the `localhost` URL that Gmail filters
+    // as spam during local development and works on mobile without a deep
+    // link. `sendOnSignIn` also gives an unverified account a fresh code when
+    // it tries to sign in.
+    sendOnSignIn: true,
     sendOnSignUp: true,
-    sendVerificationEmail: async ({ user, url }) => {
-      // Better Auth builds the URL against the API origin. Keep native deep
-      // links (wearly://…) so the mobile app can receive the result; rewrite
-      // everything else so web users land on the web verify page.
-      const verifyUrl = new URL(url);
-      const callback = verifyUrl.searchParams.get("callbackURL");
-      if (!callback?.startsWith("wearly://")) {
-        const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:3000";
-        verifyUrl.searchParams.set("callbackURL", `${webOrigin}/verify-email`);
-      }
-      await sendEmail({
-        html: emailLayout(
-          "Confirm your email",
-          `Verify <strong>${user.email}</strong>: <a href="${verifyUrl.toString()}">Verify email</a>`
-        ),
-        subject: "Verify your Wearly email",
-        text: `Verify your email: ${verifyUrl.toString()}`,
-        to: user.email,
-      });
-    },
   },
   hooks: {
     // Clean error for soft-deleted users on password sign-in.
@@ -171,6 +220,17 @@ export const auth = betterAuth({
         [ROLES.SUPER_ADMIN]: superAdminRole,
         [ROLES.USER]: userAc,
       },
+    }),
+    emailOTP({
+      allowedAttempts: 5,
+      expiresIn: 600,
+      otpLength: 6,
+      overrideDefaultEmailVerification: true,
+      sendVerificationOTP: async ({ email, otp, type }) => {
+        const copy = otpEmail(type, otp);
+        await sendEmail({ ...copy, to: email });
+      },
+      storeOTP: "hashed",
     }),
   ],
   socialProviders: buildSocialProviders(),

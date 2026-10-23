@@ -1,4 +1,5 @@
 import { authTab } from "@core/routing/routes";
+import { VerifyCodeForm } from "@features/auth/components/verify-code-form";
 import { Button } from "@wearly/ui-native/button";
 import { Screen } from "@wearly/ui-native/screen";
 import { Text } from "@wearly/ui-native/text";
@@ -6,13 +7,12 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native";
 
 /**
- * Email verification landing (`wearly://verify-email`).
+ * Email verification.
  *
- * The token is checked by the API *before* this route exists — success is the
- * bare deep link, failure arrives as Better Auth's `?error=` code. The
- * session cookie set during verification landed in the browser that followed
- * the email link, not in SecureStore, so the honest hand-off is an explicit
- * sign-in rather than a pretend auto-login.
+ * Sign-up pushes this screen with the address, so the six-digit code form is
+ * the normal path. Without an address it is the landing for an old
+ * `wearly://verify-email` link, where success is the bare deep link and
+ * failure arrives as Better Auth's `?error=` code.
  */
 
 const ERROR_COPY: Record<string, string> = {
@@ -21,10 +21,30 @@ const ERROR_COPY: Record<string, string> = {
   USER_NOT_FOUND: "That link does not match any account.",
 };
 
+function firstValue(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 export default function VerifyEmailScreen() {
-  const params = useLocalSearchParams<{ error?: string | string[] }>();
+  const params = useLocalSearchParams<{
+    email?: string | string[];
+    error?: string | string[];
+  }>();
   const router = useRouter();
-  const error = Array.isArray(params.error) ? params.error[0] : params.error;
+  const email = firstValue(params.email);
+  const error = firstValue(params.error);
+
+  if (email) {
+    return (
+      <Screen
+        className="flex-1 bg-background"
+        contentClassName="flex grow flex-col justify-center px-gutter py-10"
+      >
+        <VerifyCodeForm email={email} />
+      </Screen>
+    );
+  }
+
   const failed = Boolean(error);
   const message = failed
     ? `${ERROR_COPY[error ?? ""] ?? "We could not verify that email."} Go to sign in and we'll get you sorted.`

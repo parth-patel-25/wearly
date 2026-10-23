@@ -40,7 +40,7 @@ export function SignUpForm() {
         toast.error(error.message ?? "Could not create your account");
         return;
       }
-      // requireEmailVerification is on — send the user to the verify screen
+      // requireEmailVerification is on — send the user to the code screen
       // with the email pre-filled so they know what to check.
       const params = new URLSearchParams({ email: values.email });
       if (next) {

@@ -5,7 +5,7 @@ import { Button } from "@wearly/ui/components/ui/button";
 import { Input } from "@wearly/ui/components/ui/input";
 import { Label } from "@wearly/ui/components/ui/label";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import type { FieldErrors } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -13,12 +13,15 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { type SignInInput, SignInSchema } from "../validations/auth.schema";
 
+const UNVERIFIED_EMAIL = /not verified|verify your email/i;
+
 function firstError(errors: FieldErrors<SignInInput>): string {
   const [first] = Object.values(errors);
   return first?.message ?? "Please fix the highlighted fields";
 }
 
 export function SignInForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,6 +41,17 @@ export function SignInForm() {
         password: values.password,
       });
       if (error) {
+        // `sendOnSignIn` already emailed a fresh code for an unverified
+        // account, so send the user to the code screen instead of a dead end.
+        if (UNVERIFIED_EMAIL.test(error.message ?? "")) {
+          toast.info("Verify your email first — we sent a fresh code.");
+          const params = new URLSearchParams({ email: values.email });
+          if (next) {
+            params.set("next", next);
+          }
+          router.push(`/verify-email?${params.toString()}`);
+          return;
+        }
         toast.error(error.message ?? "Could not sign in");
         return;
       }

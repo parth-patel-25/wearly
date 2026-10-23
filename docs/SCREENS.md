@@ -128,9 +128,9 @@ sign-in with Better Auth (`expoClient` + SecureStore, scheme `wearly`).
   (`signIn.social({ idToken })`,
   `@react-native-google-signin/google-signin`); Facebook via the
   system-browser `signIn.social` (Apple removed; no server provider)
-- [x] Email verification — `wearly://verify-email` deep link (server keeps a
-  `wearly://` callback instead of rewriting it to the web origin)
-- [x] Post-verify screen — `/verify-email` route (success + `?error=` states)
+- [x] Email verification — 6-digit code emailed by Better Auth's email-OTP
+  plugin; `/verify-email?email=` shows the code form. Legacy
+  `wearly://verify-email` links still land on the success + `?error=` states.
 - [x] Post-auth navigation — after any successful sign-in (email, Google,
   Facebook) the session store is hydrated (`refetch()` awaited via
   `SessionProvider`) *before* navigating, so the destination never
@@ -166,7 +166,8 @@ Auth wiring and the admin surface live in the web app (see
 - [x] Sign up — `/sign-up` (validated email/password, first-error toast +
   inline errors); still reachable for invitees whose email has no account yet
   (invite landing links here)
-- [x] Verify email — `/verify-email` + Better Auth verification callback route
+- [x] Verify email — `/verify-email?email=` code form (resend + verify) plus
+  success/error states
 - [x] Session wiring — `authClient.useSession` on web (admin shell, invite landing);
   mobile parity still pending (Phase 4)
 

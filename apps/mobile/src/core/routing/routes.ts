@@ -29,6 +29,7 @@ export const ROUTES = {
   rentals: "/(tabs)/rentals",
   signIn: "/sign-in",
   splash: "/splash",
+  verifyEmail: "/verify-email",
   welcome: "/welcome",
 } as const satisfies Record<string, Href | ((id: string) => Href)>;
 
@@ -39,6 +40,10 @@ export const datesFor = (pieceId: string) =>
 /** Typed navigation target for the auth screen, which opens on a given tab. */
 export const authTab = (tab: "login" | "signup") =>
   ({ params: { tab }, pathname: ROUTES.auth }) as const;
+
+/** Typed navigation target for the code screen, keyed to the address. */
+export const verifyEmailFor = (email: string) =>
+  ({ params: { email }, pathname: ROUTES.verifyEmail }) as const;
 
 /** The four bottom-navigation destinations, in order. */
 export const TABS = ["index", "discover", "list", "profile"] as const;

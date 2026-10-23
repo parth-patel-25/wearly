@@ -17,7 +17,7 @@ decision (auth framework unchanged — still **Better Auth**):
 | Concern | Choice |
 | --- | --- |
 | Hosting | **Supabase** Postgres (`DATABASE_URL` session pooler, port 5432). The "Hosting — still open" options below are now closed. |
-| Sign-up methods | Email + password, **Google** OAuth, **Facebook** OAuth, email verification via **Resend** |
+| Sign-up methods | Email + password, **Google** OAuth, **Facebook** OAuth, 6-digit email verification via **Resend** |
 | Clients | Web **and** Mobile both get real auth this pass |
 | Roles | `user` → `admin` → `super_admin`, via the Better Auth **admin plugin** with custom access control |
 | Admin surface | Web-only panel at `/admin`; all admin operations go through Nest-owned `/api/admin/*` (never the raw Better Auth `/admin/*` in the browser) |

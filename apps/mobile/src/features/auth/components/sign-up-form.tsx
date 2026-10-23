@@ -18,10 +18,9 @@ import { View } from "react-native";
  *
  * Owns the name field Better Auth requires on `signUpEmail`, the password
  * strength rules, and the confirm match. A valid submit creates the account
- * and does *not* navigate: `requireEmailVerification` means nobody can sign
- * in yet, so the success toast telling the user to check their email is the
- * hand-off. Swipe-as-submit and the toast-plus-inline-errors contract are
- * the login form's, unchanged.
+ * and pushes the code screen: `requireEmailVerification` means nobody can
+ * sign in until the emailed OTP is verified. Swipe-as-submit and the
+ * toast-plus-inline-errors contract are the login form's, unchanged.
  */
 
 export function SignUpForm() {

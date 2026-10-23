@@ -1,3 +1,4 @@
+import { verifyEmailFor } from "@core/routing/routes";
 import type {
   LoginInput,
   SignUpInput,
@@ -10,14 +11,16 @@ import { useGoogleSignIn } from "./use-google-sign-in";
 
 export type SocialProvider = "facebook" | "google";
 
+const UNVERIFIED_EMAIL = /not verified|verify your email/i;
+
 /**
  * Real auth actions for the forms and social buttons.
  *
  * Email sign-in resolves into the SecureStore-backed cookie and pops back to
  * whatever screen asked; a soft-deleted or unverified account comes back as a
- * server error message and toasts it. Sign-up does *not* navigate — with
- * `requireEmailVerification` the account exists but cannot sign in yet, so
- * the success toast is the instruction to check email.
+ * server error message and toasts it. Sign-up pushes the code screen — with
+ * `requireEmailVerification` the account exists but cannot sign in yet, and
+ * the OTP is the proof instead of a link.
  *
  * Google uses the native idToken flow (`use-google-sign-in`): an ID token
  * from `expo-auth-session` is verified server-side against Google's JWKS, so
@@ -42,6 +45,14 @@ export function useAuth() {
       rememberMe: values.rememberMe,
     });
     if (error) {
+      // `sendOnSignIn` has already emailed a fresh code for an unverified
+      // account, so the useful next step is the code screen, not a toast that
+      // leaves the user stuck on the password form.
+      if (UNVERIFIED_EMAIL.test(error.message ?? "")) {
+        toast.show("Verify your email first — we sent a fresh code.", "info");
+        router.push(verifyEmailFor(values.email));
+        return;
+      }
       toast.show(error.message ?? "Could not sign in", "error");
       return;
     }
@@ -58,7 +69,6 @@ export function useAuth() {
 
   const signUp = async (values: SignUpInput) => {
     const { error } = await authClient.signUp.email({
-      callbackURL: "wearly://verify-email",
       email: values.email,
       name: values.name,
       password: values.password,
@@ -67,7 +77,8 @@ export function useAuth() {
       toast.show(error.message ?? "Could not create the account", "error");
       return;
     }
-    toast.show(`Check your email to verify ${values.email}`, "success");
+    toast.show(`We emailed a code to ${values.email}`, "success");
+    router.push(verifyEmailFor(values.email));
   };
 
   const socialSignIn = async (provider: SocialProvider) => {

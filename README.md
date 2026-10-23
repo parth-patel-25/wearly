@@ -267,7 +267,8 @@ migrations, new `packages/db`) and **Better Auth**, served from `apps/api` at
 `/api/auth/*` so web and mobile share one session. The auth server deliberately
 lives in Nest rather than Next, because the mobile app already talks to Nest and
 there is only one origin to authorise. Sign-up covers email + password, Google and
-Facebook OAuth, with email verification via Resend. A web-only **admin panel** at
+Facebook OAuth, with 6-digit email verification via Resend from the verified
+`patelsindustries.com` sender. A web-only **admin panel** at
 `/admin` (users list, soft/hard delete with confirmation, restore, email invites
 for the `admin` role) talks to Nest-owned `/api/admin/*` endpoints.
 
