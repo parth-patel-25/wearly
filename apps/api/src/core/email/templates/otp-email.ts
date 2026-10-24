@@ -22,7 +22,7 @@ const OTP_COPY: Record<
   "change-email": {
     action: "confirm your new email",
     body: "Enter this code where prompted to confirm your new email address.",
-    heroIcon: `<img src="${HERO_ICONS["mail-open"]}" width="32" height="32" alt="" style="display:block" />`,
+    heroIcon: `<img src="${HERO_ICONS["mail-open"]}" width="32" height="32" alt="" style="display:block;margin:20px auto" />`,
     subject: "Confirm your new Wearly email",
     subtitle: "Enter this code to confirm your new email address.",
     title: "Confirm your new email",
@@ -30,7 +30,7 @@ const OTP_COPY: Record<
   "email-verification": {
     action: "verify your email",
     body: "Enter this code where prompted to verify your email and finish setting up your account.",
-    heroIcon: `<img src="${HERO_ICONS["mail-check"]}" width="32" height="32" alt="" style="display:block" />`,
+    heroIcon: `<img src="${HERO_ICONS["mail-check"]}" width="32" height="32" alt="" style="display:block;margin:20px auto" />`,
     subject: "Your Wearly verification code",
     subtitle:
       "Enter this code to verify your email and finish setting up your Wearly account.",
@@ -39,7 +39,7 @@ const OTP_COPY: Record<
   "forget-password": {
     action: "reset your password",
     body: "Enter this code where prompted to choose a new password for your account.",
-    heroIcon: `<img src="${HERO_ICONS["key-round"]}" width="32" height="32" alt="" style="display:block" />`,
+    heroIcon: `<img src="${HERO_ICONS["key-round"]}" width="32" height="32" alt="" style="display:block;margin:20px auto" />`,
     subject: "Reset your Wearly password",
     subtitle:
       "Enter this code to choose a new password for your Wearly account.",
@@ -48,7 +48,7 @@ const OTP_COPY: Record<
   "sign-in": {
     action: "sign in",
     body: "Enter this code where prompted to sign in to your Wearly account.",
-    heroIcon: `<img src="${HERO_ICONS["lock-keyhole"]}" width="32" height="32" alt="" style="display:block" />`,
+    heroIcon: `<img src="${HERO_ICONS["lock-keyhole"]}" width="32" height="32" alt="" style="display:block;margin:20px auto" />`,
     subject: "Your Wearly sign-in code",
     subtitle: "Enter this code to sign in to your Wearly account.",
     title: "Sign in to Wearly",
