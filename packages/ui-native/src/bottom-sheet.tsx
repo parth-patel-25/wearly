@@ -1,7 +1,14 @@
 import { SPRING } from "@wearly/design-tokens/motion";
 import type { ReactNode } from "react";
 import { useEffect, useMemo } from "react";
-import { Modal, Pressable, ScrollView, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  View,
+} from "react-native";
 import {
   Gesture,
   GestureDetector,
@@ -119,6 +126,10 @@ export function BottomSheet({
       visible={open}
     >
       <GestureHandlerRootView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
         <View className="flex-1 justify-end">
           <Pressable
             accessibilityLabel="Close"
@@ -168,6 +179,7 @@ export function BottomSheet({
             ) : null}
           </Animated.View>
         </View>
+        </KeyboardAvoidingView>
       </GestureHandlerRootView>
     </Modal>
   );
