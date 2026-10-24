@@ -18,7 +18,8 @@ import { emailOTP } from "better-auth/plugins";
 import { admin } from "better-auth/plugins/admin";
 import { userAc } from "better-auth/plugins/admin/access";
 import { isProduction } from "../config/env.js";
-import { emailLayout, sendEmail } from "../email/email.js";
+import { sendEmail } from "../email/email.js";
+import { type OtpType, otpEmail } from "../email/templates/otp-email.js";
 import { ac, adminRole, superAdminRole } from "./auth.roles.js";
 
 const logger = new Logger("Auth");
@@ -102,52 +103,6 @@ function unwrapUser(record: unknown): unknown {
   return record;
 }
 
-type OtpType =
-  | "sign-in"
-  | "email-verification"
-  | "forget-password"
-  | "change-email";
-
-const OTP_COPY: Record<
-  OtpType,
-  { action: string; subject: string; title: string }
-> = {
-  "change-email": {
-    action: "confirm your new email",
-    subject: "Confirm your new Wearly email",
-    title: "Confirm your new email",
-  },
-  "email-verification": {
-    action: "verify your email",
-    subject: "Your Wearly verification code",
-    title: "Confirm your email",
-  },
-  "forget-password": {
-    action: "reset your password",
-    subject: "Reset your Wearly password",
-    title: "Reset your password",
-  },
-  "sign-in": {
-    action: "sign in",
-    subject: "Your Wearly sign-in code",
-    title: "Sign in to Wearly",
-  },
-};
-
-/** A code-only email: Gmail treats a `localhost` verification link as spam. */
-function otpEmail(type: OtpType, otp: string) {
-  const copy = OTP_COPY[type];
-  const body = `<p style="margin:0 0 16px">Use this code to ${copy.action}:</p>
-<p style="margin:0 0 16px;font-size:32px;font-weight:700;letter-spacing:8px">${otp}</p>
-<p style="margin:0">The code expires in 10 minutes. If you did not request it, you can ignore this email.</p>`;
-
-  return {
-    html: emailLayout(copy.title, body),
-    subject: copy.subject,
-    text: `Use this code to ${copy.action}: ${otp}\n\nThe code expires in 10 minutes. If you did not request it, you can ignore this email.`,
-  };
-}
-
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema: authSchema }),
   databaseHooks: {
@@ -227,7 +182,7 @@ export const auth = betterAuth({
       otpLength: 6,
       overrideDefaultEmailVerification: true,
       sendVerificationOTP: async ({ email, otp, type }) => {
-        const copy = otpEmail(type, otp);
+        const copy = otpEmail(type as OtpType, otp);
         await sendEmail({ ...copy, to: email });
       },
       storeOTP: "hashed",
