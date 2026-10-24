@@ -489,6 +489,7 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
+| 2026-10-24 | Mobile email verification redesigned as a full OTP screen: six token-styled slots, outline back control, 40s resend countdown, primary verify button, bottom custom keypad; preserves 6-digit Better Auth flow and legacy link states. |
 | 2026-10-22 | Home greeting drops the fabricated guest name ("Romina") for the on-theme "Stylist", and the avatar no longer seeds initials for a guest. §7.1. |
 | 2026-10-21 | Web toasts rebuilt as the mobile brand pill (card surface, neutral hairline border, pill radius, rose disc with a white icon, tone carried by icon alone), and the token reference gained a Toasts section that fires each tone. See `DESIGN_SYSTEM.md` §9. |
 | 2026-10-18 | Mobile toast rebuilt as a brand pill (white `bg-card`, neutral hairline `border-border`, `rounded-pill`, `shadow-float`, rose disc with a white icon) with four tones — success, error, warning, information — told apart by icon and spoken label, plus optional `duration` and `persistent` per message. See `DESIGN_SYSTEM.md` §9. |

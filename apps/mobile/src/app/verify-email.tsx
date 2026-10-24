@@ -38,7 +38,8 @@ export default function VerifyEmailScreen() {
     return (
       <Screen
         className="flex-1 bg-background"
-        contentClassName="flex grow flex-col justify-center px-gutter py-10"
+        contentClassName="flex grow flex-col px-gutter py-6"
+        scrollable={false}
       >
         <VerifyCodeForm email={email} />
       </Screen>

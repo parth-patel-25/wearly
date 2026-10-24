@@ -166,8 +166,9 @@ Auth wiring and the admin surface live in the web app (see
 - [x] Sign up — `/sign-up` (validated email/password, first-error toast +
   inline errors); still reachable for invitees whose email has no account yet
   (invite landing links here)
-- [x] Verify email — `/verify-email?email=` code form (resend + verify) plus
-  success/error states
+- [x] Verify email — `/verify-email?email=` OTP screen: six token-styled code
+  slots, outline back control, 40s resend countdown, primary verify button,
+  bottom numeric keypad; success/error states preserved for legacy links
 - [x] Session wiring — `authClient.useSession` on web (admin shell, invite landing);
   mobile parity still pending (Phase 4)
 

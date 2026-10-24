@@ -28,11 +28,16 @@ export const LoginSchema = z.object({
 
 export type LoginInput = z.infer<typeof LoginSchema>;
 
+export const OTP_LENGTH = 6;
+
 export const VerifyCodeSchema = z.object({
   otp: z
     .string()
     .trim()
-    .regex(/^\d{6}$/, "Enter the 6-digit code from your email"),
+    .regex(
+      new RegExp(`^\\d{${OTP_LENGTH}}$`),
+      `Enter the ${OTP_LENGTH}-digit code from your email`
+    ),
 });
 
 export type VerifyCodeInput = z.infer<typeof VerifyCodeSchema>;

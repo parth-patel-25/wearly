@@ -1,38 +1,30 @@
 import { authTab } from "@core/routing/routes";
-import { FontAwesome6 } from "@expo/vector-icons";
-import { AuthField } from "@features/auth/components/auth-field";
+import { useResendTimer } from "@features/auth/hooks/use-resend-timer";
 import {
   type VerifyCodeInput,
   VerifyCodeSchema,
 } from "@features/auth/validations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@wearly/ui-native/button";
+import { Button, IconButton } from "@wearly/ui-native/button";
 import { Text } from "@wearly/ui-native/text";
 import { useToast } from "@wearly/ui-native/toast";
-import { useToneColor } from "@wearly/ui-native/tone";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FieldErrors } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import { Pressable, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
 import { authClient } from "@/lib/auth-client";
+import { OtpSlots } from "./otp-slots";
 
 interface VerifyCodeFormProps {
   email: string;
 }
 
-/**
- * Six-digit email verification.
- *
- * The code is the whole flow: the API emails it on sign-up, this form verifies
- * it, and the user then signs in with the password they chose. A code instead
- * of a link keeps the email free of a `localhost` URL (which Gmail filters)
- * and works without `adb reverse`.
- */
 export function VerifyCodeForm({ email }: VerifyCodeFormProps) {
   const router = useRouter();
   const toast = useToast();
-  const muted = useToneColor("muted-foreground");
+  const timer = useResendTimer();
+  const inputRef = useRef<TextInput>(null);
   const [isResending, setIsResending] = useState(false);
   const { control, formState, handleSubmit } = useForm<VerifyCodeInput>({
     defaultValues: { otp: "" },
@@ -41,8 +33,11 @@ export function VerifyCodeForm({ email }: VerifyCodeFormProps) {
   });
 
   const submit = handleSubmit(
-    async ({ otp }) => {
-      const { error } = await authClient.emailOtp.verifyEmail({ email, otp });
+    async ({ otp: code }) => {
+      const { error } = await authClient.emailOtp.verifyEmail({
+        email,
+        otp: code,
+      });
       if (error) {
         toast.show(error.message ?? "That code did not work", "error");
         return;
@@ -72,6 +67,7 @@ export function VerifyCodeForm({ email }: VerifyCodeFormProps) {
         toast.show(error.message ?? "Could not send another code", "error");
         return;
       }
+      timer.restart();
       toast.show(`A new code is on its way to ${email}`, "success");
     } finally {
       setIsResending(false);
@@ -79,36 +75,86 @@ export function VerifyCodeForm({ email }: VerifyCodeFormProps) {
   };
 
   return (
-    <View className="gap-5">
-      <View className="gap-1">
-        <Text variant="headingSm">Enter your code</Text>
+    <View className="flex-1 gap-6">
+      <View className="flex-row items-center">
+        <IconButton
+          accessibilityLabel="Go back"
+          icon="arrow-left"
+          onPress={() => {
+            if (router.canDismiss()) {
+              router.back();
+            } else {
+              router.replace(authTab("login"));
+            }
+          }}
+          variant="outline"
+        />
+      </View>
+
+      <View className="gap-2">
+        <Text variant="headingMd">Verification code</Text>
         <Text tone="muted-foreground" variant="bodySm">
-          We sent a 6-digit code to {email}.
+          We sent to the e-mail{" "}
+          <Text className="font-medium text-foreground" variant="bodySm">
+            {email}
+          </Text>
         </Text>
       </View>
 
-      <Controller
-        control={control}
-        name="otp"
-        render={({ field: { onBlur, onChange, value }, fieldState }) => (
-          <AuthField
-            autoCapitalize="none"
-            autoComplete="one-time-code"
-            error={fieldState.error?.message}
-            keyboardType="number-pad"
-            label="Verification code"
-            leading={
-              <FontAwesome6 color={muted} name="shield-halved" size={16} />
-            }
-            maxLength={6}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            placeholder="123456"
-            textContentType="oneTimeCode"
-            value={value}
+      <View className="gap-4">
+        <Pressable onPress={() => inputRef.current?.focus()}>
+          <Controller
+            control={control}
+            name="otp"
+            render={({ field: { value } }) => (
+              <OtpSlots invalid={Boolean(formState.errors.otp)} value={value} />
+            )}
           />
+        </Pressable>
+        <Controller
+          control={control}
+          name="otp"
+          render={({ field: { onBlur, onChange, value } }) => (
+            <TextInput
+              accessibilityLabel="Verification code"
+              autoCapitalize="none"
+              autoComplete="one-time-code"
+              className="h-1 w-full opacity-0"
+              keyboardType="number-pad"
+              maxLength={6}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              ref={inputRef}
+              textContentType="oneTimeCode"
+              value={value}
+            />
+          )}
+        />
+        {formState.errors.otp?.message ? (
+          <Text tone="destructive" variant="caption">
+            {formState.errors.otp.message}
+          </Text>
+        ) : null}
+      </View>
+
+      <View className="flex-row items-center justify-center gap-2">
+        {timer.canResend ? (
+          <Pressable
+            accessibilityRole="button"
+            disabled={isResending}
+            hitSlop={8}
+            onPress={resend}
+          >
+            <Text className="text-center" tone="primary" variant="bodySm">
+              {isResending ? "Sending a new code…" : "Resend code"}
+            </Text>
+          </Pressable>
+        ) : (
+          <Text tone="muted-foreground" variant="bodySm">
+            Resend code in {timer.formatted}
+          </Text>
         )}
-      />
+      </View>
 
       <Button
         disabled={formState.isSubmitting}
@@ -116,19 +162,8 @@ export function VerifyCodeForm({ email }: VerifyCodeFormProps) {
         onPress={submit}
         size="lg"
       >
-        {formState.isSubmitting ? "Verifying…" : "Verify email"}
+        {formState.isSubmitting ? "Verifying…" : "Verify"}
       </Button>
-
-      <Pressable
-        accessibilityRole="button"
-        disabled={isResending}
-        hitSlop={8}
-        onPress={resend}
-      >
-        <Text className="text-center" tone="primary" variant="bodySm">
-          {isResending ? "Sending a new code…" : "Resend code"}
-        </Text>
-      </Pressable>
     </View>
   );
 }
