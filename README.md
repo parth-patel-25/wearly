@@ -37,6 +37,10 @@ docs/
   auth-and-admin-plan.md phased build checklist (auth + admin panel)
 ```
 
+## Deployment
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the Vercel + Railway + Supabase + EAS runbook.
+
 ## Getting started
 
 ```bash

@@ -1,4 +1,4 @@
-import "../src/load-env.js";
+import "../src/core/config/load-env.js";
 
 import { db } from "@wearly/db/client";
 import { user } from "@wearly/db/schema/auth";
@@ -30,7 +30,7 @@ async function main(): Promise<void> {
     throw new Error("ADMIN_PASSWORD must be at least 8 characters");
   }
 
-  const { auth } = await import("../src/auth.js");
+  const { auth } = await import("../src/core/auth/auth.js");
   const existing = await db
     .select()
     .from(user)
