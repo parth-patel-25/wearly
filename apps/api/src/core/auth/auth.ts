@@ -55,9 +55,24 @@ function buildSocialProviders(): SocialProviders {
     process.env.FACEBOOK_CLIENT_SECRET,
   ];
   if (googleClientId) {
-    providers.google = googleClientSecret
-      ? { clientId: googleClientId, clientSecret: googleClientSecret }
-      : { clientId: googleClientId };
+    if (googleClientSecret) {
+      providers.google = {
+        clientId: googleClientId,
+        clientSecret: googleClientSecret,
+      };
+    } else {
+      // Mobile idToken sign-in only needs the client id, but the browser
+      // authorization-code flow calls `createAuthorizationURL`, which throws
+      // CLIENT_ID_AND_SECRET_REQUIRED and surfaces as an opaque 500. Warn at
+      // boot so a missing secret on the API host is never silent.
+      logger.warn(
+        "GOOGLE_CLIENT_ID is set but GOOGLE_CLIENT_SECRET is missing/empty: " +
+          "native idToken sign-in will work, but browser Google sign-in " +
+          "(/api/auth/sign-in/social) will fail with 500. Set " +
+          "GOOGLE_CLIENT_SECRET on this API host and redeploy."
+      );
+      providers.google = { clientId: googleClientId };
+    }
   }
   if (f[0] && f[1]) {
     providers.facebook = { clientId: f[0], clientSecret: f[1] };
