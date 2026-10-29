@@ -6,7 +6,7 @@
   "scripts": {
     "android": "expo run:android",
     "clean": "rm -rf .expo .turbo dist *.tsbuildinfo",
-    "dev": "expo start",
+    "dev": "expo run:android",
     "images:generate": "bun scripts/generate-catalogue-images.ts",
     "ios": "expo run:ios",
     "start": "expo start",
