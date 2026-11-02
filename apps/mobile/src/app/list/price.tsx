@@ -23,7 +23,7 @@ export default function PriceScreen() {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 bg-background">
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1 bg-background pt-safe">
       <ScrollView
         automaticallyAdjustKeyboardInsets
         className="flex-1 px-gutter"
@@ -31,7 +31,7 @@ export default function PriceScreen() {
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
       >
-        <View className="gap-2 pt-6">
+        <View className="gap-2 pt-4">
           <Text variant="headingLg">Set rental price</Text>
         </View>
         <View className="mt-4 gap-4">
