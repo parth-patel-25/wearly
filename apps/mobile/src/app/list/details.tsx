@@ -36,7 +36,13 @@ export default function DetailsScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-background"
     >
-      <ScrollView className="flex-1 px-gutter" contentContainerStyle={{ paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        automaticallyAdjustKeyboardInsets
+        className="flex-1 px-gutter"
+        contentContainerStyle={{ paddingBottom: 24 }}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+      >
         <View className="gap-2 pt-6">
           <Text variant="headingLg">Clothing details</Text>
         </View>
