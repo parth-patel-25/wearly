@@ -1,6 +1,8 @@
 import { useListingDraft } from "@features/listing/providers/listing-draft-provider";
 import { Button } from "@wearly/ui-native/button";
+import { Chip } from "@wearly/ui-native/badge";
 import { TextField } from "@wearly/ui-native/fields";
+import { OptionGrid } from "@features/welcome/components/option-grid";
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -42,14 +44,40 @@ export default function DetailsScreen() {
             value={draft.title}
             error={errors.title}
           />
-          <ChipGroup label="Category" options={CATEGORIES} selected={draft.category} onSelect={(v) => set({ category: v })} error={errors.category} />
+          <View className="gap-2">
+            <Text variant="label">Category</Text>
+            <OptionGrid
+              onSelect={(v) => set({ category: v })}
+              options={CATEGORIES}
+              selected={draft.category || null}
+            />
+            {errors.category ? <Text tone="destructive" variant="caption">{errors.category}</Text> : null}
+          </View>
           <TextField
             label="Subcategory (optional)"
             onChangeText={(v) => set({ subcategory: v })}
             value={draft.subcategory}
           />
-          <ChipGroup label="Size" options={SIZES} selected={draft.size} onSelect={(v) => set({ size: v })} error={errors.size} />
-          <ChipGroup label="Condition" options={CONDITIONS} selected={draft.condition} onSelect={(v) => set({ condition: v })} error={errors.condition} />
+          <View className="gap-2">
+            <Text variant="label">Size</Text>
+            <View className="flex-row flex-wrap gap-3">
+              {SIZES.map((o) => (
+                <Chip key={o} onPress={() => set({ size: o })} selected={draft.size === o}>
+                  {o}
+                </Chip>
+              ))}
+            </View>
+            {errors.size ? <Text tone="destructive" variant="caption">{errors.size}</Text> : null}
+          </View>
+          <View className="gap-2">
+            <Text variant="label">Condition</Text>
+            <OptionGrid
+              onSelect={(v) => set({ condition: v })}
+              options={CONDITIONS}
+              selected={draft.condition || null}
+            />
+            {errors.condition ? <Text tone="destructive" variant="caption">{errors.condition}</Text> : null}
+          </View>
           <TextField
             label="Description"
             multiline
@@ -68,35 +96,4 @@ export default function DetailsScreen() {
   );
 }
 
-function ChipGroup({
-  error,
-  label,
-  onSelect,
-  options,
-  selected,
-}: {
-  error?: string;
-  label: string;
-  onSelect: (v: string) => void;
-  options: string[];
-  selected: string;
-}) {
-  return (
-    <View className="gap-2">
-      <Text variant="label">{label}</Text>
-      <View className="flex-row flex-wrap gap-2">
-        {options.map((o) => (
-          <Button
-            key={o}
-            onPress={() => onSelect(o)}
-            size="sm"
-            variant={selected === o ? "primary" : "soft"}
-          >
-            {o}
-          </Button>
-        ))}
-      </View>
-      {error ? <Text tone="destructive" variant="caption">{error}</Text> : null}
-    </View>
-  );
-}
+
