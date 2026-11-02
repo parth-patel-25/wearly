@@ -4,7 +4,8 @@ import { TextField } from "@wearly/ui-native/fields";
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import { Platform, ScrollView, View } from "react-native";
 
 export default function PriceScreen() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function PriceScreen() {
       <ScrollView
         automaticallyAdjustKeyboardInsets
         className="flex-1 px-gutter"
-        contentContainerStyle={{ paddingBottom: 96 }}
+        contentContainerStyle={{ paddingBottom: 32 }}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
       >

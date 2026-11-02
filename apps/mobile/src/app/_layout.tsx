@@ -7,6 +7,7 @@ import { HeroLayer } from "@wearly/ui-native/hero-layer";
 import { HeroProvider } from "@wearly/ui-native/hero-provider";
 
 import { AppProviders } from "@wearly/ui-native/providers";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ToastProvider } from "@wearly/ui-native/toast";
 import { Stack } from "expo-router";
 import { hideAsync, preventAutoHideAsync } from "expo-splash-screen";
@@ -56,6 +57,7 @@ export default function RootLayout() {
   return (
     // Outermost: the query client owns the focus events, so every provider and
     // screen below it is covered by refetch-on-focus.
+    <KeyboardProvider>
     <QueryProvider>
       <AppProviders>
         <SessionProvider>
@@ -126,5 +128,6 @@ export default function RootLayout() {
         </SessionProvider>
       </AppProviders>
     </QueryProvider>
+    </KeyboardProvider>
   );
 }

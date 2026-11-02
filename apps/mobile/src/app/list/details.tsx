@@ -6,7 +6,8 @@ import { CONTROL_PRIMARY, CONTROL_SURFACE } from "@wearly/ui-native/control-toke
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import { Platform, Pressable, ScrollView, View } from "react-native";
 
 const CATEGORIES = ["Dresses", "Ethnic", "Jackets", "Sets", "Shirts", "Trousers"];
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "Free Size", "Other"];
@@ -39,7 +40,7 @@ export default function DetailsScreen() {
       <ScrollView
         automaticallyAdjustKeyboardInsets
         className="flex-1 px-gutter"
-        contentContainerStyle={{ paddingBottom: 96 }}
+        contentContainerStyle={{ paddingBottom: 32 }}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
       >
