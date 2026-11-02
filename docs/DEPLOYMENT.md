@@ -11,6 +11,8 @@ Secrets to prepare: Supabase session pooler URI (port 5432), fresh `BETTER_AUTH_
 ## 1. Supabase
 
 1. Create the project (or reuse). Copy the **Session pooler** URI, port `5432`, append `?sslmode=require`.
+   - Use the **pooler** host (`*.pooler.supabase.com`), not the direct `db.<ref>.supabase.co` host. Render's outbound network is IPv4-only; the direct host resolves to IPv6 and fails with `ENETUNREACH ... :5432` (`cause: connect ENETUNREACH 2406:...`). The pooler is IPv4-capable.
+   - `packages/db/src/client.ts` also sets `dns.setDefaultResultOrder("ipv4first")` so hosts publishing both A and AAAA records are dialled over IPv4.
 2. Apply migrations before the first API deploy:
    ```bash
    DATABASE_URL='postgresql://...:5432/postgres?sslmode=require' \

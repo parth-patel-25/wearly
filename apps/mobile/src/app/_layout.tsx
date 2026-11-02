@@ -88,10 +88,13 @@ export default function RootLayout() {
                     name="(tabs)"
                     options={{ headerShown: false }}
                   />
-                  <Stack.Screen
-                    name="list/new"
-                    options={{ headerShown: false }}
-                  />
+                  <Stack.Screen name="list/photos" options={{ headerShown: false }} />
+                  <Stack.Screen name="list/details" options={{ headerShown: false }} />
+                  <Stack.Screen name="list/price" options={{ headerShown: false }} />
+                  <Stack.Screen name="list/availability" options={{ headerShown: false }} />
+                  <Stack.Screen name="list/review" options={{ headerShown: false }} />
+                  <Stack.Screen name="list/published" options={{ headerShown: false }} />
+                  <Stack.Screen name="list/new" options={{ headerShown: false }} />
                   <Stack.Screen
                     name="product/[id]"
                     options={{ headerShown: false }}
