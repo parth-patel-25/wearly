@@ -1,6 +1,7 @@
 import { QueryProvider } from "@core/providers/query-provider";
 import { SessionProvider } from "@core/providers/session-provider";
 import { useThemeOverride } from "@core/theme/use-theme-override";
+import { ListingDraftProvider } from "@features/listing/providers/listing-draft-provider";
 import { RentalDraftProvider } from "@features/rental/providers/rental-draft-provider";
 import { HeroLayer } from "@wearly/ui-native/hero-layer";
 import { HeroProvider } from "@wearly/ui-native/hero-provider";
@@ -59,6 +60,7 @@ export default function RootLayout() {
       <AppProviders>
         <SessionProvider>
           <RentalDraftProvider>
+            <ListingDraftProvider>
             <ToastProvider>
               <HeroProvider>
                 <StatusBar style={theme === "dark" ? "light" : "dark"} />
@@ -87,6 +89,10 @@ export default function RootLayout() {
                     options={{ headerShown: false }}
                   />
                   <Stack.Screen
+                    name="list/new"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
                     name="product/[id]"
                     options={{ headerShown: false }}
                   />
@@ -112,6 +118,7 @@ export default function RootLayout() {
                 <HeroLayer />
               </HeroProvider>
             </ToastProvider>
+            </ListingDraftProvider>
           </RentalDraftProvider>
         </SessionProvider>
       </AppProviders>

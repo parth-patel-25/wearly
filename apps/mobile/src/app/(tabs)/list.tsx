@@ -111,7 +111,10 @@ export default function ListScreen() {
             accepts input yet, because a form that quietly discards what you
             typed is worse than an honest outline.
           </Text>
-          <Button disabled size="md" variant="soft">
+          <Button
+            onPress={() => router.push("/list/new" as any)}
+            size="md"
+          >
             Start a listing
           </Button>
         </Card>
