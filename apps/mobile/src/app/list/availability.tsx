@@ -22,9 +22,9 @@ export default function AvailabilityScreen() {
   };
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-background pt-safe">
       <ScrollView className="flex-1 px-gutter" contentContainerStyle={{ paddingBottom: 24 }}>
-        <View className="gap-2 pt-6">
+        <View className="gap-2 pt-4">
           <Text variant="headingLg">Set availability</Text>
           <Text tone="muted-foreground" variant="bodySm">
             Tap dates to mark unavailable. Blocked: {draft.availability.length}
