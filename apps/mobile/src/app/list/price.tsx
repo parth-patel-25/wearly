@@ -26,7 +26,7 @@ export default function PriceScreen() {
       <ScrollView
         automaticallyAdjustKeyboardInsets
         className="flex-1 px-gutter"
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: 96 }}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
       >
@@ -45,10 +45,10 @@ export default function PriceScreen() {
             Earnings preview: ₹{draft.pricePerDay || "0"}/day. Platform fees apply per policy.
           </Text>
         </View>
-        <View className="px-gutter pb-8 pt-4">
-          <Button onPress={next}>Continue</Button>
-        </View>
       </ScrollView>
+      <View className="px-gutter pb-6 pt-2">
+        <Button onPress={next}>Continue</Button>
+      </View>
     </KeyboardAvoidingView>
   );
 }
