@@ -2,11 +2,11 @@ import { useListingDraft } from "@features/listing/providers/listing-draft-provi
 import { Button } from "@wearly/ui-native/button";
 import { Chip } from "@wearly/ui-native/badge";
 import { TextField } from "@wearly/ui-native/fields";
-import { OptionGrid } from "@features/welcome/components/option-grid";
+import { CONTROL_PRIMARY, CONTROL_SURFACE } from "@wearly/ui-native/control-tokens";
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 const CATEGORIES = ["Dresses", "Ethnic", "Jackets", "Sets", "Shirts", "Trousers"];
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "Free Size", "Other"];
@@ -46,11 +46,7 @@ export default function DetailsScreen() {
           />
           <View className="gap-2">
             <Text variant="label">Category</Text>
-            <OptionGrid
-              onSelect={(v) => set({ category: v })}
-              options={CATEGORIES}
-              selected={draft.category || null}
-            />
+            <CompactGrid options={CATEGORIES} selected={draft.category} onSelect={(v) => set({ category: v })} />
             {errors.category ? <Text tone="destructive" variant="caption">{errors.category}</Text> : null}
           </View>
           <TextField
@@ -71,11 +67,7 @@ export default function DetailsScreen() {
           </View>
           <View className="gap-2">
             <Text variant="label">Condition</Text>
-            <OptionGrid
-              onSelect={(v) => set({ condition: v })}
-              options={CONDITIONS}
-              selected={draft.condition || null}
-            />
+            <CompactGrid options={CONDITIONS} selected={draft.condition} onSelect={(v) => set({ condition: v })} />
             {errors.condition ? <Text tone="destructive" variant="caption">{errors.condition}</Text> : null}
           </View>
           <TextField
@@ -93,6 +85,62 @@ export default function DetailsScreen() {
         <Button onPress={next}>Continue</Button>
       </View>
     </View>
+  );
+}
+
+function CompactGrid({
+  onSelect,
+  options,
+  selected,
+}: {
+  onSelect: (v: string) => void;
+  options: string[];
+  selected: string;
+}) {
+  return (
+    <View className="flex-row flex-wrap gap-2">
+      {options.map((o) => {
+        const isSelected = selected === o;
+        return (
+          <PressableCompact
+            key={o}
+            label={o}
+            onPress={() => onSelect(o)}
+            selected={isSelected}
+            className={
+              isSelected
+                ? `border-primary ${CONTROL_PRIMARY.surface}`
+                : `border-border ${CONTROL_SURFACE.surface}`
+            }
+          />
+        );
+      })}
+    </View>
+  );
+}
+
+function PressableCompact({
+  className,
+  label,
+  onPress,
+  selected,
+}: {
+  className: string;
+  label: string;
+  onPress: () => void;
+  selected: boolean;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="radio"
+      accessibilityState={{ selected }}
+      className={`min-h-10 items-center justify-center rounded-card border px-3 py-2 ${className}`}
+      onPress={onPress}
+    >
+      <Text tone={selected ? "primary-foreground" : "foreground"} variant="bodySm">
+        {label}
+      </Text>
+    </Pressable>
   );
 }
 
