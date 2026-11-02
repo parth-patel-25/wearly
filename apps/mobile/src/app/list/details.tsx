@@ -89,10 +89,10 @@ export default function DetailsScreen() {
           <TextField label="Color (optional)" onChangeText={(v) => set({ color: v })} value={draft.color} />
           <TextField label="Material (optional)" onChangeText={(v) => set({ material: v })} value={draft.material} />
         </View>
+        <View className="px-gutter pb-8 pt-4">
+          <Button onPress={next}>Continue</Button>
+        </View>
       </ScrollView>
-      <View className="px-gutter pb-6">
-        <Button onPress={next}>Continue</Button>
-      </View>
     </KeyboardAvoidingView>
   );
 }

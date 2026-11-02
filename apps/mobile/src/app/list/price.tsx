@@ -45,10 +45,10 @@ export default function PriceScreen() {
             Earnings preview: ₹{draft.pricePerDay || "0"}/day. Platform fees apply per policy.
           </Text>
         </View>
+        <View className="px-gutter pb-8 pt-4">
+          <Button onPress={next}>Continue</Button>
+        </View>
       </ScrollView>
-      <View className="px-gutter pb-6">
-        <Button onPress={next}>Continue</Button>
-      </View>
     </KeyboardAvoidingView>
   );
 }
