@@ -6,7 +6,7 @@ import { CONTROL_PRIMARY, CONTROL_SURFACE } from "@wearly/ui-native/control-toke
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native";
 
 const CATEGORIES = ["Dresses", "Ethnic", "Jackets", "Sets", "Shirts", "Trousers"];
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "Free Size", "Other"];
@@ -32,8 +32,11 @@ export default function DetailsScreen() {
   };
 
   return (
-    <View className="flex-1 bg-background">
-      <ScrollView className="flex-1 px-gutter" contentContainerStyle={{ paddingBottom: 24 }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1 bg-background"
+    >
+      <ScrollView className="flex-1 px-gutter" contentContainerStyle={{ paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
         <View className="gap-2 pt-6">
           <Text variant="headingLg">Clothing details</Text>
         </View>
@@ -84,7 +87,7 @@ export default function DetailsScreen() {
       <View className="px-gutter pb-6">
         <Button onPress={next}>Continue</Button>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
