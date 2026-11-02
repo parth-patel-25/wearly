@@ -5,6 +5,10 @@
  * them, so a route rename is a compile error rather than a runtime 404.
  */
 export const API_ROUTES = {
+  LISTINGS: {
+    BASE: "/listings",
+    BY_ID: (id: string) => `/listings/${id}`,
+  },
   admin: {
     invites: {
       accept: "/api/admin/invites/accept",

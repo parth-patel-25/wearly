@@ -6,6 +6,7 @@ import { LoggingInterceptor } from "./common/interceptors/logging.interceptor.js
 import { auth } from "./core/auth/auth.js";
 import { AdminModule } from "./modules/admin/admin.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
+import { ListingsModule } from "./modules/listings/listings.module.js";
 import { NotesModule } from "./modules/notes/notes.module.js";
 
 @Module({
@@ -17,6 +18,7 @@ import { NotesModule } from "./modules/notes/notes.module.js";
     AuthModule.forRoot({ auth }),
     AdminModule,
     HealthModule,
+    ListingsModule,
     NotesModule,
   ],
   providers: [{ provide: APP_INTERCEPTOR, useClass: LoggingInterceptor }],

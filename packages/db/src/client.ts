@@ -2,6 +2,7 @@ import { setDefaultResultOrder } from "node:dns";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { adminInvites } from "./schema/admin-invites.js";
+import { listings } from "./schema/listings.js";
 import {
   account,
   accountRelations,
@@ -36,6 +37,7 @@ const schema = {
   account,
   accountRelations,
   adminInvites,
+  listings,
   session,
   sessionRelations,
   user,

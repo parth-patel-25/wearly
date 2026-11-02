@@ -1,12 +1,15 @@
 import type { ZodType } from "zod";
+import { z } from "zod";
 import { createAdminApi } from "./client-admin.js";
 import type { ApiClientOptions } from "./client-core.js";
 import { joinUrl, json, request, requestVoid } from "./client-core.js";
 import { API_ROUTES } from "./routes.js";
 import {
+  type CreateListingInput,
   type CreateNoteInput,
   healthResponseSchema,
   type ListNotesQuery,
+  listingSchema,
   listNotesResponseSchema,
   noteSchema,
   type UpdateNoteInput,
@@ -31,6 +34,13 @@ export function createApiClient(options: ApiClientOptions) {
   return {
     admin: createAdminApi(options, fetcher),
     health: () => send(API_ROUTES.health, healthResponseSchema),
+
+    listings: {
+      create: (input: CreateListingInput) =>
+        send(API_ROUTES.LISTINGS.BASE, listingSchema, json(input)),
+      get: (id: string) => send(API_ROUTES.LISTINGS.BY_ID(id), listingSchema),
+      list: () => send(API_ROUTES.LISTINGS.BASE, z.array(listingSchema)),
+    },
 
     notes: {
       create: (input: CreateNoteInput) =>

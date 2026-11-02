@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { INVITE_STATUSES, USER_ROLES } from "../enums/index.js";
+import { INVITE_STATUSES, LISTING_STATUS_VALUES, USER_ROLES } from "../enums/index.js";
 
 /** Shape returned by `GET /api/health`. */
 export const healthResponseSchema = z.object({
@@ -148,4 +148,42 @@ export type CreateAdminInviteInput = z.infer<typeof createAdminInviteSchema>;
 export const acceptAdminInviteSchema = z.object({
   token: z.string().min(1),
 });
+
+export const createListingSchema = z.object({
+  availability: z.array(z.string()).optional(),
+  brand: z.string().optional(),
+  category: z.string().min(1),
+  color: z.string().optional(),
+  condition: z.string().min(1),
+  description: z.string().optional(),
+  material: z.string().optional(),
+  photos: z.array(z.string()).optional(),
+  pricePerDay: z.string().min(1),
+  size: z.string().min(1),
+  status: z.enum(LISTING_STATUS_VALUES).optional(),
+  subcategory: z.string().optional(),
+  title: z.string().min(1),
+});
+export type CreateListingInput = z.infer<typeof createListingSchema>;
+
+export const listingSchema = z.object({
+  availability: z.array(z.string()).optional(),
+  brand: z.string().nullable().optional(),
+  category: z.string(),
+  color: z.string().nullable().optional(),
+  condition: z.string(),
+  createdAt: z.string(),
+  description: z.string().nullable().optional(),
+  id: z.string(),
+  lenderId: z.string(),
+  material: z.string().nullable().optional(),
+  photos: z.array(z.string()).optional(),
+  pricePerDay: z.string(),
+  size: z.string(),
+  status: z.enum(LISTING_STATUS_VALUES),
+  subcategory: z.string().nullable().optional(),
+  title: z.string(),
+  updatedAt: z.string(),
+});
+export type Listing = z.infer<typeof listingSchema>;
 export type AcceptAdminInviteInput = z.infer<typeof acceptAdminInviteSchema>;

@@ -15,6 +15,10 @@
     "./schema/auth": {
       "types": "./dist/schema/auth.d.ts",
       "default": "./dist/schema/auth.js"
+    },
+    "./schema/listings": {
+      "types": "./dist/schema/listings.d.ts",
+      "default": "./dist/schema/listings.js"
     }
   },
   "main": "./dist/client.js",
