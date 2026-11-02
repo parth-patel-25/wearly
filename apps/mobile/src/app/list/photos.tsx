@@ -1,10 +1,10 @@
 import { useListingDraft } from "@features/listing/providers/listing-draft-provider";
 import { Button } from "@wearly/ui-native/button";
 import { Text } from "@wearly/ui-native/text";
-import * as ImagePicker from "expo-image-picker";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Image, ScrollView, View } from "react-native";
+import { Image, ScrollView, View } from "react-native";
 
 const MAX = 8;
 
@@ -14,25 +14,16 @@ export default function PhotosScreen() {
   const [loading, setLoading] = useState(false);
 
   const pick = async (camera: boolean) => {
-    const perm = camera
-      ? await ImagePicker.requestCameraPermissionsAsync()
-      : await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) {
-      Alert.alert("Permission needed", "Please allow access in settings.");
-      return;
-    }
     setLoading(true);
     const res = camera
-      ? await ImagePicker.launchCameraAsync({ mediaTypes: ["images"], quality: 0.9 })
-      : await ImagePicker.launchImageLibraryAsync({
-          allowsMultipleSelection: true,
-          mediaTypes: ["images"],
-          quality: 0.9,
+      ? await launchCamera({ mediaType: "photo", quality: 0.9 })
+      : await launchImageLibrary({
+          mediaType: "photo",
           selectionLimit: MAX - draft.photos.length,
         });
     setLoading(false);
-    if (res.canceled) return;
-    const newPhotos = res.assets.map((a) => ({ id: a.assetId ?? a.uri, uri: a.uri }));
+    if (res.didCancel || !res.assets) return;
+    const newPhotos = res.assets.map((a, i) => ({ id: a.id ?? a.uri ?? String(i), uri: a.uri! }));
     const merged = [...draft.photos, ...newPhotos].slice(0, MAX);
     const coverSet = merged.map((p, i) => ({ ...p, cover: i === 0 }));
     set({ photos: coverSet });
