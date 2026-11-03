@@ -28,6 +28,8 @@ Service: root directory = repo root. Build: `bun install --frozen-lockfile && bu
 Env vars:
 - `NODE_ENV=production`
 - `DATABASE_URL` = Supabase session pooler URI
+- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` = Supabase project URL + service role key (image uploads; server-only)
+- Create a public Storage bucket named `listing-photos` (10 MB limit, image/* MIME types)
 - `BETTER_AUTH_SECRET` = fresh 32-byte secret
 - `BETTER_AUTH_URL` = `https://<web>.vercel.app`
 - `WEB_ORIGIN` = `https://<web>.vercel.app`

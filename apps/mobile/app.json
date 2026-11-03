@@ -33,6 +33,7 @@
       ],
       "expo-image",
       "expo-secure-store",
+      "expo-image-picker",
       "@react-native-google-signin/google-signin"
     ],
     "experiments": {

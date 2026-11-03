@@ -1,32 +1,86 @@
 import { useListingDraft } from "@features/listing/providers/listing-draft-provider";
+import { API_ROUTES } from "@wearly/shared/api/routes";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@wearly/ui-native/button";
 import { Text } from "@wearly/ui-native/text";
-import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import * as ImagePicker from "expo-image-picker";
+import { useToast } from "@wearly/ui-native/toast";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Image, ScrollView, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, View } from "react-native";
 
 const MAX = 8;
 
 export default function PhotosScreen() {
   const router = useRouter();
   const { draft, set } = useListingDraft();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState<string[]>([]);
 
   const pick = async (camera: boolean) => {
     setLoading(true);
-    const res = camera
-      ? await launchCamera({ mediaType: "photo", quality: 0.9 })
-      : await launchImageLibrary({
-          mediaType: "photo",
-          selectionLimit: MAX - draft.photos.length,
-        });
-    setLoading(false);
-    if (res.didCancel || !res.assets) return;
-    const newPhotos = res.assets.map((a, i) => ({ id: a.id ?? a.uri ?? String(i), uri: a.uri! }));
-    const merged = [...draft.photos, ...newPhotos].slice(0, MAX);
-    const coverSet = merged.map((p, i) => ({ ...p, cover: i === 0 }));
-    set({ photos: coverSet });
+    try {
+      const res = camera
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: "images",
+            quality: 0.9,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: "images",
+            allowsMultipleSelection: true,
+            selectionLimit: MAX - draft.photos.length,
+            quality: 0.9,
+          });
+      if (res.canceled || !res.assets?.length) return;
+      const assets = res.assets.slice(0, MAX - draft.photos.length);
+      setPending(assets.map((a) => a.uri));
+      // Upload each picked asset to the Supabase bucket via a signed URL
+      // issued by the API, then store the resulting public URL in the draft.
+      try {
+        let currentPhotos = draft.photos;
+        for (const a of assets) {
+          const filename = a.fileName ?? `photo-${Date.now()}.jpg`;
+          const contentType = a.mimeType ?? "image/jpeg";
+          const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
+          const uploadUrlEndpoint = `${apiBase}/api${API_ROUTES.STORAGE.UPLOAD_URL}`;
+          const result = (await authClient.$fetch(uploadUrlEndpoint, {
+            body: { contentType, filename },
+            method: "POST",
+          })) as { data?: { path: string; publicUrl: string; uploadUrl: string }; error?: { message?: string } };
+          if (result.error || !result.data) {
+            throw new Error(result.error?.message ?? "Failed to get upload URL");
+          }
+          const signed = result.data;
+          const fileRes = await fetch(a.uri);
+          const buffer = await fileRes.arrayBuffer();
+          const uploadRes = await fetch(signed.uploadUrl, {
+            body: buffer,
+            headers: { "content-type": contentType },
+            method: "PUT",
+          });
+          if (!uploadRes.ok) {
+            throw new Error(`Upload failed (${uploadRes.status})`);
+          }
+          setPending((p) => p.filter((u) => u !== a.uri));
+          currentPhotos = [
+            ...currentPhotos,
+            { id: a.assetId ?? signed.path, uri: signed.publicUrl },
+          ].slice(0, MAX);
+          set({ photos: currentPhotos });
+        }
+        set({ photos: currentPhotos.map((p, i) => ({ ...p, cover: i === 0 })) });
+      } finally {
+        setPending([]);
+      }
+    } catch (error) {
+      toast.show(
+        error instanceof Error ? error.message : "Could not open the camera",
+        "error",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const remove = (id: string) => {
@@ -60,6 +114,14 @@ export default function PhotosScreen() {
                 <PressableCover onPress={() => setCover(p.id)} />
               )}
               <PressableRemove onPress={() => remove(p.id)} />
+            </View>
+          ))}
+          {pending.map((uri) => (
+            <View className="relative items-center justify-center" key={uri} style={{ width: "30%", aspectRatio: 1 }}>
+              <Image source={{ uri }} style={{ aspectRatio: 1, borderRadius: 12, width: "100%", opacity: 0.6 }} />
+              <View className="absolute inset-0 items-center justify-center">
+                <ActivityIndicator color="#C54B75" />
+              </View>
             </View>
           ))}
         </View>

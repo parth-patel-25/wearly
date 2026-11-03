@@ -9,6 +9,9 @@ export const API_ROUTES = {
     BASE: "/listings",
     BY_ID: (id: string) => `/listings/${id}`,
   },
+  STORAGE: {
+    UPLOAD_URL: "/storage/upload-url",
+  },
   admin: {
     invites: {
       accept: "/api/admin/invites/accept",

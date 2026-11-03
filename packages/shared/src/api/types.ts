@@ -9,6 +9,8 @@ export type {
   AdminUser,
   CreateAdminInviteInput,
   CreateListingInput,
+  CreateUploadUrlInput,
+  CreateUploadUrlResponse,
   CreateNoteInput,
   ErrorResponse,
   HealthResponse,

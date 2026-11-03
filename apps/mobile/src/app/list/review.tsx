@@ -1,13 +1,16 @@
 import { useListingDraft } from "@features/listing/providers/listing-draft-provider";
+import type { Listing } from "@wearly/shared/api/types";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@wearly/ui-native/button";
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Image, ScrollView, View } from "react-native";
 
 export default function ReviewScreen() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { draft } = useListingDraft();
   const cover = draft.photos.find((p) => p.cover) ?? draft.photos[0];
   const [publishing, setPublishing] = useState(false);
@@ -17,7 +20,8 @@ export default function ReviewScreen() {
     setPublishing(true);
     setError("");
     try {
-      await authClient.$fetch("/listings", {
+      const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
+      const result = (await authClient.$fetch(`${apiBase}/api/listings`, {
         body: {
           availability: draft.availability,
           brand: draft.brand || undefined,
@@ -34,10 +38,14 @@ export default function ReviewScreen() {
           title: draft.title,
         },
         method: "POST",
-      });
-      router.push("/list/published" as any);
+      })) as { data?: Listing; error?: { message?: string } };
+      if (result.error || !result.data) {
+        throw new Error(result.error?.message ?? "Failed to publish");
+      }
+      await queryClient.invalidateQueries({ queryKey: ["my-listings"] });
+      router.push({ params: { id: result.data.id }, pathname: "/list/published" } as any);
     } catch (e) {
-      setError("Failed to publish. Please try again.");
+      setError(e instanceof Error ? e.message : "Failed to publish. Please try again.");
     } finally {
       setPublishing(false);
     }

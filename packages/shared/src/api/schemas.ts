@@ -166,6 +166,21 @@ export const createListingSchema = z.object({
 });
 export type CreateListingInput = z.infer<typeof createListingSchema>;
 
+/** Body accepted by `POST /storage/upload-url`. */
+export const createUploadUrlSchema = z.object({
+  contentType: z.string().min(1),
+  filename: z.string().min(1).max(255),
+});
+export type CreateUploadUrlInput = z.infer<typeof createUploadUrlSchema>;
+
+/** Response of `POST /storage/upload-url`. */
+export const createUploadUrlResponseSchema = z.object({
+  path: z.string().min(1),
+  publicUrl: z.string().url(),
+  uploadUrl: z.string().url(),
+});
+export type CreateUploadUrlResponse = z.infer<typeof createUploadUrlResponseSchema>;
+
 export const listingSchema = z.object({
   availability: z.array(z.string()).optional(),
   brand: z.string().nullable().optional(),
