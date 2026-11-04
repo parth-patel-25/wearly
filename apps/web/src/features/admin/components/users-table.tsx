@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@wearly/ui/components/ui/table";
-import { Loader2 } from "lucide-react";
+import { Skeleton } from "@wearly/ui/components/ui/skeleton";
 import { useCallback } from "react";
 import { AccountStatusBadge } from "./account-status-badge";
 import { RoleBadge } from "./role-badge";
@@ -109,13 +109,12 @@ export function UsersTable({
         </Table>
         {isLoading ? (
           <div
-            className="absolute inset-0 flex items-start justify-center bg-background/60 pt-24"
+            className="absolute inset-0 flex flex-col gap-2 bg-background/60 p-4"
             role="status"
           >
-            <Loader2
-              aria-hidden="true"
-              className="size-5 animate-spin text-primary motion-reduce:animate-none"
-            />
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton className="h-12 w-full" key={i} />
+            ))}
             <span className="sr-only">Loading users</span>
           </div>
         ) : null}

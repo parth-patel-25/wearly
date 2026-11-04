@@ -1,5 +1,6 @@
 import { cn } from "cn";
-import { AlertCircle, Inbox, Loader2, RefreshCw } from "lucide-react";
+import { AlertCircle, Inbox, RefreshCw } from "lucide-react";
+import { Skeleton } from "./skeleton";
 import type { ComponentProps, ComponentType, ReactNode } from "react";
 
 export type EmptyStateProps = ComponentProps<"div"> & {
@@ -110,18 +111,14 @@ function LoadingState({
   return (
     <div
       aria-busy="true"
-      className={cn(
-        "flex flex-col items-center justify-center gap-3 px-6 py-12 text-muted-foreground",
-        className
-      )}
+      className={cn("flex flex-col gap-3 px-6 py-12", className)}
       data-slot="loading-state"
       role="status"
       {...props}
     >
-      <Loader2
-        aria-hidden="true"
-        className="size-6 animate-spin text-primary motion-reduce:animate-none"
-      />
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="h-4 w-2/3" />
       <span className="sr-only">{label}</span>
     </div>
   );

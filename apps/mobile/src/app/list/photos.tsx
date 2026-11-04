@@ -3,11 +3,12 @@ import { API_ROUTES } from "@wearly/shared/api/routes";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@wearly/ui-native/button";
 import { Text } from "@wearly/ui-native/text";
+import { Skeleton } from "@wearly/ui-native/skeleton";
 import * as ImagePicker from "expo-image-picker";
 import { useToast } from "@wearly/ui-native/toast";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Image, ScrollView, View } from "react-native";
+import { Image, ScrollView, View } from "react-native";
 
 const MAX = 8;
 
@@ -120,7 +121,7 @@ export default function PhotosScreen() {
             <View className="relative items-center justify-center" key={uri} style={{ width: "30%", aspectRatio: 1 }}>
               <Image source={{ uri }} style={{ aspectRatio: 1, borderRadius: 12, width: "100%", opacity: 0.6 }} />
               <View className="absolute inset-0 items-center justify-center">
-                <ActivityIndicator color="#C54B75" />
+                <Skeleton className="size-10 rounded-pill" />
               </View>
             </View>
           ))}

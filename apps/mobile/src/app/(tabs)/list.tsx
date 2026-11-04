@@ -4,6 +4,7 @@ import { ROUTES } from "@core/routing/routes";
 import { Button } from "@wearly/ui-native/button";
 import { Card, Panel } from "@wearly/ui-native/card";
 import { EmptyState } from "@wearly/ui-native/display";
+import { Skeleton } from "@wearly/ui-native/skeleton";
 import type { IconName } from "@wearly/ui-native/icon";
 import { Icon } from "@wearly/ui-native/icon";
 import { Text } from "@wearly/ui-native/text";
@@ -12,7 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Listing } from "@wearly/shared/api/types";
 import { API_ROUTES } from "@wearly/shared/api/routes";
 import { useRouter } from "expo-router";
-import { ActivityIndicator, Image, View } from "react-native";
+import { Image, View } from "react-native";
 
 const STEPS: readonly { icon: IconName; label: string; detail: string }[] = [
   {
@@ -97,8 +98,15 @@ export default function ListScreen() {
       </View>
 
       {isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#C54B75" size="large" />
+        <View className="gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <View className="gap-3 rounded-card border border-border bg-card p-4" key={i}>
+              <Skeleton className="h-40 w-full rounded-card" />
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-3 w-1/2" />
+              <Skeleton className="h-4 w-1/3" />
+            </View>
+          ))}
         </View>
       ) : listingsError ? (
         <View className="flex-1 items-center justify-center gap-3">
