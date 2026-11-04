@@ -4,6 +4,7 @@ import { useRentalDraft } from "@features/rental/providers/rental-draft-provider
 import { countDays } from "@features/rental/validations/rental.schema";
 import type { Piece } from "@shared/data/catalogue";
 import { formatRupees } from "@shared/data/catalogue";
+import { formatDate } from "@shared/lib/format-date";
 import { listingToPiece } from "@shared/data/listing-to-piece";
 import { useQuery } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
@@ -157,7 +158,7 @@ function ConfirmationBody() {
                 {piece.name}
               </Text>
               <Text tone="muted-foreground" variant="caption">
-                {`${draft.start} → ${draft.end}`}
+                {`${formatDate(draft.start ?? "")} → ${formatDate(draft.end ?? "")}`}
               </Text>
             </View>
           </Card>

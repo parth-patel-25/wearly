@@ -3,6 +3,7 @@ import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
 import { countDays } from "@features/rental/validations/rental.schema";
 import { formatRupees } from "@shared/data/catalogue";
+import { formatDate } from "@shared/lib/format-date";
 import { listingToPiece } from "@shared/data/listing-to-piece";
 import { useQuery } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
@@ -103,7 +104,7 @@ function RentalCard({ rental }: RentalCardProps) {
         <View className="flex-1 gap-1">
           <Text variant="headingSm">{piece.name}</Text>
           <Text tone="muted-foreground" variant="caption">
-            {`${rental.start} → ${rental.end} · ${days} ${days === 1 ? "day" : "days"}`}
+            {`${formatDate(rental.start)} → ${formatDate(rental.end)} · ${days} ${days === 1 ? "day" : "days"}`}
           </Text>
         </View>
         <StatusPill status="active" />

@@ -4,6 +4,7 @@ import { useRentalDraft } from "@features/rental/providers/rental-draft-provider
 import type { Fulfillment } from "@features/rental/validations/rental.schema";
 import { countDays } from "@features/rental/validations/rental.schema";
 import { formatRupees } from "@shared/data/catalogue";
+import { formatDate } from "@shared/lib/format-date";
 import { listingToPiece } from "@shared/data/listing-to-piece";
 import { useQuery } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
@@ -161,7 +162,7 @@ export default function CheckoutScreen() {
               {piece.name}
             </Text>
             <Text tone="muted-foreground" variant="caption">
-              {`${draft.start} → ${draft.end} · ${totals.days} ${totals.days === 1 ? "day" : "days"}`}
+              {`${formatDate(draft.start ?? "")} → ${formatDate(draft.end ?? "")} · ${totals.days} ${totals.days === 1 ? "day" : "days"}`}
             </Text>
           </View>
         </Card>

@@ -108,7 +108,7 @@ export function Calendar({
       <View className="flex-row items-center justify-between">
         <Animated.View style={slideStyle}>
           <Text variant="headingSm">
-            {visibleMonth.toLocaleDateString(undefined, {
+            {visibleMonth.toLocaleDateString("en-IN", {
               month: "long",
               year: "numeric",
             })}

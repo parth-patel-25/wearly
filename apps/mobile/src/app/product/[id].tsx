@@ -3,6 +3,7 @@ import { datesFor, ROUTES } from "@core/routing/routes";
 import { useHeroParallax } from "@features/product/hooks/use-hero-parallax";
 import { listingToPiece } from "@shared/data/listing-to-piece";
 import { CONDITION_LABEL, formatRupees, rentalSummary, sizeOf } from "@shared/data/catalogue";
+import { formatDate } from "@shared/lib/format-date";
 import type { Piece } from "@shared/data/catalogue";
 import { useQuery } from "@tanstack/react-query";
 import { API_ROUTES } from "@wearly/shared/api/routes";
@@ -206,7 +207,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
           </Section>
 
           <Section subtitle="You pick the dates next" title="Availability">
-            <KeyValueRow label="Earliest start" value={piece.availableFrom} />
+            <KeyValueRow label="Earliest start" value={formatDate(piece.availableFrom)} />
             <KeyValueRow
               label="Already committed"
               value={`${piece.unavailable.length} days this month`}
@@ -214,7 +215,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
             <View className="flex-row flex-wrap gap-2 pt-3">
               {piece.unavailable.map((day) => (
                 <Badge key={day} variant="warning">
-                  {day}
+                  {formatDate(day)}
                 </Badge>
               ))}
             </View>
