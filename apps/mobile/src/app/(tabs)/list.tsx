@@ -10,6 +10,7 @@ import { Text } from "@wearly/ui-native/text";
 import { authClient } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 import type { Listing } from "@wearly/shared/api/types";
+import { API_ROUTES } from "@wearly/shared/api/routes";
 import { useRouter } from "expo-router";
 import { ActivityIndicator, Image, View } from "react-native";
 
@@ -49,7 +50,7 @@ export default function ListScreen() {
     enabled: state.isAuthenticated,
     queryFn: async () => {
       const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
-      const res = (await authClient.$fetch(`${apiBase}/api/listings`)) as {
+      const res = (await authClient.$fetch(`${apiBase}${API_ROUTES.LISTINGS.BASE}`)) as {
         data?: Listing[];
         error?: { message?: string };
       };

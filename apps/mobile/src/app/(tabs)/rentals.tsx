@@ -2,7 +2,11 @@ import type { ConfirmedRental } from "@core/providers/session-provider";
 import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
 import { countDays } from "@features/rental/validations/rental.schema";
-import { findPiece, formatRupees } from "@shared/data/catalogue";
+import { formatRupees } from "@shared/data/catalogue";
+import { listingToPiece } from "@shared/data/listing-to-piece";
+import { useQuery } from "@tanstack/react-query";
+import { authClient } from "@/lib/auth-client";
+import { API_ROUTES } from "@wearly/shared/api/routes";
 import { Button } from "@wearly/ui-native/button";
 import { Card } from "@wearly/ui-native/card";
 import { EmptyState } from "@wearly/ui-native/display";
@@ -69,7 +73,19 @@ interface RentalCardProps {
 }
 
 function RentalCard({ rental }: RentalCardProps) {
-  const piece = findPiece(rental.pieceId);
+  const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
+  const { data: listing } = useQuery({
+    queryFn: async () => {
+      const res = (await authClient.$fetch(`${apiBase}${API_ROUTES.LISTINGS.BY_ID(rental.pieceId)}`)) as {
+        data?: import("@wearly/shared/api/types").Listing;
+        error?: { message?: string };
+      };
+      if (res.error || !res.data) return null;
+      return res.data;
+    },
+    queryKey: ["listing", rental.pieceId],
+  });
+  const piece = listing ? listingToPiece(listing) : undefined;
 
   if (!piece) {
     return null;

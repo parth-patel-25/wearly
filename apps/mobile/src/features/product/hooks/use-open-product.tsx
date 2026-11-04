@@ -1,7 +1,7 @@
 import { ROUTES } from "@core/routing/routes";
-import { findPiece } from "@shared/data/catalogue";
+// findPiece removed with dummy data; hero expansion is skipped for uploaded listings.
 import { useHero } from "@wearly/ui-native/hero-provider";
-import { Media } from "@wearly/ui-native/media";
+
 import type { ProductCardFrame } from "@wearly/ui-native/product-card";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
@@ -25,21 +25,14 @@ import { useCallback } from "react";
  */
 export function useOpenProduct(): (
   id: string,
-  frame: ProductCardFrame
+  _frame: ProductCardFrame
 ) => void {
   const router = useRouter();
   const { begin } = useHero();
 
   return useCallback(
-    (id: string, frame: ProductCardFrame) => {
-      const piece = findPiece(id);
-      const [tone] = piece?.gallery ?? [];
-
-      if (piece && tone && frame.width > 0 && frame.height > 0) {
-        begin(id, frame, () => (
-          <Media aspect="4/5" src={piece.images[0]} tone={tone} />
-        ));
-      }
+    (id: string, _frame: ProductCardFrame) => {
+      // hero expansion skipped (no dummy catalogue)
 
       router.push(ROUTES.product(id));
     },

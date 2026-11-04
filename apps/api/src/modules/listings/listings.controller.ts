@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
-import { Session } from "@thallesp/nestjs-better-auth";
+import { AllowAnonymous, Session } from "@thallesp/nestjs-better-auth";
 import type { UserSession } from "@thallesp/nestjs-better-auth";
 import { createListingSchema, idSchema } from "@wearly/shared/api/schemas";
 import type { CreateListingInput, Listing } from "@wearly/shared/api/types";
@@ -18,12 +18,19 @@ export class ListingsController {
     return this.service.create(session.user.id, body);
   }
 
+  @Get("public")
+  @AllowAnonymous()
+  listPublished(): Promise<Listing[]> {
+    return this.service.listPublished();
+  }
+
   @Get()
   list(@Session() session: UserSession): Promise<Listing[]> {
     return this.service.listByLender(session.user.id);
   }
 
   @Get(":id")
+  @AllowAnonymous()
   get(@Param("id", new ZodValidationPipe(idSchema)) id: string): Promise<Listing | null> {
     return this.service.get(id);
   }

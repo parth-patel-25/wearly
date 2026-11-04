@@ -191,6 +191,7 @@ export const listingSchema = z.object({
   description: z.string().nullable().optional(),
   id: z.string(),
   lenderId: z.string(),
+  lenderName: z.string().nullable().optional(),
   material: z.string().nullable().optional(),
   photos: z.array(z.string()).optional(),
   pricePerDay: z.string(),

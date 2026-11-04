@@ -6,11 +6,12 @@
  */
 export const API_ROUTES = {
   LISTINGS: {
-    BASE: "/listings",
-    BY_ID: (id: string) => `/listings/${id}`,
+    BASE: "/api/listings",
+    BY_ID: (id: string) => `/api/listings/${id}`,
+    PUBLIC: "/api/listings/public",
   },
   STORAGE: {
-    UPLOAD_URL: "/storage/upload-url",
+    UPLOAD_URL: "/api/storage/upload-url",
   },
   admin: {
     invites: {

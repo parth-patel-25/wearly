@@ -1,14 +1,11 @@
 import { useSession } from "@core/providers/session-provider";
 import { datesFor, ROUTES } from "@core/routing/routes";
 import { useHeroParallax } from "@features/product/hooks/use-hero-parallax";
+import { listingToPiece } from "@shared/data/listing-to-piece";
+import { CONDITION_LABEL, formatRupees, rentalSummary, sizeOf } from "@shared/data/catalogue";
 import type { Piece } from "@shared/data/catalogue";
-import {
-  CONDITION_LABEL,
-  findPiece,
-  formatRupees,
-  rentalSummary,
-  sizeOf,
-} from "@shared/data/catalogue";
+import { useQuery } from "@tanstack/react-query";
+import { API_ROUTES } from "@wearly/shared/api/routes";
 import { Avatar } from "@wearly/ui-native/avatar";
 import { Badge } from "@wearly/ui-native/badge";
 import { Button, IconButton } from "@wearly/ui-native/button";
@@ -43,7 +40,17 @@ const RENTAL_DAYS = 3;
 
 export default function ProductScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const piece = typeof id === "string" ? findPiece(id) : undefined;
+  const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
+  const { data: listing } = useQuery({
+    enabled: typeof id === "string",
+    queryFn: async () => {
+      const response = await fetch(`${apiBase}${API_ROUTES.LISTINGS.BY_ID(id as string)}`);
+      if (!response.ok) throw new Error("Not found");
+      return (await response.json()) as import("@wearly/shared/api/types").Listing;
+    },
+    queryKey: ["listing", id],
+  });
+  const piece = listing ? listingToPiece(listing) : undefined;
 
   if (!piece) {
     return <MissingProduct />;

@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { db } from "@wearly/db/client";
 import { listings } from "@wearly/db/schema/listings";
+import { user } from "@wearly/db/schema/auth";
 import type { CreateListingInput, Listing } from "@wearly/shared/api/types";
 import { eq } from "drizzle-orm";
 
@@ -35,7 +36,18 @@ export class ListingsService {
       .select()
       .from(listings)
       .where(eq(listings.lenderId, lenderId));
-    return rows.map(toListing);
+    return rows.map((row) => toListing(row));
+  }
+
+  async listPublished(): Promise<Listing[]> {
+    const rows = await db
+      .select({ listing: listings, lenderName: user.name })
+      .from(listings)
+      .leftJoin(user, eq(listings.lenderId, user.id))
+      .where(eq(listings.status, "published"));
+    return rows.map(({ listing, lenderName }) =>
+      toListing(listing, lenderName ?? null)
+    );
   }
 
   async get(id: string): Promise<Listing | null> {
@@ -44,7 +56,10 @@ export class ListingsService {
   }
 }
 
-function toListing(row: typeof listings.$inferSelect): Listing {
+function toListing(
+  row: typeof listings.$inferSelect,
+  lenderName: string | null = null
+): Listing {
   return {
     availability: row.availability ?? [],
     brand: row.brand,
@@ -55,6 +70,7 @@ function toListing(row: typeof listings.$inferSelect): Listing {
     description: row.description,
     id: row.id,
     lenderId: row.lenderId,
+    lenderName,
     material: row.material,
     photos: row.photos ?? [],
     pricePerDay: row.pricePerDay,

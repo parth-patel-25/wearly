@@ -3,7 +3,11 @@ import { ROUTES } from "@core/routing/routes";
 import { useRentalDraft } from "@features/rental/providers/rental-draft-provider";
 import type { Fulfillment } from "@features/rental/validations/rental.schema";
 import { countDays } from "@features/rental/validations/rental.schema";
-import { findPiece, formatRupees } from "@shared/data/catalogue";
+import { formatRupees } from "@shared/data/catalogue";
+import { listingToPiece } from "@shared/data/listing-to-piece";
+import { useQuery } from "@tanstack/react-query";
+import { authClient } from "@/lib/auth-client";
+import { API_ROUTES } from "@wearly/shared/api/routes";
 import { Chip } from "@wearly/ui-native/badge";
 import { Button, IconButton } from "@wearly/ui-native/button";
 import { Card, Panel } from "@wearly/ui-native/card";
@@ -59,7 +63,20 @@ export default function CheckoutScreen() {
   const { state } = useSession();
   const toast = useToast();
 
-  const piece = findPiece(draft.pieceId ?? "");
+  const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
+  const { data: listing } = useQuery({
+    enabled: !!draft.pieceId,
+    queryFn: async () => {
+      const res = (await authClient.$fetch(`${apiBase}${API_ROUTES.LISTINGS.BY_ID(draft.pieceId ?? "")}`)) as {
+        data?: import("@wearly/shared/api/types").Listing;
+        error?: { message?: string };
+      };
+      if (res.error || !res.data) return null;
+      return res.data;
+    },
+    queryKey: ["listing", draft.pieceId],
+  });
+  const piece = listing ? listingToPiece(listing) : undefined;
 
   const totals = useMemo(() => {
     if (!(piece && draft.start && draft.end)) {

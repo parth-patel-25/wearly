@@ -43,7 +43,7 @@ export default function PhotosScreen() {
           const filename = a.fileName ?? `photo-${Date.now()}.jpg`;
           const contentType = a.mimeType ?? "image/jpeg";
           const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
-          const uploadUrlEndpoint = `${apiBase}/api${API_ROUTES.STORAGE.UPLOAD_URL}`;
+          const uploadUrlEndpoint = `${apiBase}${API_ROUTES.STORAGE.UPLOAD_URL}`;
           const result = (await authClient.$fetch(uploadUrlEndpoint, {
             body: { contentType, filename },
             method: "POST",

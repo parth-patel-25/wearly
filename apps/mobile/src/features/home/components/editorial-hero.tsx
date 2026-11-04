@@ -14,10 +14,11 @@ import { HOME_HERO } from "../home-data";
 
 interface EditorialHeroProps {
   onExplore: () => void;
-  piece: Piece;
+  piece: Piece | undefined;
 }
 
 export function EditorialHero({ onExplore, piece }: EditorialHeroProps) {
+  if (!piece) return null;
   return (
     <Pressable
       accessibilityLabel={`${HOME_HERO.title}. ${HOME_HERO.subtitle}`}

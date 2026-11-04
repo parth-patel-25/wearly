@@ -3,12 +3,10 @@ import { HomeContent } from "@features/home/components/home-content";
 import { HomeIntroCard } from "@features/home/components/home-intro-card";
 import { HomeSearch } from "@features/home/components/home-search";
 import { RecommendedGrid } from "@features/home/components/recommended-grid";
-import {
-  CATALOGUE,
-  CATALOGUE_DISCLAIMER,
-  rentalSummary,
-} from "@shared/data/catalogue";
+import { rentalSummary } from "@shared/data/catalogue";
+import { listingToPiece } from "@shared/data/listing-to-piece";
 import { useCatalogueGrid } from "@shared/hooks/use-catalogue-grid";
+import { usePublicListings } from "@shared/hooks/use-public-listings";
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
@@ -36,11 +34,16 @@ const GRID_COUNT = 6;
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { favourites, items, onFavourite } = useCatalogueGrid();
+  const { data: rawListings } = usePublicListings();
+  const pieces = useMemo(
+    () => (rawListings ?? []).map(listingToPiece),
+    [rawListings]
+  );
+  const { favourites, items, onFavourite } = useCatalogueGrid(pieces);
 
   const trending = useMemo(
     () =>
-      CATALOGUE.slice(0, RAIL_COUNT).map((piece, index) => ({
+      pieces.slice(0, RAIL_COUNT).map((piece, index) => ({
         fact: items[index]?.fact ?? piece.lender.neighbourhood,
         id: piece.id,
         name: piece.name,
@@ -48,11 +51,11 @@ export default function HomeScreen() {
         price: rentalSummary(piece, 2),
         src: piece.images[0],
       })),
-    [items]
+    [pieces, items]
   );
   const fresh = useMemo(
     () =>
-      CATALOGUE.slice(-RAIL_COUNT)
+      pieces.slice(-RAIL_COUNT)
         .reverse()
         .map((piece) => ({
           fact: "Just added",
@@ -62,7 +65,7 @@ export default function HomeScreen() {
           price: rentalSummary(piece, 2),
           src: piece.images[0],
         })),
-    []
+    [pieces]
   );
   const recommended = useMemo(() => items.slice(0, GRID_COUNT), [items]);
   const open = (id: string) => router.push(ROUTES.product(id));
@@ -117,9 +120,11 @@ export default function HomeScreen() {
                   onFavourite={onFavourite}
                   onOpen={open}
                 />
-                <Text tone="muted-foreground" variant="caption">
-                  {CATALOGUE_DISCLAIMER}
-                </Text>
+                {pieces.length === 0 ? (
+                  <Text tone="muted-foreground" variant="caption">
+                    No pieces listed yet — be the first to share your wardrobe.
+                  </Text>
+                ) : null}
               </View>
             </View>
           </View>

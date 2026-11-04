@@ -5,8 +5,9 @@ import { EditNameSheet } from "@features/profile/components/edit-name-sheet";
 import { ProfileFooter } from "@features/profile/components/profile-footer";
 import { ProfileHeader } from "@features/profile/components/profile-header";
 import { useSignOut } from "@features/profile/hooks/use-sign-out";
-import { CATALOGUE } from "@shared/data/catalogue";
+import { listingToPiece } from "@shared/data/listing-to-piece";
 import { useCatalogueGrid } from "@shared/hooks/use-catalogue-grid";
+import { usePublicListings } from "@shared/hooks/use-public-listings";
 import { EmptyState } from "@wearly/ui-native/display";
 import { ProductGrid } from "@wearly/ui-native/product-grid";
 import { useRouter } from "expo-router";
@@ -37,9 +38,13 @@ export default function ProfileScreen() {
   const [editNameOpen, setEditNameOpen] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
 
+  const { data: rawListings } = usePublicListings();
   const saved = useMemo(
-    () => CATALOGUE.filter((piece) => state.favourites.includes(piece.id)),
-    [state.favourites]
+    () =>
+      (rawListings ?? [])
+        .map(listingToPiece)
+        .filter((piece) => state.favourites.includes(piece.id)),
+    [rawListings, state.favourites]
   );
   const { favourites, items, onFavourite } = useCatalogueGrid(saved);
 

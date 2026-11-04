@@ -2,7 +2,11 @@ import { ROUTES } from "@core/routing/routes";
 import { useRentalDraft } from "@features/rental/providers/rental-draft-provider";
 import { countDays } from "@features/rental/validations/rental.schema";
 import type { Piece } from "@shared/data/catalogue";
-import { findPiece, formatRupees, rentalSummary } from "@shared/data/catalogue";
+import { formatRupees, rentalSummary } from "@shared/data/catalogue";
+import { listingToPiece } from "@shared/data/listing-to-piece";
+import { useQuery } from "@tanstack/react-query";
+import { authClient } from "@/lib/auth-client";
+import { API_ROUTES } from "@wearly/shared/api/routes";
 import { Button, IconButton } from "@wearly/ui-native/button";
 import type { CalendarRange } from "@wearly/ui-native/calendar";
 import { Calendar } from "@wearly/ui-native/calendar";
@@ -34,9 +38,21 @@ const TODAY = new Date().toISOString().slice(0, 10);
 export default function DatesScreen() {
   const { pieceId } = useLocalSearchParams<{ pieceId: string }>();
   const { draft } = useRentalDraft();
-  const piece = findPiece(
-    typeof pieceId === "string" ? pieceId : (draft.pieceId ?? "")
-  );
+  const id = typeof pieceId === "string" ? pieceId : (draft.pieceId ?? "");
+  const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
+  const { data: listing } = useQuery({
+    enabled: !!id,
+    queryFn: async () => {
+      const res = (await authClient.$fetch(`${apiBase}${API_ROUTES.LISTINGS.BY_ID(id)}`)) as {
+        data?: import("@wearly/shared/api/types").Listing;
+        error?: { message?: string };
+      };
+      if (res.error || !res.data) return null;
+      return res.data;
+    },
+    queryKey: ["listing", id],
+  });
+  const piece = listing ? listingToPiece(listing) : undefined;
 
   return piece === undefined ? <MissingPiece /> : <DatesBody piece={piece} />;
 }

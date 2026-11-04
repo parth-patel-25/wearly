@@ -1,7 +1,10 @@
 import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
 import { FilterSheet } from "@features/discover/components/filter-sheet";
-import { CATALOGUE, CATEGORIES, CONDITION_LABEL } from "@shared/data/catalogue";
+import type { Piece } from "@shared/data/catalogue";
+import { CATEGORIES, CONDITION_LABEL } from "@shared/data/catalogue";
+import { listingToPiece } from "@shared/data/listing-to-piece";
+import { usePublicListings } from "@shared/hooks/use-public-listings";
 import type { Filters } from "@shared/data/filters";
 import {
   activeFilterCount,
@@ -47,9 +50,14 @@ export default function DiscoverScreen() {
     }
   }, [q]);
 
+  const { data: rawListings } = usePublicListings();
+  const pieces = useMemo(
+    () => (rawListings ?? []).map(listingToPiece),
+    [rawListings]
+  );
   const results = useMemo(
-    () => search(applyFilters(CATALOGUE, filters), query),
-    [filters, query]
+    () => search(applyFilters(pieces, filters), query),
+    [pieces, filters, query]
   );
   const { favourites, items, onFavourite } = useCatalogueGrid(results);
   const count = activeFilterCount(filters);
@@ -59,11 +67,19 @@ export default function DiscoverScreen() {
       <ProductGrid
         className="flex-1 px-4"
         emptyState={
-          <EmptyState
-            body="Try removing a filter, or search for something broader."
-            icon="search"
-            title="Nothing matches yet"
-          />
+          pieces.length === 0 ? (
+            <EmptyState
+              body="Be the first to share — list a piece from your wardrobe and start earning. Or keep exploring looks."
+              icon="plus"
+              title="Nothing listed yet"
+            />
+          ) : (
+            <EmptyState
+              body="Try removing a filter, or search for something broader."
+              icon="search"
+              title="Nothing matches yet"
+            />
+          )
         }
         favourites={favourites}
         header={
@@ -110,7 +126,7 @@ export default function DiscoverScreen() {
             <AppliedFilters filters={filters} onChange={setFilters} />
 
             <SectionHeader
-              caption={`${results.length} of ${CATALOGUE.length} pieces`}
+              caption={`${results.length} of ${pieces.length} pieces`}
               title={query ? `Results for “${query}”` : "Everything"}
             />
           </View>
@@ -187,7 +203,7 @@ function removeOne(
   });
 }
 
-function search(pieces: typeof CATALOGUE, query: string) {
+function search(pieces: Piece[], query: string) {
   const trimmed = query.trim().toLowerCase();
   if (trimmed.length === 0) {
     return pieces;

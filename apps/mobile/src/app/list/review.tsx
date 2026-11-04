@@ -1,5 +1,6 @@
 import { useListingDraft } from "@features/listing/providers/listing-draft-provider";
 import type { Listing } from "@wearly/shared/api/types";
+import { API_ROUTES } from "@wearly/shared/api/routes";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@wearly/ui-native/button";
 import { Text } from "@wearly/ui-native/text";
@@ -21,7 +22,7 @@ export default function ReviewScreen() {
     setError("");
     try {
       const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
-      const result = (await authClient.$fetch(`${apiBase}/api/listings`, {
+      const result = (await authClient.$fetch(`${apiBase}${API_ROUTES.LISTINGS.BASE}`, {
         body: {
           availability: draft.availability,
           brand: draft.brand || undefined,
@@ -43,6 +44,7 @@ export default function ReviewScreen() {
         throw new Error(result.error?.message ?? "Failed to publish");
       }
       await queryClient.invalidateQueries({ queryKey: ["my-listings"] });
+      await queryClient.invalidateQueries({ queryKey: ["public-listings"] });
       router.push({ params: { id: result.data.id }, pathname: "/list/published" } as any);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to publish. Please try again.");

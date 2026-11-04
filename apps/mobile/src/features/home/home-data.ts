@@ -42,7 +42,7 @@ export const HOME_HERO = {
   title: "Wedding Season",
 } as const;
 
-export function heroPiece(): Piece {
+export function heroPiece(): Piece | undefined {
   return FEATURED;
 }
 
@@ -68,6 +68,7 @@ const LOOK_SEEDS = [
 ] as const;
 
 export function homeLooks(): readonly Look[] {
+  if (CATALOGUE.length === 0) return [];
   return LOOK_SEEDS.map((seed, index) => ({
     ...seed,
     id: `look-${index + 1}`,
