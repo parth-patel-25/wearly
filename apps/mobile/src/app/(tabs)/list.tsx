@@ -67,7 +67,7 @@ export default function ListScreen() {
 
   if (!state.isAuthenticated) {
     return (
-      <View className="flex-1 gap-6 bg-background px-5 pt-5">
+      <View className="flex-1 gap-6 bg-background px-6 pt-5">
         <View className="gap-1">
           <Text variant="headingXl">Share something good</Text>
           <Text tone="muted-foreground" variant="bodyMd">
@@ -154,7 +154,7 @@ export default function ListScreen() {
   return (
     <View className="flex-1 bg-background">
       <View className="flex-1">
-        <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
+        <View className="flex-row items-center justify-between px-6 pt-5 pb-3">
           <Text variant="headingXl">Your listings</Text>
           {(listings ?? []).length > 0 ? (
             <Text tone="muted-foreground" variant="caption">
@@ -163,7 +163,7 @@ export default function ListScreen() {
           ) : null}
         </View>
         <AppList
-        className="px-5"
+        className="px-4"
         data={listings ?? []}
         emptyState={emptyState}
         keyExtractor={(item) => item.id}
@@ -172,7 +172,7 @@ export default function ListScreen() {
       />
       </View>
       {(listings ?? []).length > 0 ? (
-        <View className="px-5 pt-3 pb-4">
+        <View className="px-6 pt-3 pb-4">
           <Button
             onPress={() => router.push("/list/new" as any)}
             size="md"
