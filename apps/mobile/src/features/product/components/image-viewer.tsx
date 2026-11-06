@@ -5,7 +5,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import { Image } from "expo-image";
 import { Button } from "@wearly/ui-native/button";
 import { Icon } from "@wearly/ui-native/icon";
@@ -110,6 +110,7 @@ export function FullScreenImageViewer({
       transparent
       visible={visible}
     >
+      <GestureHandlerRootView style={{ flex: 1 }}>
       <View className="flex-1 bg-black">
         <View className="flex-row items-center justify-between px-4 pt-safe pb-2">
           <Text tone="primary-foreground" variant="bodySm">
@@ -142,6 +143,7 @@ export function FullScreenImageViewer({
           </Button>
         </View>
       </View>
+      </GestureHandlerRootView>
     </Modal>
   );
 }
