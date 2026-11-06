@@ -31,7 +31,9 @@ export default function ReviewScreen() {
           condition: draft.condition,
           description: draft.description || undefined,
           material: draft.material || undefined,
-          photos: draft.photos.map((p) => p.uri),
+          photos: [...draft.photos]
+             .sort((a, b) => (b.cover ? 1 : 0) - (a.cover ? 1 : 0))
+             .map((p) => p.uri),
           pricePerDay: draft.pricePerDay,
           size: draft.size,
           status: "published",

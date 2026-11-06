@@ -1,6 +1,7 @@
 import { useSession } from "@core/providers/session-provider";
 import { datesFor, ROUTES } from "@core/routing/routes";
 import { useHeroParallax } from "@features/product/hooks/use-hero-parallax";
+import { FullScreenImageViewer } from "@features/product/components/image-viewer";
 import { ProductSkeleton } from "@features/product/components/product-skeleton";
 import { listingToPiece } from "@shared/data/listing-to-piece";
 import { CONDITION_LABEL, formatRupees, rentalSummary, sizeOf } from "@shared/data/catalogue";
@@ -18,8 +19,9 @@ import { Icon } from "@wearly/ui-native/icon";
 import { Media } from "@wearly/ui-native/media";
 import { KeyValueRow } from "@wearly/ui-native/status";
 import { Text } from "@wearly/ui-native/text";
+import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { View } from "react-native";
+import { ScrollView, useWindowDimensions, View } from "react-native";
 import Animated from "react-native-reanimated";
 
 /**
@@ -81,6 +83,9 @@ function ProductDetail({ piece }: ProductDetailProps) {
   const size = sizeOf(piece);
   const summary = rentalSummary(piece, RENTAL_DAYS);
   const parallax = useHeroParallax();
+  const { width } = useWindowDimensions();
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [heroFrame, setHeroFrame] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
   return (
     // The status strip is its own `bg-card` backdrop (inset height only),
@@ -151,11 +156,33 @@ function ProductDetail({ piece }: ProductDetailProps) {
           the sheet (see `useHeroParallax`) instead of scrolling with it. */}
       <Animated.View
         className="-mt-20"
-        onLayout={parallax.onPhotoLayout}
+        onLayout={(e) => {
+          parallax.onPhotoLayout(e);
+          setHeroFrame(e.nativeEvent.layout);
+        }}
         style={parallax.photoStyle}
       >
-        <Media aspect="3/4" src={piece.images[0]} tone="secondary" />
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+        >
+          {piece.images
+            .filter((img) => !!img)
+            .map((img, i) => (
+              <View key={`${img}-${i}`} style={{ width }}>
+                <Media
+                  aspect="3/4"
+                  contentFit="contain"
+                  src={img}
+                  tone={piece.gallery[i] ?? "secondary"}
+                />
+              </View>
+            ))}
+        </ScrollView>
       </Animated.View>
+
+
 
       <Animated.ScrollView
         className="flex flex-1 flex-col bg-transparent"
@@ -182,7 +209,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
             elevation — so the white lifts off light imagery instead of
             blending into it. Rose-tinted, never grey. */}
         <View className="flex flex-col gap-10 rounded-t-6xl bg-card pt-8 pb-8 shadow-lift">
-          <View className="gap-2 px-gutter">
+           <View className="gap-2 px-gutter">
             {/* Measured (see `useHeroParallax`): when this title scrolls fully
                 past the header, the header takes over showing the piece name. */}
             <View onLayout={parallax.onCrossingLayout} ref={parallax.titleRef}>
@@ -200,7 +227,9 @@ function ProductDetail({ piece }: ProductDetailProps) {
             <Badge variant="success">Available now</Badge>
           </View>
 
-          <Section title="About this piece">
+          
+
+           <Section title="About this piece">
             <Text tone="muted-foreground" variant="bodyMd">
               {piece.description}
             </Text>
@@ -294,6 +323,31 @@ function ProductDetail({ piece }: ProductDetailProps) {
           </Section>
         </View>
       </Animated.ScrollView>
+
+      {heroFrame.height > 0 && (
+        <View
+          style={{
+            position: "absolute",
+            top: heroFrame.y + heroFrame.height - 120,
+            right: 12,
+            zIndex: 50,
+            elevation: 50,
+          }}
+        >
+          <IconButton
+            accessibilityLabel="View full screen"
+            icon="zoom"
+            onPress={() => setViewerOpen(true)}
+            variant="soft"
+          />
+        </View>
+      )}
+
+      <FullScreenImageViewer
+        images={piece.images.filter((img) => !!img) as string[]}
+        onClose={() => setViewerOpen(false)}
+        visible={viewerOpen}
+      />
 
       <StickyCta
         dailyRate={piece.dailyRate}

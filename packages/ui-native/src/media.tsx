@@ -54,6 +54,11 @@ export interface MediaProps extends ViewProps {
   /** 4:5 is the product-card ratio; 1:1 for avatars; 16/9 for editorial blocks. */
   aspect?: "1/1" | "3/4" | "4/5" | "16/9";
   /**
+   * How the image fills the box. "cover" crops (default); "contain" shows the
+   * whole image, letterboxing if needed.
+   */
+  contentFit?: "cover" | "contain";
+  /**
    * Remote fallback photograph, used when a bundled `src` fails to load.
    * Ignored for remote `src` — a second remote URL buys nothing over the tone
    * block if the device is offline.
@@ -80,6 +85,7 @@ const ASPECT = {
 export function Media({
   aspect = "4/5",
   className,
+  contentFit = "cover",
   fallbackSrc,
   icon = "shirt",
   src,
@@ -108,7 +114,7 @@ export function Media({
       ) : (
         <StyledImage
           className="h-full w-full"
-          contentFit="cover"
+          contentFit={contentFit}
           onError={() => setFailed(true)}
           source={
             typeof effective === "number" ? effective : { uri: effective }

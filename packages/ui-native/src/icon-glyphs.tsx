@@ -280,6 +280,22 @@ export const GLYPHS = {
       />
     </>
   ),
-} as const satisfies Record<string, Glyph>;
+   "maximize": (c) => (
+     <>
+       <Path d="M8 3H5a2 2 0 0 0-2 2v3" {...stroke(c)} />
+       <Path d="M16 3h3a2 2 0 0 0 2 2v3" {...stroke(c)} />
+       <Path d="M8 21H5a2 2 0 0 0-2-2v-3" {...stroke(c)} />
+       <Path d="M16 21h3a2 2 0 0 0 2-2v-3" {...stroke(c)} />
+     </>
+   ),
+   "zoom": (c) => (
+     <>
+       <Path d="M4 4l6 6" {...stroke(c)} />
+       <Polyline points="4 8 4 4 8 4" {...stroke(c)} />
+       <Path d="M20 20l-6-6" {...stroke(c)} />
+       <Polyline points="20 16 20 20 16 20" {...stroke(c)} />
+     </>
+   ),
+ } as const satisfies Record<string, Glyph>;
 
 export type IconName = keyof typeof GLYPHS;
