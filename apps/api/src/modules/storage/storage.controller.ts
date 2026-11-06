@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from "@nestjs/common";
-import { Session } from "@thallesp/nestjs-better-auth";
 import type { UserSession } from "@thallesp/nestjs-better-auth";
+import { Session } from "@thallesp/nestjs-better-auth";
 import { createUploadUrlSchema } from "@wearly/shared/api/schemas";
 import type {
   CreateUploadUrlInput,
@@ -17,12 +17,13 @@ export class StorageController {
   async createUploadUrl(
     @Session() session: UserSession,
     @Body(new ZodValidationPipe(createUploadUrlSchema))
-    body: CreateUploadUrlInput,
+    body: CreateUploadUrlInput
   ): Promise<CreateUploadUrlResponse> {
-    return this.storage.createUploadUrl(
+    return await this.storage.createUploadUrl(
       session.user.id,
       body.filename,
       body.contentType,
+      body.folder
     );
   }
 }

@@ -22,6 +22,25 @@ config.resolver.extraNodeModules = {
   uniwind: path.resolve(projectRoot, "node_modules/uniwind"),
 };
 
+// Monorepo packages built with `moduleResolution: "node16"` import their
+// siblings with an explicit `.js` extension (`./environment.js`) for Node's
+// sake — but those files on disk are `.ts`. Metro's default resolver fails on
+// them. Keep the app's resolution untouched; only when the default fails and
+// the specifier ends in `.js`, retry without it so Metro finds the `.ts`.
+const defaultResolveRequest = config.resolver.resolveRequest;
+const resolveRequest =
+  defaultResolveRequest ?? ((context, moduleName, platform) => context.resolveRequest(context, moduleName, platform));
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  try {
+    return resolveRequest(context, moduleName, platform);
+  } catch (error) {
+    if (moduleName.endsWith(".js")) {
+      return resolveRequest(context, moduleName.slice(0, -".js".length), platform);
+    }
+    throw error;
+  }
+};
+
 // withUniwindConfig must be the OUTERMOST wrapper.
 module.exports = withUniwindConfig(config, {
   // Must be a relative path string, not path.resolve().

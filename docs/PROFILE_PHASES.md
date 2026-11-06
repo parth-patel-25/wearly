@@ -17,6 +17,14 @@ Supported by the current app (Better Auth session + local session state).
 - [x] Guest identity state with a sign-in CTA (`/sign-in`)
 - [x] Editable display name via Better Auth `updateUser`
       (`features/profile/components/edit-name-sheet.tsx`, `hooks/use-update-name.ts`)
+- [x] Profile photo — add/change/remove for every signed-in account, including
+      email+password accounts that never got a provider image. Square-crop
+      picker (gallery or camera), uploads through the signed-URL pipeline into
+      the existing public Supabase bucket under an `avatars/` prefix, saved via
+      Better Auth `updateUser({ image })`. Removal falls back to the monogram.
+      (`features/profile/components/edit-photo-sheet.tsx`,
+      `hooks/use-update-avatar.ts`, `shared/lib/upload-image.ts`,
+      `POST /api/storage/upload-url` with `folder: "avatars"`)
 - [x] Wishlist / saved pieces — preserved FlashList grid pipeline
       (`session.favourites → CATALOGUE.filter → useCatalogueGrid → ProductGrid`)
 - [x] Settings + sign-out with confirmation and Better Auth `signOut`

@@ -2,6 +2,7 @@ import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
 import { ConfirmSheet } from "@features/profile/components/confirm-sheet";
 import { EditNameSheet } from "@features/profile/components/edit-name-sheet";
+import { EditPhotoSheet } from "@features/profile/components/edit-photo-sheet";
 import { ProfileFooter } from "@features/profile/components/profile-footer";
 import { ProfileHeader } from "@features/profile/components/profile-header";
 import { useSignOut } from "@features/profile/hooks/use-sign-out";
@@ -25,10 +26,10 @@ import { View } from "react-native";
  * one vertical scrolling surface — the header and footer are the grid's own
  * header and footer, never a `ScrollView` wrapped around a list.
  *
- * Editing the name opens a sheet that owns its own draft and saving; this
- * screen only decides which sheet is open. Sign-out confirms first and goes
- * through Better Auth, so the server session is revoked rather than only the
- * local copy being cleared.
+ * Editing the name or photo opens a sheet that owns its own draft and saving;
+ * this screen only decides which sheet is open. Sign-out confirms first and
+ * goes through Better Auth, so the server session is revoked rather than only
+ * the local copy being cleared.
  */
 
 export default function ProfileScreen() {
@@ -36,7 +37,9 @@ export default function ProfileScreen() {
   const { state } = useSession();
   const { isSigningOut, signOut } = useSignOut();
   const [editNameOpen, setEditNameOpen] = useState(false);
+  const [editPhotoOpen, setEditPhotoOpen] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
+  const hasPhoto = typeof state.image === "string" && state.image.length > 0;
 
   const { data: rawListings } = usePublicListings();
   const saved = useMemo(
@@ -62,8 +65,10 @@ export default function ProfileScreen() {
         favourites={favourites}
         footer={
           <ProfileFooter
+            hasPhoto={hasPhoto}
             isAuthenticated={state.isAuthenticated}
             onEditName={() => setEditNameOpen(true)}
+            onEditPhoto={() => setEditPhotoOpen(true)}
             onSignOut={() => setSignOutOpen(true)}
           />
         }
@@ -77,6 +82,13 @@ export default function ProfileScreen() {
         currentName={state.name ?? ""}
         onClose={() => setEditNameOpen(false)}
         open={editNameOpen}
+      />
+
+      <EditPhotoSheet
+        image={state.image}
+        name={state.name}
+        onClose={() => setEditPhotoOpen(false)}
+        open={editPhotoOpen}
       />
 
       <ConfirmSheet

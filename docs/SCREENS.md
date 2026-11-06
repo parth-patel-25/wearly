@@ -30,7 +30,8 @@ Proves the design language and the hero-expansion interaction end to end.
 - [x] 15 Confirmation
 - [x] 16 Orders / rentals — honest empty state
 - [x] 18 Profile — Phase 1 complete: identity (photo + initials fallback, name,
-  email), editable display name via Better Auth, saved-pieces grid, account and
+  email), editable display name via Better Auth, profile photo add/change/remove
+  via the signed-URL pipeline, saved-pieces grid, account and
   sign-out, help/legal configuration hooks and app version. Progress reaches
   100% through achievable steps only. See `docs/PROFILE_PHASES.md` for Phase 2/3.
 

@@ -13,21 +13,31 @@ import { ProfileAccount } from "./profile-account";
  */
 
 export interface ProfileFooterProps {
+  /** Whether the account already has a photo — drives the photo row's supporting line. */
+  hasPhoto: boolean;
   isAuthenticated: boolean;
   onEditName: () => void;
+  onEditPhoto: () => void;
   onSignOut: () => void;
 }
 
 export function ProfileFooter({
+  hasPhoto,
   isAuthenticated,
   onEditName,
+  onEditPhoto,
   onSignOut,
 }: ProfileFooterProps) {
   return (
     <View className="gap-8 pt-8">
       <LendCta />
       {isAuthenticated ? (
-        <ProfileAccount onEditName={onEditName} onSignOut={onSignOut} />
+        <ProfileAccount
+          hasPhoto={hasPhoto}
+          onEditName={onEditName}
+          onEditPhoto={onEditPhoto}
+          onSignOut={onSignOut}
+        />
       ) : null}
       <ProfileAbout />
     </View>

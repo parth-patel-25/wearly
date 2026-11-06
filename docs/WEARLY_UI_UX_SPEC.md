@@ -370,8 +370,20 @@ rose monogram, display name, account email — no "account created" badge, no
 header edit action; editing lives in Account), a
 compact completion bar that counts only achievable steps and can reach 100%,
 the style answers when they exist, the saved-pieces grid, a "Lend with Wearly"
-invitation to the List destination, then Account (edit display name, sign out
-with confirmation) and About (help, configured legal links, app version).
+invitation to the List destination, then Account (photo upload/change/remove,
+edit display name, sign out with confirmation) and About (help, configured
+legal links, app version).
+
+Accounts created with email and password start without a photo — the monogram
+is the honest default. The Account group therefore carries a "Profile photo"
+row (every signed-in user, including OAuth ones who may prefer their own shot)
+which opens a sheet: choose from gallery or take a photo (square crop,
+`allowsEditing`), uploads through the same signed-URL pipeline as listing
+photos into the existing public bucket under an `avatars/` prefix, and saves
+via Better Auth `updateUser({ image })`. Removing sets `image` back to `null`
+and the monogram returns. Failures surface as a toast; the session is
+re-fetched after every change so all screens read the new photo from one
+source.
 
 Saved pieces are device-local and the screen says so; it never implies account
 sync. Privacy and terms rows appear only when `EXPO_PUBLIC_PRIVACY_URL` /

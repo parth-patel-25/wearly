@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { INVITE_STATUSES, LISTING_STATUS_VALUES, USER_ROLES } from "../enums/index.js";
+import {
+  INVITE_STATUSES,
+  LISTING_STATUS_VALUES,
+  STORAGE_FOLDER_VALUES,
+  STORAGE_FOLDERS,
+  USER_ROLES,
+} from "../enums/index.js";
 
 /** Shape returned by `GET /api/health`. */
 export const healthResponseSchema = z.object({
@@ -170,6 +176,8 @@ export type CreateListingInput = z.infer<typeof createListingSchema>;
 export const createUploadUrlSchema = z.object({
   contentType: z.string().min(1),
   filename: z.string().min(1).max(255),
+  /** Bucket folder; defaults to `listings` so existing callers are unchanged. */
+  folder: z.enum(STORAGE_FOLDER_VALUES).default(STORAGE_FOLDERS.LISTINGS),
 });
 export type CreateUploadUrlInput = z.infer<typeof createUploadUrlSchema>;
 
@@ -179,7 +187,9 @@ export const createUploadUrlResponseSchema = z.object({
   publicUrl: z.string().url(),
   uploadUrl: z.string().url(),
 });
-export type CreateUploadUrlResponse = z.infer<typeof createUploadUrlResponseSchema>;
+export type CreateUploadUrlResponse = z.infer<
+  typeof createUploadUrlResponseSchema
+>;
 
 export const listingSchema = z.object({
   availability: z.array(z.string()).optional(),
