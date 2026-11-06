@@ -7,7 +7,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import { Image } from "expo-image";
-import { Button } from "@wearly/ui-native/button";
+import { IconButton } from "@wearly/ui-native/button";
 import { Icon } from "@wearly/ui-native/icon";
 import { Text } from "@wearly/ui-native/text";
 
@@ -126,9 +126,12 @@ export function FullScreenImageViewer({
             ))}
         </ScrollView>
         <View className="flex-row justify-center gap-4 px-4 pb-8 pt-2">
-          <Button onPress={onClose} variant="soft">
-            Close
-          </Button>
+          <IconButton
+            accessibilityLabel="Close"
+            icon="zoom-out"
+            onPress={onClose}
+            variant="soft"
+          />
         </View>
       </View>
       </GestureHandlerRootView>

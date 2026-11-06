@@ -296,6 +296,14 @@ export const GLYPHS = {
        <Polyline points="20 16 20 20 16 20" {...stroke(c)} />
      </>
    ),
+   "zoom-out": (c) => (
+     <>
+       <Path d="M10 10L4 4" {...stroke(c)} />
+       <Polyline points="8 4 4 4 4 8" {...stroke(c)} />
+       <Path d="M14 14l6 6" {...stroke(c)} />
+       <Polyline points="16 20 20 20 20 16" {...stroke(c)} />
+     </>
+   ),
  } as const satisfies Record<string, Glyph>;
 
 export type IconName = keyof typeof GLYPHS;
