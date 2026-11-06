@@ -43,18 +43,6 @@ function ZoomableImage({ uri }: { uri: string }) {
       savedScale.value = scale.value;
     });
 
-  const pan = Gesture.Pan()
-    .onUpdate((e) => {
-      if (scale.value > 1) {
-        translateX.value = savedTranslateX.value + e.translationX;
-        translateY.value = savedTranslateY.value + e.translationY;
-      }
-    })
-    .onEnd(() => {
-      savedTranslateX.value = translateX.value;
-      savedTranslateY.value = translateY.value;
-    });
-
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
     .onEnd(() => {
@@ -71,7 +59,7 @@ function ZoomableImage({ uri }: { uri: string }) {
       }
     });
 
-  const composed = Gesture.Simultaneous(pinch, pan, doubleTap);
+  const composed = Gesture.Simultaneous(pinch, doubleTap);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
