@@ -32,6 +32,7 @@ import { withUniwind } from "uniwind";
 const StyledFlashList = withUniwind(FlashList) as unknown as <T>(
   props: FlashListProps<T> & {
     className?: string;
+    stickyHeaderIndices?: number[];
   }
 ) => ReactElement;
 
@@ -52,6 +53,7 @@ export interface AppListProps<T> {
   renderItem: ListRenderItem<T>;
   separator?: ReactElement | null;
   showsScrollIndicator?: boolean;
+  stickyHeaderIndices?: number[];
   testID?: string;
 }
 
@@ -72,6 +74,7 @@ export function AppList<T>({
   renderItem,
   separator,
   showsScrollIndicator,
+  stickyHeaderIndices,
   testID,
 }: AppListProps<T>) {
   return (
@@ -98,7 +101,8 @@ export function AppList<T>({
       }
       renderItem={renderItem}
       showsHorizontalScrollIndicator={horizontal ? showsScrollIndicator : false}
-      showsVerticalScrollIndicator={horizontal ? false : showsScrollIndicator}
+      showsVerticalScrollIndicator={false}
+      stickyHeaderIndices={stickyHeaderIndices}
       testID={testID}
     />
   );

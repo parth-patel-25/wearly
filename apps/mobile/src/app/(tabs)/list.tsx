@@ -2,6 +2,7 @@ import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
 
 import { Button } from "@wearly/ui-native/button";
+import { AppList } from "@wearly/ui-native/app-list";
 import { Card, Panel } from "@wearly/ui-native/card";
 import { EmptyState } from "@wearly/ui-native/display";
 import { Skeleton } from "@wearly/ui-native/skeleton";
@@ -13,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Listing } from "@wearly/shared/api/types";
 import { API_ROUTES } from "@wearly/shared/api/routes";
 import { useRouter } from "expo-router";
+import type { ListRenderItem } from "@shopify/flash-list";
 import { Image, View } from "react-native";
 
 const STEPS: readonly { icon: IconName; label: string; detail: string }[] = [
@@ -65,7 +67,7 @@ export default function ListScreen() {
 
   if (!state.isAuthenticated) {
     return (
-      <View className="flex-1 gap-8 bg-background px-gutter pt-6">
+      <View className="flex-1 gap-6 bg-background px-5 pt-5">
         <View className="gap-1">
           <Text variant="headingXl">Share something good</Text>
           <Text tone="muted-foreground" variant="bodyMd">
@@ -86,81 +88,91 @@ export default function ListScreen() {
     );
   }
 
-  return (
-    <View className="flex-1 gap-6 bg-background px-gutter pt-6">
-      <View className="flex-row items-center justify-between">
-        <Text variant="headingXl">Your listings</Text>
-        {(listings ?? []).length > 0 ? (
-          <Text tone="muted-foreground" variant="caption">
-            {(listings ?? []).length} live
-          </Text>
-        ) : null}
-      </View>
+  const renderItem: ListRenderItem<Listing> = ({ item }) => <ListingCard listing={item} />;
 
-      {isLoading ? (
-        <View className="gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <View className="gap-3 rounded-card border border-border bg-card p-4" key={i}>
-              <Skeleton className="h-40 w-full rounded-card" />
-              <Skeleton className="h-4 w-2/3" />
-              <Skeleton className="h-3 w-1/2" />
-              <Skeleton className="h-4 w-1/3" />
-            </View>
-          ))}
+  const emptyState = isLoading ? (
+    <View className="gap-4 pt-5">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <View className="gap-3 rounded-card border border-border bg-card p-4" key={i}>
+          <Skeleton className="h-40 w-full rounded-card" />
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-3 w-1/2" />
+          <Skeleton className="h-4 w-1/3" />
         </View>
-      ) : listingsError ? (
-        <View className="flex-1 items-center justify-center gap-3">
-          <Text tone="destructive" variant="bodySm">
-            {listingsError instanceof Error ? listingsError.message : "Failed to load listings"}
-          </Text>
-          <Button onPress={() => refetch()} size="sm" variant="soft">
-            Retry
-          </Button>
-        </View>
-      ) : (listings ?? []).length === 0 ? (
-        <View className="gap-6">
-          <Panel
-            subtitle="Five steps, and you can stop at any of them"
-            title="How listing works"
-          >
-            <View className="flex-col">
-              {STEPS.map((step) => (
-                <View
-                  className="flex-row items-start gap-3 py-2"
-                  key={step.label}
-                >
-                  <View className="size-9 items-center justify-center rounded-pill bg-accent">
-                    <Icon name={step.icon} size="sm" tone="accent-foreground" />
-                  </View>
-                  <View className="flex-1 gap-0.5">
-                    <Text variant="bodySm">{step.label}</Text>
-                    <Text tone="muted-foreground" variant="caption">
-                      {step.detail}
-                    </Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </Panel>
-          <Card className="gap-3 p-5">
-            <Text tone="muted-foreground" variant="bodySm">
-              The listing flow itself is the next build phase. Nothing here
-              accepts input yet, because a form that quietly discards what you
-              typed is worse than an honest outline.
-            </Text>
-            <Button
-              onPress={() => router.push("/list/new" as any)}
-              size="md"
+      ))}
+    </View>
+  ) : listingsError ? (
+    <View className="items-center justify-center gap-3 pt-5">
+      <Text tone="destructive" variant="bodySm">
+        {listingsError instanceof Error ? listingsError.message : "Failed to load listings"}
+      </Text>
+      <Button onPress={() => refetch()} size="sm" variant="soft">
+        Retry
+      </Button>
+    </View>
+  ) : (
+    <View className="gap-5 pt-5">
+      <Panel
+        subtitle="Five steps, and you can stop at any of them"
+        title="How listing works"
+      >
+        <View className="flex-col">
+          {STEPS.map((step) => (
+            <View
+              className="flex-row items-start gap-3 py-2"
+              key={step.label}
             >
-              Start a listing
-            </Button>
-          </Card>
-        </View>
-      ) : (
-        <View className="gap-4">
-          {(listings ?? []).map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+              <View className="size-9 items-center justify-center rounded-pill bg-accent">
+                <Icon name={step.icon} size="sm" tone="accent-foreground" />
+              </View>
+              <View className="flex-1 gap-0.5">
+                <Text variant="bodySm">{step.label}</Text>
+                <Text tone="muted-foreground" variant="caption">
+                  {step.detail}
+                </Text>
+              </View>
+            </View>
           ))}
+        </View>
+      </Panel>
+      <Card className="gap-3 p-5">
+        <Text tone="muted-foreground" variant="bodySm">
+          The listing flow itself is the next build phase. Nothing here
+          accepts input yet, because a form that quietly discards what you
+          typed is worse than an honest outline.
+        </Text>
+        <Button
+          onPress={() => router.push("/list/new" as any)}
+          size="md"
+        >
+          Start a listing
+        </Button>
+      </Card>
+    </View>
+  );
+
+  return (
+    <View className="flex-1 bg-background">
+      <View className="flex-1">
+        <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
+          <Text variant="headingXl">Your listings</Text>
+          {(listings ?? []).length > 0 ? (
+            <Text tone="muted-foreground" variant="caption">
+              {(listings ?? []).length} live
+            </Text>
+          ) : null}
+        </View>
+        <AppList
+        className="px-5"
+        data={listings ?? []}
+        emptyState={emptyState}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        separator={<View className="h-4" />}
+      />
+      </View>
+      {(listings ?? []).length > 0 ? (
+        <View className="px-5 pt-3 pb-4">
           <Button
             onPress={() => router.push("/list/new" as any)}
             size="md"
@@ -169,7 +181,7 @@ export default function ListScreen() {
             List another item
           </Button>
         </View>
-      )}
+      ) : null}
     </View>
   );
 }
