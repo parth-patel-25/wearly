@@ -1,6 +1,7 @@
 import { useSession } from "@core/providers/session-provider";
 import { datesFor, ROUTES } from "@core/routing/routes";
 import { useHeroParallax } from "@features/product/hooks/use-hero-parallax";
+import { ProductSkeleton } from "@features/product/components/product-skeleton";
 import { listingToPiece } from "@shared/data/listing-to-piece";
 import { CONDITION_LABEL, formatRupees, rentalSummary, sizeOf } from "@shared/data/catalogue";
 import { formatDate } from "@shared/lib/format-date";
@@ -42,7 +43,7 @@ const RENTAL_DAYS = 3;
 export default function ProductScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
-  const { data: listing } = useQuery({
+  const { data: listing, isPending, isError } = useQuery({
     enabled: typeof id === "string",
     queryFn: async () => {
       const response = await fetch(`${apiBase}${API_ROUTES.LISTINGS.BY_ID(id as string)}`);
@@ -52,6 +53,14 @@ export default function ProductScreen() {
     queryKey: ["listing", id],
   });
   const piece = listing ? listingToPiece(listing) : undefined;
+
+  if (typeof id !== "string") {
+    return <MissingProduct />;
+  }
+
+  if (isPending || (!listing && !isError)) {
+    return <ProductSkeleton />;
+  }
 
   if (!piece) {
     return <MissingProduct />;
