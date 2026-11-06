@@ -65,10 +65,10 @@ export interface Piece {
    * Placeholder hues, one per gallery slot. These are what a media block shows
    * before its photograph arrives — not the imagery itself.
    */
-  gallery: readonly [PlaceholderTone, PlaceholderTone, PlaceholderTone];
+  gallery: readonly PlaceholderTone[];
   id: string;
-  /** Three angles of the same garment, so a gallery reads as one piece. */
-  images: readonly [string, string, string];
+  /** All photos of the piece (cover first). */
+  images: readonly string[];
   lender: Lender;
   name: string;
   /** ISO date the piece is already committed and cannot be rented. */

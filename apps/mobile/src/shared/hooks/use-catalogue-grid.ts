@@ -43,7 +43,7 @@ export function toCardItem(piece: Piece): ProductGridItem {
     fact: piece.lender.neighbourhood,
     id: piece.id,
     name: piece.name,
-    placeholderTone: piece.gallery[0],
+    placeholderTone: piece.gallery[0] ?? "muted",
     price: rentalSummary(piece, 3),
     src: piece.images[0],
   };
