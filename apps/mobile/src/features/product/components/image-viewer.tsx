@@ -128,7 +128,7 @@ export function FullScreenImageViewer({
         <View className="flex-row justify-center gap-4 px-4 pb-8 pt-2">
           <IconButton
             accessibilityLabel="Close"
-            icon="zoom-out"
+            icon="close"
             onPress={onClose}
             variant="soft"
           />
