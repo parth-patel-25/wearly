@@ -146,6 +146,7 @@ export function useHeroParallax() {
     onPhotoLayout,
     onScroll,
     photoStyle,
+    scrollY,
     scrollerMarginTop: -photoHeight,
     spacerHeight: Math.max(photoHeight - SHEET_PEEK, 0),
     titleFadeStyle,

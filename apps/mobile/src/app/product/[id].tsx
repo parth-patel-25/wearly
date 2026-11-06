@@ -22,7 +22,7 @@ import { Text } from "@wearly/ui-native/text";
 import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ScrollView, useWindowDimensions, View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 /**
  * Product detail.
@@ -83,6 +83,16 @@ function ProductDetail({ piece }: ProductDetailProps) {
   const size = sizeOf(piece);
   const summary = rentalSummary(piece, RENTAL_DAYS);
   const parallax = useHeroParallax();
+  const { scrollY } = parallax;
+  const buttonAnimStyle = useAnimatedStyle(() => {
+    const y = scrollY.value;
+    const translateY = y <= 0 ? 0 : -y * 0.5;
+    const opacity = y <= 0 ? 1 : Math.max(0, 1 - y / 100);
+    return {
+      transform: [{ translateY }],
+      opacity,
+    };
+  });
   const { width } = useWindowDimensions();
   const [viewerOpen, setViewerOpen] = useState(false);
   const [heroFrame, setHeroFrame] = useState({ x: 0, y: 0, width: 0, height: 0 });
@@ -324,15 +334,19 @@ function ProductDetail({ piece }: ProductDetailProps) {
         </View>
       </Animated.ScrollView>
 
+
       {heroFrame.height > 0 && (
-        <View
-          style={{
-            position: "absolute",
-            top: heroFrame.y + heroFrame.height - 120,
-            right: 12,
-            zIndex: 50,
-            elevation: 50,
-          }}
+        <Animated.View
+          style={[
+            buttonAnimStyle,
+            {
+              position: "absolute",
+              top: heroFrame.y + heroFrame.height - 120,
+              right: 12,
+              zIndex: 50,
+              elevation: 50,
+            },
+          ]}
         >
           <IconButton
             accessibilityLabel="View full screen"
@@ -340,7 +354,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
             onPress={() => setViewerOpen(true)}
             variant="soft"
           />
-        </View>
+        </Animated.View>
       )}
 
       <FullScreenImageViewer
