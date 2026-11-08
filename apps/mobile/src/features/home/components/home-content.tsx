@@ -1,7 +1,8 @@
 import type { ProductGridItem } from "@wearly/ui-native/product-grid";
+import type { Piece } from "@shared/data/catalogue";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
-import { heroPiece, homeLooks } from "../home-data";
+import { homeLooks } from "../home-data";
 import { CategoryRail } from "./category-rail";
 import { EditorialHero } from "./editorial-hero";
 import { LooksRail } from "./looks-rail";
@@ -23,7 +24,7 @@ import { ProductRail } from "./product-rail";
  *
  * Honest-metadata rule (spec §7.8): no fabricated rental counts or ratings.
  * Trending carries the lender neighbourhood, New carries "Just added" — both
- * true of the prototype catalogue, which the screen footer labels as invented.
+ * true of the live catalogue served by the public API.
  */
 
 interface HomeContentProps {
@@ -33,6 +34,7 @@ interface HomeContentProps {
   onFavourite: (id: string) => void;
   onOpen: (id: string) => void;
   onSeeAll: () => void;
+  pieces: readonly Piece[];
   trending: readonly ProductGridItem[];
 }
 
@@ -43,11 +45,12 @@ export function HomeContent({
   onFavourite,
   onOpen,
   onSeeAll,
+  pieces,
   trending,
 }: HomeContentProps) {
   const [category, setCategory] = useState<string>("✨ For You");
-  const hero = useMemo(() => heroPiece(), []);
-  const looks = useMemo(() => homeLooks(), []);
+  const hero = useMemo(() => pieces[0], [pieces]);
+  const looks = useMemo(() => homeLooks(pieces), [pieces]);
 
   return (
     <View className="gap-10">

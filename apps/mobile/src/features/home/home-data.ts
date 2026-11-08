@@ -1,5 +1,4 @@
 import type { Piece } from "@shared/data/catalogue";
-import { CATALOGUE, FEATURED } from "@shared/data/catalogue";
 import type { IconName } from "@wearly/ui-native/icon";
 
 /**
@@ -42,16 +41,12 @@ export const HOME_HERO = {
   title: "Wedding Season",
 } as const;
 
-export function heroPiece(): Piece | undefined {
-  return FEATURED;
+export function trendingPieces(pieces: readonly Piece[], count = 8): readonly Piece[] {
+  return pieces.slice(0, count);
 }
 
-export function trendingPieces(count = 8): readonly Piece[] {
-  return CATALOGUE.slice(0, count);
-}
-
-export function newPieces(count = 8): readonly Piece[] {
-  return CATALOGUE.slice(-count).reverse();
+export function newPieces(pieces: readonly Piece[], count = 8): readonly Piece[] {
+  return pieces.slice(-count).reverse();
 }
 
 export interface Look {
@@ -67,15 +62,15 @@ const LOOK_SEEDS = [
   { bundle: "Set + Jacket + Bag", name: "Festival Edit" },
 ] as const;
 
-export function homeLooks(): readonly Look[] {
-  if (CATALOGUE.length === 0) return [];
+export function homeLooks(pieces: readonly Piece[] = []): readonly Look[] {
+  if (pieces.length === 0) return [];
   return LOOK_SEEDS.map((seed, index) => ({
     ...seed,
     id: `look-${index + 1}`,
     pieceIds: [
-      CATALOGUE[index * 9]?.id ?? CATALOGUE[0]?.id ?? "w-001",
-      CATALOGUE[index * 9 + 3]?.id ?? CATALOGUE[1]?.id ?? "w-002",
-      CATALOGUE[index * 9 + 5]?.id ?? CATALOGUE[2]?.id ?? "w-003",
+      pieces[index * 3]?.id ?? pieces[0]?.id ?? "",
+      pieces[index * 3 + 1]?.id ?? pieces[1]?.id ?? "",
+      pieces[index * 3 + 2]?.id ?? pieces[2]?.id ?? "",
     ] as const,
   }));
 }

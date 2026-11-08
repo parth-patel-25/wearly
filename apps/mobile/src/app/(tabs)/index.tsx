@@ -111,6 +111,7 @@ export default function HomeScreen() {
                 onFavourite={onFavourite}
                 onOpen={open}
                 onSeeAll={toDiscover}
+                pieces={pieces}
                 trending={trending}
               />
               <View className="gap-4">

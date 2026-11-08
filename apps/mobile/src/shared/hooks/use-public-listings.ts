@@ -7,6 +7,7 @@ const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
 
 export function usePublicListings() {
   return useQuery<Listing[]>({
+    enabled: true,
     queryFn: async () => {
       const response = await fetch(`${apiBase}${API_ROUTES.LISTINGS.PUBLIC}`);
       if (!response.ok) {
@@ -19,5 +20,7 @@ export function usePublicListings() {
       return data;
     },
     queryKey: ["public-listings"],
+    refetchOnMount: "always",
+    staleTime: 0,
   });
 }
