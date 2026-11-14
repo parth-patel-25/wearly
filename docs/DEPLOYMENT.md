@@ -21,14 +21,14 @@ Secrets to prepare: Supabase session pooler URI (port 5432), fresh `BETTER_AUTH_
 3. Verify tables: `user`, `session`, `account`, `verification`, `admin_invites`.
 4. Enable PITR/backups.
 
-## 2. Railway — API
+## 2. Vercel — API
 
-Service: root directory = repo root. Build: `bun install --frozen-lockfile && bun run build --filter=@wearly/api...`. Start: `cd apps/api && node dist/main.js`. Health check: `/api/health`. Public networking on, HTTPS.
+Project: root directory = `apps/api`, enable "include files outside root". Install: `cd ../.. && bun install --frozen-lockfile`. Build: `cd ../.. && bun run build --filter=@wearly/api...`. Node 22.x. The `api/index.ts` serverless function wraps the NestJS app; `vercel.json` rewrites `/(.*)` → `/api`.
 
-Env vars:
+Env vars (Production):
 - `NODE_ENV=production`
 - `DATABASE_URL` = Supabase session pooler URI
-- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` = Supabase project URL + service role key (image uploads; server-only)
+- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (image uploads; server-only)
 - Create a public Storage bucket named `listing-photos` (10 MB limit, image/* MIME types)
 - `BETTER_AUTH_SECRET` = fresh 32-byte secret
 - `BETTER_AUTH_URL` = `https://<web>.vercel.app`
@@ -38,7 +38,7 @@ Env vars:
 - `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET` optional
 - `ADMIN_EMAIL` / `ADMIN_PASSWORD` for seeding only
 
-Notes: `BETTER_AUTH_URL` points at the web origin because browser auth traffic is proxied through Vercel. `WEB_ORIGIN` drives CORS, trusted origins and invite links. Remove `ADMIN_PASSWORD` after seeding. If Railway's builder does not detect Bun, pin `BUN_VERSION=1.3.14`. Verify: `curl https://<api>.up.railway.app/api/health`.
+Notes: `BETTER_AUTH_URL` points at the web origin because browser auth traffic is proxied through Vercel. `WEB_ORIGIN` drives CORS, trusted origins and invite links. Remove `ADMIN_PASSWORD` after seeding. Health check: `/api/health`. Vercel Hobby caps function duration at 10s — watch for `FUNCTION_INVOCATION_TIMEOUT` on cold starts.
 
 ## 3. Vercel — Web
 
@@ -52,10 +52,10 @@ Why: the browser auth client calls `/api/*` on the web origin; the Next.js rewri
 
 ## 4. Seed the super admin
 
-Fix the seed imports first (`apps/api/scripts/seed-super-admin.ts`), then:
+Fix the seed imports first (`apps/api/scripts/seed-super-admin.ts`), then run locally with the production `DATABASE_URL`:
 
 ```bash
-railway run --service <api-service> \
+DATABASE_URL='postgresql://...:5432/postgres?sslmode=require' \
   bun run --cwd apps/api db:seed:super-admin
 ```
 
@@ -81,7 +81,7 @@ Mobile talks directly to Railway (not through Vercel); native has no same-origin
 
 ## 6. Verification
 
-- [ ] `GET https://<api>.up.railway.app/api/health` → 200
+- [ ] `GET https://<api>.vercel.app/api/health` → 200
 - [ ] `GET https://<web>.vercel.app/api/health` → 200 (via rewrite)
 - [ ] Web sign-up → OTP email → verify → session cookie on the Vercel host
 - [ ] `/admin` loads after sign-in, redirects to `/sign-in` when signed out

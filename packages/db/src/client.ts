@@ -30,8 +30,10 @@ setDefaultResultOrder("ipv4first");
  * than crashing module import (e.g. during `auth generate`).
  */
 const client = process.env.DATABASE_URL
-  ? postgres(process.env.DATABASE_URL, { max: 10 })
-  : postgres({ max: 10 });
+  ? postgres(process.env.DATABASE_URL, {
+      max: process.env.VERCEL ? 1 : 10,
+    })
+  : postgres({ max: process.env.VERCEL ? 1 : 10 });
 
 const schema = {
   account,
