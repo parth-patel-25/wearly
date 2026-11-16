@@ -5,6 +5,7 @@ import type {
 } from "@features/auth/validations/auth.schema";
 import { useToast } from "@wearly/ui-native/toast";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { useSession } from "@/core/providers/session-provider";
 import { authClient } from "@/lib/auth-client";
 import { useGoogleSignIn } from "./use-google-sign-in";
@@ -34,6 +35,7 @@ export function useAuth() {
   const toast = useToast();
   const { refreshSession } = useSession();
   const { promptGoogleSignIn } = useGoogleSignIn();
+  const [socialLoading, setSocialLoading] = useState<SocialProvider | null>(null);
 
   const signIn = async (
     values: Pick<LoginInput, "email" | "password" | "rememberMe">,
@@ -82,33 +84,38 @@ export function useAuth() {
   };
 
   const socialSignIn = async (provider: SocialProvider) => {
-    if (provider === "google") {
-      await promptGoogleSignIn();
-      return;
+    setSocialLoading(provider);
+    try {
+      if (provider === "google") {
+        await promptGoogleSignIn();
+        return;
+      }
+      const { error } = await authClient.signIn.social({
+        callbackURL: "/",
+        provider,
+      });
+      if (error) {
+        toast.show(
+          error.message ?? `Could not sign in with ${provider}`,
+          "error"
+        );
+        return;
+      }
+      const { data: session } = await authClient.getSession();
+      if (!session) {
+        toast.show("Sign in was cancelled", "info");
+        return;
+      }
+      // Hydrate the shared session store before navigating so the destination
+      // does not flash guest state while /get-session is still in flight.
+      await refreshSession();
+      toast.show("Welcome to Wearly", "success");
+      // dismissAll pops the whole auth stack (sign-in + auth) back to the tabs.
+      router.dismissAll();
+    } finally {
+      setSocialLoading(null);
     }
-    const { error } = await authClient.signIn.social({
-      callbackURL: "/",
-      provider,
-    });
-    if (error) {
-      toast.show(
-        error.message ?? `Could not sign in with ${provider}`,
-        "error"
-      );
-      return;
-    }
-    const { data: session } = await authClient.getSession();
-    if (!session) {
-      toast.show("Sign in was cancelled", "info");
-      return;
-    }
-    // Hydrate the shared session store before navigating so the destination
-    // does not flash guest state while /get-session is still in flight.
-    await refreshSession();
-    toast.show("Welcome to Wearly", "success");
-    // dismissAll pops the whole auth stack (sign-in + auth) back to the tabs.
-    router.dismissAll();
   };
 
-  return { signIn, signUp, socialSignIn };
+  return { signIn, signUp, socialSignIn, socialLoading };
 }

@@ -59,7 +59,7 @@ const TAB_SPEC: Record<AuthTab, TabSpec> = {
 };
 
 function SocialRow() {
-  const { socialSignIn } = useAuth();
+  const { socialLoading, socialSignIn } = useAuth();
 
   return (
     <View className="gap-4">
@@ -74,11 +74,13 @@ function SocialRow() {
         <SocialButton
           icon={<GoogleGlyph />}
           label="Sign in with Google"
+          loading={socialLoading === "google"}
           onPress={() => socialSignIn("google")}
         />
         <SocialButton
           icon={<FacebookGlyph />}
           label="Sign in with Facebook"
+          loading={socialLoading === "facebook"}
           onPress={() => socialSignIn("facebook")}
         />
       </View>

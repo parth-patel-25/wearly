@@ -1,5 +1,6 @@
 import { FontAwesome6 } from "@expo/vector-icons";
 import { AnimatedPressable, usePressScale } from "@wearly/ui-native/motion";
+import { Spinner } from "@wearly/ui-native/spinner";
 import { Text } from "@wearly/ui-native/text";
 import type { ReactNode } from "react";
 import Svg, { Path } from "react-native-svg";
@@ -46,24 +47,28 @@ export function FacebookGlyph() {
 interface SocialButtonProps {
   icon: ReactNode;
   label: string;
+  /** Shows a themed spinner and disables the button while an OAuth flow runs. */
+  loading?: boolean;
   /** Wired to Better Auth `signIn.social`; omitted only where not yet bound. */
   onPress?: () => void;
 }
 
-export function SocialButton({ icon, label, onPress }: SocialButtonProps) {
+export function SocialButton({ icon, label, loading = false, onPress }: SocialButtonProps) {
   const { animatedStyle, onPressIn, onPressOut } = usePressScale(0.97);
 
   return (
     <AnimatedPressable
       accessibilityLabel={label}
       accessibilityRole="button"
+      accessibilityState={{ busy: loading, disabled: loading }}
       className="h-touch w-full flex-row items-center justify-center gap-3 rounded-button border border-border bg-card px-6 active:bg-muted"
+      disabled={loading}
       onPress={onPress}
       onPressIn={onPressIn}
       onPressOut={onPressOut}
       style={animatedStyle}
     >
-      {icon}
+      {loading ? <Spinner tone="primary" /> : icon}
       <Text variant="bodyLg">{label}</Text>
     </AnimatedPressable>
   );

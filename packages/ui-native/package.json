@@ -29,8 +29,8 @@
     "./tab-bar": "./src/tab-bar.tsx",
     "./hero-provider": "./src/hero-provider.tsx",
     "./hero-layer": "./src/hero-layer.tsx",
-    "./skeleton": "./src/skeleton.tsx"
-  },
+    "./skeleton": "./src/skeleton.tsx",
+    "./spinner": "./src/spinner.tsx"  },
   "scripts": {
     "clean": "rm -rf .turbo *.tsbuildinfo",
     "typecheck": "tsc --noEmit"

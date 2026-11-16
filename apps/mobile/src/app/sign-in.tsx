@@ -41,7 +41,7 @@ const SOCIALS = [
 
 export default function SignInScreen() {
   const router = useRouter();
-  const { socialSignIn } = useAuth();
+  const { socialLoading, socialSignIn } = useAuth();
 
   return (
     <Screen
@@ -75,6 +75,7 @@ export default function SignInScreen() {
               icon={social.icon}
               key={social.label}
               label={social.label}
+              loading={socialLoading === social.provider}
               onPress={() => socialSignIn(social.provider)}
             />
           ))}

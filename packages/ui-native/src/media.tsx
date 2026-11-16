@@ -1,11 +1,12 @@
 import { Image } from "expo-image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ViewProps } from "react-native";
 import { View } from "react-native";
 import { withUniwind } from "uniwind";
 
 import { Icon } from "./icon";
 import type { IconName } from "./icon-glyphs";
+import { Skeleton } from "./skeleton";
 
 // Uniwind shims React Native's own components but not third-party ones, so
 // `className` on expo-image's Image would be dropped and the image would render
@@ -95,7 +96,14 @@ export function Media({
   // A bundled asset that fails to decode falls back to the remote URL once;
   // the tone block is the final fallback if both are missing.
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const effective = failed ? fallbackSrc : src;
+
+  // Reset the loaded flag whenever the source changes so the shimmer reappears
+  // for the new image instead of flashing the previous state.
+  useEffect(() => {
+    setLoaded(false);
+  }, [effective]);
 
   return (
     <View
@@ -112,15 +120,23 @@ export function Media({
       {effective === undefined ? (
         <Icon name={icon} size="xl" tone={PLACEHOLDER_ICON[tone]} />
       ) : (
-        <StyledImage
-          className="h-full w-full"
-          contentFit={contentFit}
-          onError={() => setFailed(true)}
-          source={
-            typeof effective === "number" ? effective : { uri: effective }
-          }
-          transition={200}
-        />
+        <>
+          <StyledImage
+            className="h-full w-full"
+            contentFit={contentFit}
+            onError={() => setFailed(true)}
+            onLoad={() => setLoaded(true)}
+            source={
+              typeof effective === "number" ? effective : { uri: effective }
+            }
+            transition={200}
+          />
+          {!loaded ? (
+            <View className="absolute inset-0">
+              <Skeleton className="h-full w-full rounded-none" />
+            </View>
+          ) : null}
+        </>
       )}
     </View>
   );
