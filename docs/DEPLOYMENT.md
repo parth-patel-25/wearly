@@ -46,9 +46,11 @@ Project: root directory `apps/web`, enable "include files outside root". Install
 
 Env vars (Production):
 - `NEXT_PUBLIC_API_URL` = `https://<web>.vercel.app` (the web origin, NOT the API URL)
-- `API_PROXY_URL` = `https://<api>.up.railway.app`
+- `API_PROXY_URL` = `https://<api>.vercel.app`
 
-Why: the browser auth client calls `/api/*` on the web origin; the Next.js rewrite forwards to Railway; the cookie is set on the Vercel host, so `hasSessionCookie()` and the `/admin` gate work without a custom domain. Local dev is unaffected (`API_PROXY_URL` unset, `NEXT_PUBLIC_API_URL=http://localhost:4000`).
+Why: the browser auth client calls `/api/*` on the web origin; the rewrite forwards to the API host; the cookie is set on the Vercel host, so `hasSessionCookie()` and the `/admin` gate work without a custom domain. Local dev is unaffected (`API_PROXY_URL` unset, `NEXT_PUBLIC_API_URL=http://localhost:4000`).
+
+`apps/web/vercel.json` also rewrites `/api/:path*` to the production API. Vercel applies `vercel.json` routes before Next.js routes, so this is the authoritative production proxy: it is committed with the code and cannot be silently dropped by a missing/misspelled `API_PROXY_URL` at build time. `next.config.ts` keeps the env-driven rewrite for previews. Current production: web `https://wearly-beige.vercel.app`, API `https://wearly-xni7.vercel.app`.
 
 ## 4. Seed the super admin
 
@@ -83,12 +85,26 @@ Mobile talks directly to Railway (not through Vercel); native has no same-origin
 
 - [ ] `GET https://<api>.vercel.app/api/health` → 200
 - [ ] `GET https://<web>.vercel.app/api/health` → 200 (via rewrite)
+- [ ] `GET https://<web>.vercel.app/api/auth/get-session` → 200 JSON (`null` when signed out)
 - [ ] Web sign-up → OTP email → verify → session cookie on the Vercel host
 - [ ] `/admin` loads after sign-in, redirects to `/sign-in` when signed out
 - [ ] Admin invite create/accept works; invite links use the web origin
 - [ ] Android preview: sign-up/sign-in, session survives app restart
-- [ ] No CORS/cookie/DB errors in Railway logs
+- [ ] No CORS/cookie/DB errors in Vercel/Railway logs
 - [ ] Supabase tables populated
+
+### `/api/*` returns 404 on the web origin
+
+`x-matched-path: /404` and `content-type: text/html` mean the request never
+reached the API: Next.js served its own 404 page. Check, in order:
+
+1. `apps/web/vercel.json` exists and its rewrite destination is the current API host (committed, so a redeploy picks it up).
+2. `API_PROXY_URL` is set in **this** project (`<web>`, not `<api>`) under the **Production** environment, with no trailing slash. Env changes only apply to a *new* deployment, and the 404 page is a static file from the previous build (`last-modified` shows the build time).
+3. The deployment currently aliased to the domain is the new one: the 404's `etag`/`last-modified` must change after a redeploy.
+
+If the API answers `403 {"code":"INVALID_ORIGIN"}` instead of 404, the proxy
+works but the API does not trust the web origin: set `BETTER_AUTH_URL` and
+`WEB_ORIGIN` to the web origin on the API project and redeploy it.
 
 If the proxied `Set-Cookie` misbehaves, the fallback is a custom domain later (`app.example.com` + `api.example.com`) with Better Auth `crossSubDomainCookies`, or serving the API inside the Vercel project.
 
