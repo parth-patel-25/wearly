@@ -21,6 +21,14 @@ export interface ConfirmSheetProps {
   title: string;
 }
 
+/**
+ * A pending destructive action must stay visible. Backdrop taps, the drag
+ * dismissal and Android back all route through `onClose`, so the sheet ignores
+ * them until the operation settles — otherwise the spinner would disappear and
+ * the result would land with no context.
+ */
+const noop = () => undefined;
+
 export function ConfirmSheet({
   body,
   confirmLabel,
@@ -52,7 +60,7 @@ export function ConfirmSheet({
           </Button>
         </View>
       }
-      onClose={onClose}
+      onClose={pending ? noop : onClose}
       open={open}
       title={title}
     >

@@ -4,6 +4,7 @@ import { CONTROL_PRIMARY } from "./control-tokens";
 import { Icon } from "./icon";
 import type { IconName } from "./icon-glyphs";
 import { AnimatedPressable, usePressScale } from "./motion";
+import { Spinner } from "./spinner";
 import type { TextVariant } from "./text";
 import { Text } from "./text";
 import type { Tone } from "./tone";
@@ -25,6 +26,10 @@ import type { Tone } from "./tone";
  * needed — a wrapped element fills the row and its lines would otherwise hang
  * off the left. Keep labels to one line where you can: `w-full` plus three
  * layers of padding leaves a button roughly 96px narrower than its container.
+ *
+ * `loading` swaps the leading glyph for a themed spinner in the variant's own
+ * foreground tone and leaves the label mounted, so the control reports the wait
+ * without resizing. It dims only when the caller explicitly disables it.
  */
 
 const BASE = "flex-row items-center justify-center gap-2 rounded-button";
@@ -68,6 +73,37 @@ export interface ButtonProps
   variant?: ButtonVariant;
 }
 
+/**
+ * The leading glyph slot: a spinner while the request runs, otherwise the
+ * optional icon. The label stays mounted either way, so the button never
+ * resizes mid-request.
+ */
+function leadingGlyph({
+  icon,
+  loading,
+  size,
+  variant,
+}: {
+  icon?: IconName;
+  loading: boolean;
+  size: ButtonSize;
+  variant: ButtonVariant;
+}) {
+  if (loading) {
+    return <Spinner tone={VARIANT_TONE[variant]} />;
+  }
+  if (!icon) {
+    return null;
+  }
+  return (
+    <Icon
+      name={icon}
+      size={size === "sm" ? "sm" : "md"}
+      tone={VARIANT_TONE[variant]}
+    />
+  );
+}
+
 /** A single, obvious action. */
 export function Button({
   children,
@@ -91,7 +127,7 @@ export function Button({
         SIZE[size].container,
         SIZE[size].padding,
         "w-full",
-        isInactive ? PRESS_DISABLED : "",
+        disabled ? PRESS_DISABLED : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -101,13 +137,7 @@ export function Button({
       style={animatedStyle}
       {...rest}
     >
-      {icon ? (
-        <Icon
-          name={icon}
-          size={size === "sm" ? "sm" : "md"}
-          tone={VARIANT_TONE[variant]}
-        />
-      ) : null}
+      {leadingGlyph({ icon, loading, size, variant })}
       <Text
         className="text-center"
         tone={VARIANT_TONE[variant]}
