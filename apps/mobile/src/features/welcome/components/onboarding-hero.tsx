@@ -68,23 +68,27 @@ const HERO_BACKDROP = (
   />
 );
 
-/** The subtle wash over the photograph itself — the original tint, kept. */
+/**
+ * The subtle wash over the cutout itself, kept from the original design. It
+ * runs the opposite diagonal to the sheet's tint: deepest at the top-right
+ * corner, fading to nothing at the bottom-left.
+ */
 const HERO_TINT = (
   <LinearGradient
     colors={["rgba(255, 148, 181, 0.20)", "rgba(255, 255, 255, 0)"]}
     end={{ x: 0, y: 1 }}
     pointerEvents="none"
-    start={{ x: 0, y: 0 }}
+    start={{ x: 1, y: 0 }}
     style={StyleSheet.absoluteFill}
   />
 );
 
 /**
- * How the photograph fills the hero block. The interim asset still carries
- * its baked background, so it crops to fill; switch to `"contain"` (with
- * `contentPosition="bottom"`) when the transparent-background cutout lands.
+ * How the cutout fills the hero block. The asset is a transparent-background
+ * cutout, so it renders `contain` — no cropping of the subject — and sits at
+ * the bottom edge, standing on the sheet's dome curve.
  */
-const HERO_CONTENT_FIT = "cover" as const;
+const HERO_CONTENT_FIT = "contain" as const;
 
 /**
  * How high the sheet's dome climbs from each side edge to its centre, and how
@@ -168,6 +172,7 @@ export function OnboardingHero({
         <StyledImage
           className="h-full w-full"
           contentFit={HERO_CONTENT_FIT}
+          contentPosition="bottom"
           source={require("../../../../assets/images/onboarding-hero-girl.png")}
         />
         {HERO_TINT}

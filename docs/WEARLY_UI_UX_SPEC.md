@@ -184,7 +184,8 @@ screen changes as the circle starts moving, not after it lands.
    **Step 1 — the fashion moment.** A full-bleed hero at the top of the screen:
    a pink gradient spanning the whole width with the shopping-spree cutout
    (straw hat, white sunglasses, red dress, paper bags) anchored to its bottom
-   edge, plus a subtle pink wash over the photograph. The headline, supporting
+   edge, plus a subtle pink wash over the photograph running diagonally from
+   the top-right corner to the bottom-left. The headline, supporting
    line and **swipe-to-continue** sit on a bottom sheet whose top edge is a
    **full-width dome curve** — it climbs ~36dp from each side to its centre
    (SVG quadratic, not a corner radius), overlapping the photo. The sheet's
