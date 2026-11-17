@@ -6,6 +6,8 @@ import type { LayoutChangeEvent } from "react-native";
 import { StyleSheet, View } from "react-native";
 import Svg, {
   Defs,
+  FeDropShadow,
+  Filter,
   Path,
   Stop,
   LinearGradient as SvgGradient,
@@ -97,11 +99,21 @@ const HERO_CONTENT_FIT = "contain" as const;
  */
 const DOME_RISE = 36;
 
+/**
+ * Headroom above the apex so the curve's drop shadow has room to blur. The
+ * SVG box grows by this much at the top and the sheet's negative margin
+ * grows to match, so the visible rise — apex to sheet body — stays DOME_RISE.
+ */
+const SHADOW_HEADROOM = 8;
+
 /** The shared tint colour — the body's gradient and the dome's match. */
 const TINT_PINK = "#FF94B5";
 
 /** The dome's silhouette: sides low, centre high, in a 100×100 stretched box. */
 const DOME_PATH = "M 0 100 Q 50 -100 100 100 Z";
+
+/** Vertical viewBox units above the apex, so headroom maps to real pixels. */
+const VIEWBOX_HEAD = (100 * SHADOW_HEADROOM) / DOME_RISE;
 
 /**
  * The sheet's top edge: an opaque base path (the sheet is a surface *over*
@@ -110,14 +122,18 @@ const DOME_PATH = "M 0 100 Q 50 -100 100 100 Z";
  * own diagonal — so the dome's gradient ends at exactly that value where the
  * seam runs, and both gradients are at zero along the seam's left half. The
  * two surfaces meet with no visible step, so no part of the sheet reads as
- * untinted white above the title.
+ * untinted white above the title. The base path carries a very subtle drop
+ * shadow — an SVG filter, because native shadow props can only follow a
+ * view's rectangle, not this curve. Filter primitives use viewBox units and
+ * the box is stretched non-uniformly (100 units wide → full screen width,
+ * 100 units tall → 36px), so the blur is tuned per-axis.
  */
 function SheetCurve({ fill }: { fill: string }) {
   return (
     <Svg
-      height={DOME_RISE}
+      height={DOME_RISE + SHADOW_HEADROOM}
       preserveAspectRatio="none"
-      viewBox="0 0 100 100"
+      viewBox={`0 ${-VIEWBOX_HEAD} 100 ${100 + VIEWBOX_HEAD}`}
       width="100%"
     >
       <Defs>
@@ -126,8 +142,17 @@ function SheetCurve({ fill }: { fill: string }) {
           <Stop offset="0.5" stopColor={TINT_PINK} stopOpacity={0} />
           <Stop offset="1" stopColor={TINT_PINK} stopOpacity={0.075} />
         </SvgGradient>
+        <Filter id="sheet-shadow">
+          <FeDropShadow
+            dx="0"
+            dy="3"
+            floodColor="#000000"
+            floodOpacity={0.14}
+            stdDeviation="2 10"
+          />
+        </Filter>
       </Defs>
-      <Path d={DOME_PATH} fill={fill} />
+      <Path d={DOME_PATH} fill={fill} filter="url(#sheet-shadow)" />
       <Path d={DOME_PATH} fill="url(#dome-tint)" />
     </Svg>
   );
@@ -179,10 +204,9 @@ export function OnboardingHero({
       </View>
 
       {/* The content sheet — a full-width dome curve over the photo. The
-          overlap (-mt-9 = DOME_RISE) lets the photo show through above the
-          curve, beside its centre apex. The tint wash deepens toward the
-          bottom like the reference panel. */}
-      <View className="-mt-9">
+          overlap equals the SVG box (dome + shadow headroom) so the visible
+          rise stays DOME_RISE while the shadow blurs into the photo. */}
+      <View style={{ marginTop: -(DOME_RISE + SHADOW_HEADROOM) }}>
         <SheetCurve fill={background} />
         {/* The sheet body IS the tint — its own background stays the opaque
             theme colour, and the gradient paints over it: transparent at the
