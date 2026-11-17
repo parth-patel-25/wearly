@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { type Edge, SafeAreaView } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 
 // Third-party components don't accept className out of the box. Wrap at module
@@ -17,6 +17,13 @@ export interface ScreenProps {
    * you intend to own the height, and keep `grow` in it.
    */
   contentClassName?: string;
+  /**
+   * Safe-area edges to respect. Defaults to `["top", "left", "right"]`. Drop
+   * `"top"` only for a screen whose first surface is full-bleed imagery that
+   * should run under the status bar — the content owns its own top spacing
+   * from then on.
+   */
+  edges?: readonly Edge[];
   /** Wrap content in a ScrollView. Disable for screens that own their own list. */
   scrollable?: boolean;
 }
@@ -32,6 +39,7 @@ export function Screen({
   scrollable = true,
   className,
   contentClassName,
+  edges = ["top", "left", "right"],
 }: ScreenProps) {
   const container = (
     <View className={contentClassName ?? DEFAULT_CONTENT}>{children}</View>
@@ -40,7 +48,7 @@ export function Screen({
   return (
     <StyledSafeAreaView
       className={className ?? "flex-1 bg-background"}
-      edges={["top", "left", "right"]}
+      edges={edges}
     >
       {scrollable ? (
         <ScrollView

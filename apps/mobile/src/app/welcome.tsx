@@ -121,14 +121,17 @@ export default function WelcomeScreen() {
 
   if (isIntro) {
     return (
-      <Screen className="flex-1 bg-background" scrollable={false}>
-        <View className="flex-1 gap-6 px-gutter pt-4 pb-6">
-          <OnboardingHero
-            onSwipeComplete={goToStyling}
-            step={STEPS.indexOf(step)}
-            totalSteps={TOTAL_STEPS}
-          />
-        </View>
+      <Screen
+        className="flex-1 bg-background"
+        contentClassName="flex grow flex-col"
+        edges={["left", "right"]}
+        scrollable={false}
+      >
+        <OnboardingHero
+          onSwipeComplete={goToStyling}
+          step={STEPS.indexOf(step)}
+          totalSteps={TOTAL_STEPS}
+        />
       </Screen>
     );
   }

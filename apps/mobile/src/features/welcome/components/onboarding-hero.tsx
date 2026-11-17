@@ -1,34 +1,107 @@
-import { Media } from "@wearly/ui-native/media";
 import { Text } from "@wearly/ui-native/text";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import Svg, { Path } from "react-native-svg";
+import { useCSSVariable, withUniwind } from "uniwind";
 
 import { StepDots } from "./step-dots";
 import { SwipeToContinue } from "./swipe-to-continue";
 
+// Uniwind shims React Native's own components but not third-party ones, so
+// `className` on expo-image's Image would be dropped and the image would
+// render at zero size. Wrapping at module level keeps the HOC out of the
+// render path.
+const StyledImage = withUniwind(Image);
+
 /**
  * Onboarding step 1 — the fashion moment.
  *
- * One photograph, one headline, one line of support, one drag. It is the only
- * screen in the product that asks nothing of the user, which is exactly why it
- * can afford to be the only one that asks for a gesture.
+ * The hero is a full-bleed block at the top of the screen: a pink gradient
+ * backdrop spans the whole width, the campaign cutout is anchored to its
+ * bottom edge, and a subtle wash sits over the photograph. The headline,
+ * support line and swipe live on a sheet whose top edge is a full-width dome
+ * curve overlapping the photo — the curve is drawn (SVG), because a radius
+ * can only round corners, and the reference's sweep spans half the width.
  *
  * The word *Fashion* sits on a rotated pill rather than being bolded. Bold is a
  * weight, and a weight is invisible when the line wraps — the pill is an object
  * with its own shape, so the emphasis survives at any width and reads as
  * editorial rather than shouted.
  *
- * The photography is a **bundled placeholder** (a red-carpet shot standing in
- * for the real campaign shoot — swap it for licensed imagery before release).
- * The remote Unsplash hoodie stays as the `onError` fallback via `fallbackSrc`,
- * and `Media` falls back to a garment block if both fail — so the screen is
- * never blank, only less good.
+ * The two gradient washes are sanctioned absolute surfaces (see
+ * DESIGN_SYSTEM.md §10): no flexbox arrangement can paint colour *behind* a
+ * cutout, and the hero block's `overflow-hidden` keeps both washes inside the
+ * silhouette the sheet overlaps. Both are static at module scope — created
+ * once, never per render — and neither takes touches. The bundled asset is a
+ * local `require()`, so there is no remote fetch to fail; the block degrades
+ * to pure gradient, never to blank.
  */
 
-/** Remote fallback — cyan hoodie on a cool ground. */
-const HERO_FALLBACK_SRC =
-  "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1200&q=80";
+/**
+ * The pink backdrop. Strongest at the top edge, dissolving by the bottom —
+ * the sheet and the subject's own ground take over from there.
+ */
+const HERO_BACKDROP = (
+  <LinearGradient
+    colors={[
+      "rgba(255, 158, 190, 0.55)",
+      "rgba(255, 224, 235, 0.28)",
+      "rgba(255, 255, 255, 0)",
+    ]}
+    end={{ x: 0, y: 1 }}
+    pointerEvents="none"
+    start={{ x: 0, y: 0 }}
+    style={StyleSheet.absoluteFill}
+  />
+);
+
+/** The subtle wash over the photograph itself — the original tint, kept. */
+const HERO_TINT = (
+  <LinearGradient
+    colors={["rgba(255, 148, 181, 0.20)", "rgba(255, 255, 255, 0)"]}
+    end={{ x: 0, y: 1 }}
+    pointerEvents="none"
+    start={{ x: 0, y: 0 }}
+    style={StyleSheet.absoluteFill}
+  />
+);
+
+/**
+ * How the photograph fills the hero block. The interim asset still carries
+ * its baked background, so it crops to fill; switch to `"contain"` (with
+ * `contentPosition="bottom"`) when the transparent-background cutout lands.
+ */
+const HERO_CONTENT_FIT = "cover" as const;
+
+/**
+ * How high the sheet's dome climbs from each side edge to its centre, and how
+ * far the sheet overlaps the photo. Measured from the reference: ~40px of
+ * rise over a 406px-wide frame, ≈36dp on a phone.
+ */
+const DOME_RISE = 36;
+
+/**
+ * The sheet's top edge as a single quadratic curve — sides low, centre high.
+ * A border radius can only round *corners*, which is why the reference's
+ * 40%-of-width sweep needs a drawn curve: the path runs from each bottom
+ * corner of the box up to an apex at the centre top, and everything below the
+ * curve is filled. Above the curve, the photo shows through.
+ */
+function SheetCurve({ fill }: { fill: string }) {
+  return (
+    <Svg
+      height={DOME_RISE}
+      preserveAspectRatio="none"
+      viewBox="0 0 100 100"
+      width="100%"
+    >
+      <Path d="M 0 100 Q 50 -100 100 100 Z" fill={fill} />
+    </Svg>
+  );
+}
 
 const PILL_TILT = "-12deg";
 
@@ -57,49 +130,70 @@ export function OnboardingHero({
   // Pre-first-layout fallback so the text doesn't jump once measured.
   const pillReserve = (pillWidth > 0 ? pillWidth : 130) + PILL_GAP;
 
-  return (
-    <View className="flex-1 justify-between gap-6">
-      <Media
-        aspect="3/4"
-        className="flex-1"
-        fallbackSrc={HERO_FALLBACK_SRC}
-        src={require("../../../../assets/images/onboarding-hero.png")}
-        tone="accent"
-      />
+  // SVG cannot take a className, so the sheet's fill resolves the theme
+  // variable directly — the same route tone.ts documents for every SVG fill.
+  const background = String(useCSSVariable("--wearly-background") ?? "#FFFBFC");
 
-      <View className="gap-4">
-        {/* Three forced centered lines. Row 2 is a shrink-wrapped relative unit
-            (self-centered), so the absolute pill lives inside its own row's
-            bounds and Rows 1/3 stay full-width readable. */}
-        <View className="gap-0">
-          <Text className="text-center leading-tight" variant="displaySm">
-            Get Ready For
-          </Text>
-          <View className="mt-px flex-row justify-center">
-            <View className="relative flex-row items-center">
-              <Pill onLayout={onPillLayout} />
-              <Text style={{ paddingLeft: pillReserve }} variant="displaySm">
-                With Your
+  return (
+    <View className="flex-1">
+      {/* Full-bleed hero: gradient backdrop, cutout, wash — in that order. */}
+      <View className="min-h-0 flex-1 overflow-hidden">
+        {HERO_BACKDROP}
+        <StyledImage
+          className="h-full w-full"
+          contentFit={HERO_CONTENT_FIT}
+          source={require("../../../../assets/images/onboarding-hero-girl.png")}
+        />
+        {HERO_TINT}
+      </View>
+
+      {/* The content sheet — a full-width dome curve over the photo. The
+          overlap (-mt-9 = DOME_RISE) lets the photo show through above the
+          curve, beside its centre apex. */}
+      <View className="-mt-9">
+        <SheetCurve fill={background} />
+        <View className="bg-background px-gutter pt-4 pb-6">
+          <View className="gap-4">
+            {/* Three forced centered lines. Row 2 is a shrink-wrapped relative unit
+              (self-centered), so the absolute pill lives inside its own row's
+              bounds and Rows 1/3 stay full-width readable. */}
+            <View className="gap-0">
+              <Text className="text-center leading-tight" variant="displaySm">
+                Get Ready For
+              </Text>
+              <View className="mt-px flex-row justify-center">
+                <View className="relative flex-row items-center">
+                  <Pill onLayout={onPillLayout} />
+                  <Text
+                    style={{ paddingLeft: pillReserve }}
+                    variant="displaySm"
+                  >
+                    With Your
+                  </Text>
+                </View>
+              </View>
+              <Text className="text-center leading-tight" variant="displaySm">
+                Own Style
               </Text>
             </View>
+
+            <Text
+              className="px-2 text-center capitalize"
+              tone="muted-foreground"
+              variant="caption"
+            >
+              Embrace your individuality and express {"\n"} yourself through
+              fashion — whether you prefer
+            </Text>
+
+            <View className="gap-5 pt-1">
+              <SwipeToContinue
+                label="Get Started"
+                onComplete={onSwipeComplete}
+              />
+              <StepDots current={step} total={totalSteps} />
+            </View>
           </View>
-          <Text className="text-center leading-tight" variant="displaySm">
-            Own Style
-          </Text>
-        </View>
-
-        <Text
-          className="px-2 text-center capitalize"
-          tone="muted-foreground"
-          variant="caption"
-        >
-          Embrace your individuality and express {"\n"} yourself through fashion
-          — whether you prefer
-        </Text>
-
-        <View className="gap-5 pt-1">
-          <SwipeToContinue label="Get Started" onComplete={onSwipeComplete} />
-          <StepDots current={step} total={totalSteps} />
         </View>
       </View>
     </View>

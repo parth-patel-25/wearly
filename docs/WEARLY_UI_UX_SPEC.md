@@ -181,10 +181,15 @@ screen changes as the circle starts moving, not after it lands.
 2. **Welcome / personalisation** — three steps, pre-authentication. Never a
    registration form; the questions are asked like a conversation.
 
-   **Step 1 — the fashion moment.** A full-bleed fashion photograph, then a
-   display headline in which one word sits on a rotated accent pill
-   (*"Get Ready For **Fashion** With Your Own Style"*), one supporting line, and a
-   **swipe-to-continue** track in place of a Next button. Three dots below mark
+   **Step 1 — the fashion moment.** A full-bleed hero at the top of the screen:
+   a pink gradient spanning the whole width with the shopping-spree cutout
+   (straw hat, white sunglasses, red dress, paper bags) anchored to its bottom
+   edge, plus a subtle pink wash over the photograph. The headline, supporting
+   line and **swipe-to-continue** sit on a bottom sheet whose top edge is a
+   **full-width dome curve** — it climbs ~36dp from each side to its centre
+   (SVG quadratic, not a corner radius), overlapping the photo. One word of the
+   headline sits on a rotated accent pill
+   (*"Get Ready For **Fashion** With Your Own Style"*). Three dots below mark
    the position in the flow.
 
    The swipe is deliberate and is the one control in the product that is not
@@ -501,6 +506,7 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
+| 2026-11-17 | Onboarding step 1 restructured to the reference layout: full-bleed hero (pink gradient backdrop across the whole top, cutout subject anchored to its bottom edge, subtle wash kept over the photograph) and the headline/description/swipe block moved onto a bottom sheet whose top edge is a full-width dome curve (~36dp rise from each side to the centre, SVG-drawn) overlapping the photo. Headline, supporting line, swipe-to-continue and step dots are untouched. §6. |
 | 2026-10-24 | Mobile email verification redesigned as a full OTP screen: six token-styled slots, outline back control, 40s resend countdown, primary verify button, bottom custom keypad; preserves 6-digit Better Auth flow and legacy link states. |
 | 2026-10-22 | Home greeting drops the fabricated guest name ("Romina") for the on-theme "Stylist", and the avatar no longer seeds initials for a guest. §7.1. |
 | 2026-10-21 | Web toasts rebuilt as the mobile brand pill (card surface, neutral hairline border, pill radius, rose disc with a white icon, tone carried by icon alone), and the token reference gained a Toasts section that fires each tone. See `DESIGN_SYSTEM.md` §9. |
