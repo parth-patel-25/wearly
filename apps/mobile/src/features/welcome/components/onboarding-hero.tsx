@@ -4,7 +4,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { StyleSheet, View } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import Svg, {
+  Defs,
+  Path,
+  Stop,
+  LinearGradient as SvgGradient,
+} from "react-native-svg";
 import { useCSSVariable, withUniwind } from "uniwind";
 
 import { StepDots } from "./step-dots";
@@ -15,6 +20,7 @@ import { SwipeToContinue } from "./swipe-to-continue";
 // render at zero size. Wrapping at module level keeps the HOC out of the
 // render path.
 const StyledImage = withUniwind(Image);
+const StyledGradient = withUniwind(LinearGradient);
 
 /**
  * Onboarding step 1 — the fashion moment.
@@ -25,6 +31,10 @@ const StyledImage = withUniwind(Image);
  * support line and swipe live on a sheet whose top edge is a full-width dome
  * curve overlapping the photo — the curve is drawn (SVG), because a radius
  * can only round corners, and the reference's sweep spans half the width.
+ * The sheet body's background is itself a gradient, not an overlay: a
+ * diagonal tint from background at the top-left to faint pink at the
+ * bottom-right, with the content as the gradient's children so the colour
+ * stays behind the text.
  *
  * The word *Fashion* sits on a rotated pill rather than being bolded. Bold is a
  * weight, and a weight is invisible when the line wraps — the pill is an object
@@ -34,8 +44,8 @@ const StyledImage = withUniwind(Image);
  * The two gradient washes are sanctioned absolute surfaces (see
  * DESIGN_SYSTEM.md §10): no flexbox arrangement can paint colour *behind* a
  * cutout, and the hero block's `overflow-hidden` keeps both washes inside the
- * silhouette the sheet overlaps. Both are static at module scope — created
- * once, never per render — and neither takes touches. The bundled asset is a
+ * silhouette the sheet overlaps. All are static at module scope — created
+ * once, never per render — and none take touches. The bundled asset is a
  * local `require()`, so there is no remote fetch to fail; the block degrades
  * to pure gradient, never to blank.
  */
@@ -83,12 +93,20 @@ const HERO_CONTENT_FIT = "cover" as const;
  */
 const DOME_RISE = 36;
 
+/** The shared tint colour — the body's gradient and the dome's match. */
+const TINT_PINK = "#FF94B5";
+
+/** The dome's silhouette: sides low, centre high, in a 100×100 stretched box. */
+const DOME_PATH = "M 0 100 Q 50 -100 100 100 Z";
+
 /**
- * The sheet's top edge as a single quadratic curve — sides low, centre high.
- * A border radius can only round *corners*, which is why the reference's
- * 40%-of-width sweep needs a drawn curve: the path runs from each bottom
- * corner of the box up to an apex at the centre top, and everything below the
- * curve is filled. Above the curve, the photo shows through.
+ * The sheet's top edge: an opaque base path (the sheet is a surface *over*
+ * the photo) with the body's diagonal tint continued across it. The body's
+ * gradient reaches 0.075 alpha at its top-right corner — halfway along its
+ * own diagonal — so the dome's gradient ends at exactly that value where the
+ * seam runs, and both gradients are at zero along the seam's left half. The
+ * two surfaces meet with no visible step, so no part of the sheet reads as
+ * untinted white above the title.
  */
 function SheetCurve({ fill }: { fill: string }) {
   return (
@@ -98,7 +116,15 @@ function SheetCurve({ fill }: { fill: string }) {
       viewBox="0 0 100 100"
       width="100%"
     >
-      <Path d="M 0 100 Q 50 -100 100 100 Z" fill={fill} />
+      <Defs>
+        <SvgGradient id="dome-tint" x1="0" x2="1" y1="0" y2="1">
+          <Stop offset="0" stopColor={TINT_PINK} stopOpacity={0} />
+          <Stop offset="0.5" stopColor={TINT_PINK} stopOpacity={0} />
+          <Stop offset="1" stopColor={TINT_PINK} stopOpacity={0.075} />
+        </SvgGradient>
+      </Defs>
+      <Path d={DOME_PATH} fill={fill} />
+      <Path d={DOME_PATH} fill="url(#dome-tint)" />
     </Svg>
   );
 }
@@ -149,10 +175,20 @@ export function OnboardingHero({
 
       {/* The content sheet — a full-width dome curve over the photo. The
           overlap (-mt-9 = DOME_RISE) lets the photo show through above the
-          curve, beside its centre apex. */}
+          curve, beside its centre apex. The tint wash deepens toward the
+          bottom like the reference panel. */}
       <View className="-mt-9">
         <SheetCurve fill={background} />
-        <View className="bg-background px-gutter pt-4 pb-6">
+        {/* The sheet body IS the tint — its own background stays the opaque
+            theme colour, and the gradient paints over it: transparent at the
+            top-left, faint pink at the bottom-right. Content is the
+            gradient's children, so the colour never sits over the text. */}
+        <StyledGradient
+          className="bg-background px-gutter pt-4 pb-6"
+          colors={["rgba(255, 148, 181, 0)", "rgba(255, 148, 181, 0.15)"]}
+          end={{ x: 1, y: 1 }}
+          start={{ x: 0, y: 0 }}
+        >
           <View className="gap-4">
             {/* Three forced centered lines. Row 2 is a shrink-wrapped relative unit
               (self-centered), so the absolute pill lives inside its own row's
@@ -194,7 +230,7 @@ export function OnboardingHero({
               <StepDots current={step} total={totalSteps} />
             </View>
           </View>
-        </View>
+        </StyledGradient>
       </View>
     </View>
   );

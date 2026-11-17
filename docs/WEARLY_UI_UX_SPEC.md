@@ -187,8 +187,12 @@ screen changes as the circle starts moving, not after it lands.
    edge, plus a subtle pink wash over the photograph. The headline, supporting
    line and **swipe-to-continue** sit on a bottom sheet whose top edge is a
    **full-width dome curve** — it climbs ~36dp from each side to its centre
-   (SVG quadratic, not a corner radius), overlapping the photo. One word of the
-   headline sits on a rotated accent pill
+   (SVG quadratic, not a corner radius), overlapping the photo. The sheet's
+   own background is a subtle diagonal tint — background at the top-left,
+   faint pink at the bottom-right — behind the content, never over it, and
+   the dome curve carries the same diagonal so the curve is never an
+   untinted white band. One
+   word of the headline sits on a rotated accent pill
    (*"Get Ready For **Fashion** With Your Own Style"*). Three dots below mark
    the position in the flow.
 
@@ -506,7 +510,7 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
-| 2026-11-17 | Onboarding step 1 restructured to the reference layout: full-bleed hero (pink gradient backdrop across the whole top, cutout subject anchored to its bottom edge, subtle wash kept over the photograph) and the headline/description/swipe block moved onto a bottom sheet whose top edge is a full-width dome curve (~36dp rise from each side to the centre, SVG-drawn) overlapping the photo. Headline, supporting line, swipe-to-continue and step dots are untouched. §6. |
+| 2026-11-17 | Onboarding step 1 restructured to the reference layout: full-bleed hero (pink gradient backdrop across the whole top, cutout subject anchored to its bottom edge, subtle wash kept over the photograph) and the headline/description/swipe block moved onto a bottom sheet whose top edge is a full-width dome curve (~36dp rise from each side to the centre, SVG-drawn) overlapping the photo; the sheet's background is a subtle diagonal tint (background top-left → faint pink bottom-right) behind the content. Headline, supporting line, swipe-to-continue and step dots are untouched. §6. |
 | 2026-10-24 | Mobile email verification redesigned as a full OTP screen: six token-styled slots, outline back control, 40s resend countdown, primary verify button, bottom custom keypad; preserves 6-digit Better Auth flow and legacy link states. |
 | 2026-10-22 | Home greeting drops the fabricated guest name ("Romina") for the on-theme "Stylist", and the avatar no longer seeds initials for a guest. §7.1. |
 | 2026-10-21 | Web toasts rebuilt as the mobile brand pill (card surface, neutral hairline border, pill radius, rose disc with a white icon, tone carried by icon alone), and the token reference gained a Toasts section that fires each tone. See `DESIGN_SYSTEM.md` §9. |
