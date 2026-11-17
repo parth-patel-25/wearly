@@ -94,10 +94,10 @@ const HERO_CONTENT_FIT = "contain" as const;
 
 /**
  * How high the sheet's dome climbs from each side edge to its centre, and how
- * far the sheet overlaps the photo. Measured from the reference: ~40px of
- * rise over a 406px-wide frame, ≈36dp on a phone.
+ * far the sheet overlaps the photo. Measured from the reference at ~36dp,
+ * then raised ~20% by request so the sweep reads a touch rounder.
  */
-const DOME_RISE = 36;
+const DOME_RISE = 43;
 
 /**
  * Headroom above the apex so the curve's drop shadow has room to blur. The
@@ -213,7 +213,7 @@ export function OnboardingHero({
             top-left, faint pink at the bottom-right. Content is the
             gradient's children, so the colour never sits over the text. */}
         <StyledGradient
-          className="bg-background px-gutter pt-4 pb-6"
+          className="bg-background px-gutter pt-2 pb-6"
           colors={["rgba(255, 148, 181, 0)", "rgba(255, 148, 181, 0.15)"]}
           end={{ x: 1, y: 1 }}
           start={{ x: 0, y: 0 }}
