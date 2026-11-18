@@ -40,6 +40,10 @@ Env vars (Production):
 
 Notes: `BETTER_AUTH_URL` points at the web origin because browser auth traffic is proxied through Vercel. `WEB_ORIGIN` drives CORS, trusted origins and invite links. Remove `ADMIN_PASSWORD` after seeding. Health check: `/api/health`. Vercel Hobby caps function duration at 10s — watch for `FUNCTION_INVOCATION_TIMEOUT` on cold starts.
 
+**Region and runtime:** `apps/api/vercel.json` pins `"regions": ["bom1"]` (Mumbai) so the function runs in the same city as the Supabase session pooler (`aws-0-ap-south-1`). Without it Vercel defaults to `iad1` (Washington DC), which adds two transatlantic hops per request (~500–700 ms on `/api/listings/public`). Hobby allows a single region; Pro can add more.
+
+Do **not** set `functions.<path>.runtime` for Node functions — `.ts` files under `api/` already use the officially supported Node.js runtime, and the Vercel project setting decides the version. If a runtime is ever required (a community runtime, not Node), the value must be a package plus a **full** semver version, e.g. `"@vercel/node@31.0.2"`. A range such as `"@vercel/node@5"` fails the build with `invalid_function_runtime: Function Runtimes must have a valid version, for example now-php@1.0.0`, because Vercel validates the part after the last `@` with strict semver.
+
 ## 3. Vercel — Web
 
 Project: root directory `apps/web`, enable "include files outside root". Install: `cd ../.. && bun install --frozen-lockfile`. Build: `cd ../.. && bun run build --filter=@wearly/web...`. Output `.next`, Node 22.x.
