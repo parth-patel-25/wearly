@@ -23,7 +23,7 @@ Secrets to prepare: Supabase session pooler URI (port 5432), fresh `BETTER_AUTH_
 
 ## 2. Vercel — API
 
-Project: root directory = `apps/api`, enable "include files outside root". Install: `cd ../.. && bun install --frozen-lockfile`. Build: `cd ../.. && bun run build --filter=@wearly/api...`. Node 22.x. The `api/index.ts` serverless function wraps the NestJS app; `vercel.json` rewrites `/(.*)` → `/api`.
+Project: root directory = `apps/api`, enable "include files outside root". Install: `cd ../.. && bun install --frozen-lockfile`. Build: `cd ../.. && bun run build --filter=@wearly/api...`. Node 26.x (pinned via `engines.node` in the repo-root `package.json`; in a monorepo Vercel resolves `engines` from the **root** `package.json`, not `apps/api`'s). The `api/index.ts` serverless function wraps the NestJS app; `vercel.json` rewrites `/(.*)` → `/api`.
 
 Env vars (Production):
 - `NODE_ENV=production`
@@ -44,9 +44,11 @@ Notes: `BETTER_AUTH_URL` points at the web origin because browser auth traffic i
 
 Do **not** set `functions.<path>.runtime` for Node functions — `.ts` files under `api/` already use the officially supported Node.js runtime, and the Vercel project setting decides the version. If a runtime is ever required (a community runtime, not Node), the value must be a package plus a **full** semver version, e.g. `"@vercel/node@31.0.2"`. A range such as `"@vercel/node@5"` fails the build with `invalid_function_runtime: Function Runtimes must have a valid version, for example now-php@1.0.0`, because Vercel validates the part after the last `@` with strict semver.
 
+**Node.js version:** pinned with `"engines": { "node": "26.x" }` in the **repo-root** `package.json`. In a monorepo Vercel reads `engines` from the root `package.json` even when the project's Root Directory is `apps/api`, and only major versions exist on Vercel (`22.x`/`24.x`/`26.x`, 26.x is the default). A floor like `">=22"` is **not** a pin — Vercel resolves it to the latest matching major, so the app silently moves to each new Node LTS.
+
 ## 3. Vercel — Web
 
-Project: root directory `apps/web`, enable "include files outside root". Install: `cd ../.. && bun install --frozen-lockfile`. Build: `cd ../.. && bun run build --filter=@wearly/web...`. Output `.next`, Node 22.x.
+Project: root directory `apps/web`, enable "include files outside root". Install: `cd ../.. && bun install --frozen-lockfile`. Build: `cd ../.. && bun run build --filter=@wearly/web...`. Output `.next`, Node 26.x.
 
 Env vars (Production):
 - `NEXT_PUBLIC_API_URL` = `https://<web>.vercel.app` (the web origin, NOT the API URL)
