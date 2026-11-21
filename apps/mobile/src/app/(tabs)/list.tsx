@@ -9,6 +9,7 @@ import { AppList } from "@wearly/ui-native/app-list";
 import { Button } from "@wearly/ui-native/button";
 import { Card } from "@wearly/ui-native/card";
 import { EmptyState } from "@wearly/ui-native/display";
+import { Spinner } from "@wearly/ui-native/spinner";
 import { Text } from "@wearly/ui-native/text";
 import { useRouter } from "expo-router";
 import { Image, View } from "react-native";
@@ -42,7 +43,15 @@ export default function ListScreen() {
     queryKey: ["my-listings"],
   });
 
-  if (!state.isAuthenticated) {
+  if (state.sessionStatus === "pending") {
+    return (
+      <View className="flex-1 items-center justify-center bg-background">
+        <Spinner />
+      </View>
+    );
+  }
+
+  if (state.sessionStatus === "unauthenticated") {
     return (
       <View className="flex-1 gap-6 bg-background px-6 pt-5">
         <View className="gap-1">

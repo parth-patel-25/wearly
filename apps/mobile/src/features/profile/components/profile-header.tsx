@@ -38,14 +38,14 @@ export function ProfileHeader({ onOpenRentals, onSignIn }: ProfileHeaderProps) {
       <ProfileIdentity
         email={state.email}
         image={state.image}
-        isAuthenticated={state.isAuthenticated}
         name={state.name}
         onSignIn={onSignIn}
+        sessionStatus={state.sessionStatus}
       />
 
-      {state.isAuthenticated ? (
+      {state.sessionStatus === "unauthenticated" ? null : (
         <ProfileRentals onPress={onOpenRentals} />
-      ) : null}
+      )}
 
       <ProfileProgressPanel state={profileState} />
 

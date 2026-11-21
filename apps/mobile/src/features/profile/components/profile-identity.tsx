@@ -1,5 +1,7 @@
+import type { SessionStatus } from "@core/providers/session-provider";
 import { Avatar } from "@wearly/ui-native/avatar";
 import { Button } from "@wearly/ui-native/button";
+import { Skeleton } from "@wearly/ui-native/skeleton";
 import { Text } from "@wearly/ui-native/text";
 import { View } from "react-native";
 
@@ -12,6 +14,11 @@ import { View } from "react-native";
  * created" badge: having signed in says nothing about whether the marketplace
  * profile is complete, and implying otherwise is exactly the fake progress the
  * progress bar exists to replace.
+ *
+ * The session has three states. While the cookie is still being read, the
+ * screen shows a neutral placeholder rather than the guest prompt: an account
+ * that has not answered yet is not the same thing as no account, and telling a
+ * signed-in person to sign in on every cold start is the bug this avoids.
  */
 
 export interface ProfileIdentityProps {
@@ -19,19 +26,31 @@ export interface ProfileIdentityProps {
   email: string | null;
   /** Profile photo from the provider, when there is one. */
   image: string | null;
-  isAuthenticated: boolean;
   name: string | null;
   onSignIn: () => void;
+  sessionStatus: SessionStatus;
 }
 
 export function ProfileIdentity({
   email,
   image,
-  isAuthenticated,
   name,
   onSignIn,
+  sessionStatus,
 }: ProfileIdentityProps) {
-  if (!isAuthenticated) {
+  if (sessionStatus === "pending") {
+    return (
+      <View className="flex-row items-center gap-4">
+        <Avatar size="xl" />
+        <View className="flex-1 gap-2">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-4 w-44" />
+        </View>
+      </View>
+    );
+  }
+
+  if (sessionStatus === "unauthenticated") {
     return (
       <View className="flex-row items-center gap-4">
         <Avatar size="xl" />

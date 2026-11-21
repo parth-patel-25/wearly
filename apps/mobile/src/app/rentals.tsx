@@ -131,7 +131,7 @@ export default function RentalsScreen() {
           <EmptyState
             action={
               <Button onPress={() => router.push(ROUTES.discover)}>
-                {role === "renter" ? "Browse pieces" : "See your listings"}
+                Browse pieces
               </Button>
             }
             body={
