@@ -5,32 +5,36 @@ import { authClient } from "@/lib/auth-client";
 /**
  * Session state.
  *
- * One context, one reducer, four *local* facts: what is saved, what is
- * currently being rented, and the two pre-auth personalise answers. Whether
- * there is an account and whose it is are not local facts — they come from
- * the Better Auth session (`authClient.useSession`, cookie in SecureStore),
- * so `isAuthenticated`, `name`, `email` and `image` are derived on every read
- * and the reducer never carries them. A reload keeps you signed in now;
- * favourites and the last rental stay local, because they belong to this
- * device either way.
+ * One context, one reducer, three *local* facts: what is saved and the two
+ * pre-auth personalise answers. Whether there is an account and whose it is
+ * are not local facts — they come from the Better Auth session
+ * (`authClient.useSession`, cookie in SecureStore), so `sessionStatus`,
+ * `isAuthenticated`, `name`, `email` and `image` are derived on every read and
+ * the reducer never carries them. A reload keeps you signed in now; favourites
+ * stay local, because they belong to this device either way.
+ *
+ * Rentals are not here. They belong to the account and their state lives on
+ * the server, so a rental that only this device remembered would be a lie.
  */
-
-export interface ConfirmedRental {
-  end: string;
-  method: "delivery" | "pickup" | null;
-  pieceId: string;
-  start: string;
-}
 
 /** Device-local state the auth session knows nothing about. */
 interface LocalState {
   favourites: readonly string[];
-  /** The most recent rental, kept so My Rentals has something real to show. */
-  lastRental: ConfirmedRental | null;
   /** Answers collected before anyone was asked to sign up. */
   stylingFor: string | null;
   wears: string | null;
 }
+
+/**
+ * Whether there is an account, kept as three states rather than a boolean.
+ *
+ * A boolean cannot tell "still reading the cookie from SecureStore" apart from
+ * "there is no session", so every guest screen flashed for a signed-in user on
+ * a cold start. Screens that gate on the session read `sessionStatus`; the
+ * derived `isAuthenticated` stays for the many places that only care whether
+ * an account exists once the answer is known.
+ */
+export type SessionStatus = "pending" | "authenticated" | "unauthenticated";
 
 export interface SessionState extends LocalState {
   /** The account's email, when the session exposes it. */
@@ -40,16 +44,15 @@ export interface SessionState extends LocalState {
   isAuthenticated: boolean;
   /** The account's display name. Editable through Better Auth. */
   name: string | null;
+  sessionStatus: SessionStatus;
 }
 
 export type SessionAction =
-  | { rental: ConfirmedRental; type: "rent-confirmed" }
   | { pieceId: string; type: "toggle-favourite" }
   | { style: string; field: "stylingFor" | "wears"; type: "personalise" };
 
 const INITIAL: LocalState = {
   favourites: [],
-  lastRental: null,
   stylingFor: null,
   wears: null,
 };
@@ -58,8 +61,6 @@ function reducer(state: LocalState, action: SessionAction): LocalState {
   switch (action.type) {
     case "personalise":
       return { ...state, [action.field]: action.style };
-    case "rent-confirmed":
-      return { ...state, lastRental: action.rental };
     case "toggle-favourite":
       return {
         ...state,
@@ -88,18 +89,25 @@ const SessionContext = createContext<SessionApi | null>(null);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [local, dispatch] = useReducer(reducer, INITIAL);
-  const { data, refetch } = authClient.useSession();
+  const { data, isPending, refetch } = authClient.useSession();
 
-  const state = useMemo<SessionState>(
-    () => ({
+  const state = useMemo<SessionState>(() => {
+    let sessionStatus: SessionStatus = "unauthenticated";
+    if (isPending) {
+      sessionStatus = "pending";
+    } else if (data) {
+      sessionStatus = "authenticated";
+    }
+
+    return {
       ...local,
       email: data?.user.email ?? null,
       image: data?.user.image ?? null,
-      isAuthenticated: Boolean(data),
+      isAuthenticated: sessionStatus === "authenticated",
       name: data?.user.name ?? null,
-    }),
-    [data, local]
-  );
+      sessionStatus,
+    };
+  }, [data, isPending, local]);
   const api = useMemo<SessionApi>(
     () => ({ dispatch, refreshSession: refetch, state }),
     [refetch, state]

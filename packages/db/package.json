@@ -16,9 +16,21 @@
       "types": "./dist/schema/auth.d.ts",
       "default": "./dist/schema/auth.js"
     },
+    "./schema/disputes": {
+      "types": "./dist/schema/disputes.d.ts",
+      "default": "./dist/schema/disputes.js"
+    },
     "./schema/listings": {
       "types": "./dist/schema/listings.d.ts",
       "default": "./dist/schema/listings.js"
+    },
+    "./schema/meetups": {
+      "types": "./dist/schema/meetups.d.ts",
+      "default": "./dist/schema/meetups.js"
+    },
+    "./schema/rentals": {
+      "types": "./dist/schema/rentals.d.ts",
+      "default": "./dist/schema/rentals.js"
     }
   },
   "main": "./dist/client.js",

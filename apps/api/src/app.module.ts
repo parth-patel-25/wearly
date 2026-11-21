@@ -8,6 +8,7 @@ import { AdminModule } from "./modules/admin/admin.module.js";
 import { HealthModule } from "./modules/health/health.module.js";
 import { ListingsModule } from "./modules/listings/listings.module.js";
 import { NotesModule } from "./modules/notes/notes.module.js";
+import { RentalsModule } from "./modules/rentals/rentals.module.js";
 import { StorageModule } from "./modules/storage/storage.module.js";
 
 @Module({
@@ -21,6 +22,7 @@ import { StorageModule } from "./modules/storage/storage.module.js";
     HealthModule,
     ListingsModule,
     NotesModule,
+    RentalsModule,
     StorageModule,
   ],
   providers: [{ provide: APP_INTERCEPTOR, useClass: LoggingInterceptor }],

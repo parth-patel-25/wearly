@@ -1,8 +1,15 @@
-import { ROUTES } from "@core/routing/routes";
+import { useSession } from "@core/providers/session-provider";
+import { ROUTES, rentalFor } from "@core/routing/routes";
 import { HomeContent } from "@features/home/components/home-content";
 import { HomeIntroCard } from "@features/home/components/home-intro-card";
 import { HomeSearch } from "@features/home/components/home-search";
 import { RecommendedGrid } from "@features/home/components/recommended-grid";
+import { HomeRentalCard } from "@features/rental/components/home-rental-card";
+import { useAllRentals } from "@features/rental/hooks/use-rentals";
+import {
+  HOME_MIN_PRIORITY,
+  selectAttention,
+} from "@features/rental/lib/rental-attention";
 import { rentalSummary } from "@shared/data/catalogue";
 import { listingToPiece } from "@shared/data/listing-to-piece";
 import { useCatalogueGrid } from "@shared/hooks/use-catalogue-grid";
@@ -34,9 +41,11 @@ const GRID_COUNT = 6;
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { state } = useSession();
   const { data: rawListings } = usePublicListings();
+  const { data: rentals } = useAllRentals();
   const pieces = useMemo(
-    () => (rawListings ?? []).map(listingToPiece),
+    () => (rawListings ?? []).map((listing) => listingToPiece(listing)),
     [rawListings]
   );
   const { favourites, items, onFavourite } = useCatalogueGrid(pieces);
@@ -55,7 +64,8 @@ export default function HomeScreen() {
   );
   const fresh = useMemo(
     () =>
-      pieces.slice(-RAIL_COUNT)
+      pieces
+        .slice(-RAIL_COUNT)
         .reverse()
         .map((piece) => ({
           fact: "Just added",
@@ -68,7 +78,21 @@ export default function HomeScreen() {
     [pieces]
   );
   const recommended = useMemo(() => items.slice(0, GRID_COUNT), [items]);
+  /**
+   * At most one rental clears the Home bar. Pending session and guests get
+   * `null`, so the magazine never opens with a guest-shaped rental card or a
+   * skeleton where the hero belongs.
+   */
+  const homeAttention = useMemo(() => {
+    if (!state.isAuthenticated) {
+      return null;
+    }
+    const [first] = selectAttention(rentals?.items ?? []);
+    return first && first.priority >= HOME_MIN_PRIORITY ? first : null;
+  }, [rentals, state.isAuthenticated]);
   const open = (id: string) => router.push(ROUTES.product(id));
+  const toProfile = () => router.navigate(ROUTES.profile);
+  const toActivity = () => router.push(ROUTES.activity);
   // Home search is an entry point: hand off to Discover focused, with no
   // local filtering. `q` (even empty) is the focus signal.
   const toDiscover = () =>
@@ -85,10 +109,7 @@ export default function HomeScreen() {
         stickyHeaderIndices={[1]}
       >
         <View>
-          <HomeIntroCard
-            onNotifications={() => undefined}
-            onProfile={() => undefined}
-          />
+          <HomeIntroCard onNotifications={toActivity} onProfile={toProfile} />
         </View>
         {/* The pinned strip: the white bottom half of the header card,
             rounded on the bottom corners only. `pt-4` stays constant in both
@@ -104,6 +125,12 @@ export default function HomeScreen() {
         <View className="pt-3">
           <View className="rounded-t-5xl bg-card">
             <View className="gap-10 px-5 pt-5 pb-4">
+              {homeAttention ? (
+                <HomeRentalCard
+                  attention={homeAttention}
+                  onOpen={() => router.push(rentalFor(homeAttention.rental.id))}
+                />
+              ) : null}
               <HomeContent
                 favourites={favourites}
                 fresh={fresh}

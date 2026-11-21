@@ -79,7 +79,7 @@ export function HomeContent({
         onSeeAll={onSeeAll}
         title="✨ New on Wearly"
       />
-      <LooksRail looks={looks} onOpenLook={onOpen} />
+      <LooksRail looks={looks} onOpenLook={onOpen} pieces={pieces} />
     </View>
   );
 }

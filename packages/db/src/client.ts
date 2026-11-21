@@ -2,7 +2,6 @@ import { setDefaultResultOrder } from "node:dns";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { adminInvites } from "./schema/admin-invites.js";
-import { listings } from "./schema/listings.js";
 import {
   account,
   accountRelations,
@@ -12,6 +11,10 @@ import {
   userRelations,
   verification,
 } from "./schema/auth.js";
+import { disputes } from "./schema/disputes.js";
+import { listings } from "./schema/listings.js";
+import { meetupProposals } from "./schema/meetups.js";
+import { rentalEvents, rentals } from "./schema/rentals.js";
 
 /**
  * Prefer IPv4 when a host publishes both A and AAAA records. Node 17+ returns
@@ -39,7 +42,11 @@ const schema = {
   account,
   accountRelations,
   adminInvites,
+  disputes,
   listings,
+  meetupProposals,
+  rentalEvents,
+  rentals,
   session,
   sessionRelations,
   user,

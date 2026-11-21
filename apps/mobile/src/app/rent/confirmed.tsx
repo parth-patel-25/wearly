@@ -1,235 +1,184 @@
-import { useSession } from "@core/providers/session-provider";
-import { ROUTES } from "@core/routing/routes";
-import { useRentalDraft } from "@features/rental/providers/rental-draft-provider";
-import { countDays } from "@features/rental/validations/rental.schema";
-import type { Piece } from "@shared/data/catalogue";
-import { formatRupees } from "@shared/data/catalogue";
-import { formatDate } from "@shared/lib/format-date";
+import { ROUTES, rentalFor } from "@core/routing/routes";
+import { useRental } from "@features/rental/hooks/use-rentals";
 import { listingToPiece } from "@shared/data/listing-to-piece";
-import { useQuery } from "@tanstack/react-query";
-import { authClient } from "@/lib/auth-client";
-import { API_ROUTES } from "@wearly/shared/api/routes";
+import { formatDate } from "@shared/lib/format-date";
+import { RENTAL_STATUSES } from "@wearly/shared/enums";
 import { Button } from "@wearly/ui-native/button";
 import { Card, Panel } from "@wearly/ui-native/card";
 import { Icon } from "@wearly/ui-native/icon";
 import { Media } from "@wearly/ui-native/media";
-import { useFadeIn } from "@wearly/ui-native/motion";
-import { PriceRow } from "@wearly/ui-native/status";
+import { Spinner } from "@wearly/ui-native/spinner";
+import { KeyValueRow, PriceRow } from "@wearly/ui-native/status";
 import { Text } from "@wearly/ui-native/text";
-import { useRouter } from "expo-router";
-import { useEffect, useRef } from "react";
-import { View } from "react-native";
-import Animated from "react-native-reanimated";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { ScrollView, View } from "react-native";
 
 /**
- * Rental confirmed.
+ * Request sent.
  *
- * The one moment where a little ceremony is correct. The check mark draws itself,
- * the details arrive a beat later, and the two things a renter actually needs
- * next — the dates and the lender — are the two biggest things on the screen.
- *
- * The booking is committed to the session here rather than on the previous
- * screen, so a user who somehow reaches this screen without one cannot end up
- * with a confirmation for a rental that was never made.
+ * Not a confirmation of a rental. The lender still has to accept, the two
+ * people still have to agree where to meet, and only then does anything start.
+ * The copy says exactly that, and the payment block says nothing was charged.
  */
-
-const CLEANING_FEE_PER_DAY = 25;
-const DELIVERY_FEE = 79;
-
-export default function ConfirmedScreen() {
-  const { draft } = useRentalDraft();
-  const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
-  const { data: listing } = useQuery({
-    enabled: !!draft.pieceId,
-    queryFn: async () => {
-      const res = (await authClient.$fetch(`${apiBase}${API_ROUTES.LISTINGS.BY_ID(draft.pieceId ?? "")}`)) as {
-        data?: import("@wearly/shared/api/types").Listing;
-        error?: { message?: string };
-      };
-      if (res.error || !res.data) return null;
-      return res.data;
-    },
-    queryKey: ["listing", draft.pieceId],
-  });
-  const piece = listing ? listingToPiece(listing) : undefined;
-
-  const isComplete = Boolean(piece && draft.start && draft.end);
-
-  return isComplete ? <ConfirmationBody /> : <NothingToConfirm />;
-}
-
-function NothingToConfirm() {
+export default function RequestSentScreen() {
   const router = useRouter();
-  return (
-    <View className="flex-1 items-center justify-center gap-6 bg-background px-gutter">
-      <Text className="text-center" variant="headingMd">
-        There is no rental to confirm
-      </Text>
-      <Button onPress={() => router.replace(ROUTES.discover)}>
-        Find something to rent
-      </Button>
-    </View>
-  );
-}
+  const { rentalId } = useLocalSearchParams<{ rentalId?: string }>();
+  const id = typeof rentalId === "string" ? rentalId : "";
+  const { data: rental, error, isPending, refetch } = useRental(id);
 
-function ConfirmationBody() {
-  const router = useRouter();
-  const { draft, clear } = useRentalDraft();
-  const { dispatch } = useSession();
-  const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
-  const { data: listing } = useQuery({
-    enabled: !!draft.pieceId,
-    queryFn: async () => {
-      const res = (await authClient.$fetch(`${apiBase}${API_ROUTES.LISTINGS.BY_ID(draft.pieceId ?? "")}`)) as {
-        data?: import("@wearly/shared/api/types").Listing;
-        error?: { message?: string };
-      };
-      if (res.error || !res.data) return null;
-      return res.data;
-    },
-    queryKey: ["listing", draft.pieceId],
-  });
-  const piece = listing ? listingToPiece(listing) : ({} as Piece);
-  const committed = useRef(false);
+  if (id.length === 0) {
+    return (
+      <Centered
+        action={
+          <Button onPress={() => router.replace(ROUTES.discover)}>
+            Find something to rent
+          </Button>
+        }
+        body="The request you were looking for is no longer on this screen."
+        title="Nothing to show here"
+      />
+    );
+  }
 
-  // Commit the booking here rather than on the previous screen, so this screen
-  // cannot be reached with a confirmation for a rental that was never made.
-  useEffect(() => {
-    if (draft.start === null || draft.end === null) {
-      return;
-    }
-    if (committed.current === true) {
-      return;
-    }
-    committed.current = true;
-    dispatch({
-      rental: {
-        end: draft.end,
-        method: draft.method,
-        pieceId: piece.id,
-        start: draft.start,
-      },
-      type: "rent-confirmed",
-    });
-  }, [dispatch, draft.end, draft.method, draft.start, piece.id]);
+  if (isPending) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background">
+        <Spinner />
+      </View>
+    );
+  }
 
-  const days = countDays(draft.start ?? "", draft.end ?? "");
-  const rental = piece.dailyRate * days;
-  const cleaning = CLEANING_FEE_PER_DAY * days;
-  const headlineStyle = useFadeIn();
-  const pieceStyle = useFadeIn({ delay: 200, distance: 12 });
-  const totalsStyle = useFadeIn({ delay: 320, distance: 12 });
-  const noteStyle = useFadeIn({ delay: 440, distance: 12 });
+  if (error || !rental) {
+    return (
+      <Centered
+        action={<Button onPress={() => refetch()}>Try again</Button>}
+        body={
+          error instanceof Error
+            ? error.message
+            : "We could not load the request you just sent."
+        }
+        title="One moment"
+      />
+    );
+  }
 
-  const delivery = draft.method === "delivery" ? DELIVERY_FEE : 0;
-  const total = rental + cleaning + delivery;
+  const piece = listingToPiece(rental.listing);
+
+  /**
+   * Both CTAs leave the request flow entirely. `dismissAll` pops the date
+   * picker and review screen back to the tabs, so back from the destination
+   * lands on Home rather than on a stale date sheet whose draft was cleared
+   * when the request succeeded.
+   */
+  const openRental = () => {
+    router.dismissAll();
+    router.push(rentalFor(rental.id));
+  };
+  const openAllRentals = () => {
+    router.dismissAll();
+    router.push(ROUTES.rentals);
+  };
 
   return (
     <View className="flex-1 bg-background pt-safe">
-      <View className="flex-1 gap-10 px-gutter pt-16 pb-8">
-        <Animated.View className="items-center gap-5" style={headlineStyle}>
-          <DrawingCheck />
+      <ScrollView
+        contentContainerClassName="gap-8 px-gutter pt-14 pb-8"
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="items-center gap-5">
+          <View className="size-16 items-center justify-center rounded-pill bg-success-background">
+            <Icon name="check" size="lg" tone="success" />
+          </View>
           <View className="items-center gap-2">
             <Text className="text-center" variant="headingXl">
-              It is yours for {days} {days === 1 ? "day" : "days"}
+              Request sent
             </Text>
             <Text
               className="text-center"
               tone="muted-foreground"
               variant="bodyMd"
             >
-              {piece.lender.name} will be in touch about{" "}
-              {draft.method === "delivery" ? "delivery" : "pickup"}.
+              {`${rental.counterparty.name} has 48 hours to accept. Nothing is booked until they do.`}
             </Text>
           </View>
-        </Animated.View>
+        </View>
 
-        <Animated.View style={pieceStyle}>
-          <Card className="flex-row items-center gap-4 p-4">
-            <View className="w-20 overflow-hidden rounded-media">
-              <Media
-                aspect="1/1"
-                src={piece.images[0]}
-                tone={piece.gallery[0]}
-              />
-            </View>
-            <View className="flex-1 gap-1">
-              <Text numberOfLines={2} variant="bodyMd">
-                {piece.name}
-              </Text>
+        <Card className="flex-row items-center gap-4 p-4">
+          <View className="w-20 overflow-hidden rounded-media">
+            <Media aspect="1/1" src={piece.images[0]} tone={piece.gallery[0]} />
+          </View>
+          <View className="flex-1 gap-1">
+            <Text numberOfLines={2} variant="bodyMd">
+              {piece.name}
+            </Text>
+            <Text tone="muted-foreground" variant="caption">
+              {`${formatDate(rental.startDate)} → ${formatDate(rental.endDate)}`}
+            </Text>
+            {piece.areaLabel.length > 0 ? (
               <Text tone="muted-foreground" variant="caption">
-                {`${formatDate(draft.start ?? "")} → ${formatDate(draft.end ?? "")}`}
+                {`Meet in ${piece.areaLabel}`}
               </Text>
-            </View>
-          </Card>
-        </Animated.View>
-
-        <Animated.View style={totalsStyle}>
-          <Panel title="Paid today">
-            <View className="flex-col gap-3">
-              <PriceRow label="Rental" value={formatRupees(rental)} />
-              <PriceRow label="Dry cleaning" value={formatRupees(cleaning)} />
-              <PriceRow
-                emphasis={delivery === 0 ? "muted" : "normal"}
-                label={delivery === 0 ? "Pickup" : "Delivery"}
-                value={delivery === 0 ? "Free" : formatRupees(delivery)}
-              />
-              <PriceRow
-                emphasis="total"
-                label="Total"
-                value={formatRupees(total)}
-              />
-              <PriceRow
-                emphasis="muted"
-                hint="Refunded once it comes back"
-                label="Deposit held"
-                value={formatRupees(piece.deposit)}
-              />
-            </View>
-          </Panel>
-        </Animated.View>
-
-        <Animated.View style={noteStyle}>
-          <View className="flex-row items-start gap-3 rounded-card bg-muted p-5">
-            <Icon name="sparkles" size="sm" tone="muted-foreground" />
-            <Text className="flex-1" tone="muted-foreground" variant="bodySm">
-              This is a prototype. No payment was taken, no message was sent,
-              and the piece does not exist.
-            </Text>
+            ) : null}
           </View>
-        </Animated.View>
-      </View>
+        </Card>
+
+        <Panel title="What happens next">
+          <KeyValueRow label="Accept or decline" value="Within 48 hours" />
+          <KeyValueRow label="Where" value="A public place you agree on" />
+          <KeyValueRow label="Rental starts" value="When you confirm receipt" />
+          <PriceRow
+            hint={`${rental.days} ${rental.days === 1 ? "day" : "days"}, fixed now`}
+            label="If accepted"
+            value={`₹${rental.totalRupees.toLocaleString("en-IN")}`}
+          />
+        </Panel>
+
+        <Card className="flex-row items-start gap-3 p-5" variant="muted">
+          <Icon name="lock" size="sm" tone="muted-foreground" />
+          <Text className="flex-1" tone="muted-foreground" variant="bodySm">
+            Payment protection is not connected in this build, so sending this
+            did not charge or reserve anything. A real provider would authorize
+            the amount only after the lender accepts.
+          </Text>
+        </Card>
+
+        {rental.status === RENTAL_STATUSES.REQUESTED ? null : (
+          <Text tone="muted-foreground" variant="bodySm">
+            This request has already moved on. Open it to see the latest state.
+          </Text>
+        )}
+      </ScrollView>
 
       <View className="gap-3 border-border border-t bg-card px-gutter pt-5 pb-10">
-        <Button
-          onPress={() => {
-            clear();
-            router.replace(ROUTES.rentals);
-          }}
-          size="lg"
-        >
-          See my rentals
+        <Button onPress={openRental} size="lg">
+          Open the request
         </Button>
-        <Button
-          onPress={() => {
-            clear();
-            router.replace(ROUTES.home);
-          }}
-          size="sm"
-          variant="ghost"
-        >
-          Keep browsing
+        <Button onPress={openAllRentals} size="sm" variant="ghost">
+          See all my rentals
         </Button>
       </View>
     </View>
   );
 }
 
-/** The one animated moment in the app, and it is 400ms. */
-function DrawingCheck() {
+function Centered({
+  action,
+  body,
+  title,
+}: {
+  action: React.ReactNode;
+  body: string;
+  title: string;
+}) {
   return (
-    <View className="size-16 items-center justify-center rounded-pill bg-success-background">
-      <Icon name="check" size="lg" tone="success" />
+    <View className="flex-1 items-center justify-center gap-4 bg-background px-gutter">
+      <Text className="text-center" variant="headingMd">
+        {title}
+      </Text>
+      <Text className="text-center" tone="muted-foreground" variant="bodyMd">
+        {body}
+      </Text>
+      {action}
     </View>
   );
 }

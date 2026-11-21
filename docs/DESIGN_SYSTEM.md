@@ -809,18 +809,32 @@ reads from the circle, the glyph swap, the tone and the label's weight
 The bar's own geometry is named constants in `tab-bar.tsx`: `SLOT` (`h-14`) on
 the tab, `CIRCLE`, `CIRCLE_OVERHANG`, and the container's `pb-safe-or-4`.
 
-### Four destinations, and `rentals` is no longer one of them
+### Four destinations, and `rentals` is not one of them
 
-The bar is **Home, Discover, List, Profile**. Rentals left the bar; its screen is
-still registered in `apps/mobile/src/app/(tabs)/_layout.tsx` and stays
-deep-linkable, but it has no in-bar entry point and must be reached from Home or a
-product card. A wardrobe list is a place you visit deliberately, not one of the
-four things you bounce between all day, and dropping it is what buys the circle
-the slot width it needs.
+The bar is **Home, Discover, List, Profile**. Rentals left the bar entirely: its
+screen now lives at `apps/mobile/src/app/rentals.tsx` as a **root-stack route**,
+not a tab and not a member of the `(tabs)` group. A wardrobe list is a place you
+visit deliberately, not one of the four things you bounce between all day, and
+dropping it is what buys the circle the slot width it needs.
 
-`ROUTES.TABS` in `apps/mobile/src/core/routing/routes.ts` still lists five. It is
-exported but unused by the bar, so it is stale rather than wrong — but it is a
-trap for the next person who reaches for it, and should be reconciled or deleted.
+Because it is a stack route it draws its own header row (outline back · centred
+`headingSm` "Rentals" · mirror spacer), exactly like `product/[id]`,
+`rental/[id]` and `rent/dates`. That is what gives it a real back affordance:
+returning to Profile or Home is a pop, not a guess. The tab bar is not rendered
+on it, and the wrong-tab-highlight fallback in `(tabs)/_layout.tsx` no longer
+applies to any rental route.
+
+Rentals is reached from three deliberate places:
+
+- **Profile → Your rentals** — permanent discoverability, directly under the
+  identity block so it stays visible before the saved grid.
+- **Home → contextual rental card** — appears only when the API reports a rental
+  that needs attention, and deep-links to that rental, not to the list.
+- **Home → bell → Activity** — the attention inbox, derived from the same rental
+  list. No unread state is claimed, because none is stored.
+
+`ROUTES.TABS` in `apps/mobile/src/core/routing/routes.ts` now lists the four real
+destinations and matches the bar.
 
 ### The bar's bottom padding is `max(inset, 1rem)`
 

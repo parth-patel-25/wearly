@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 
-import type { Fulfillment } from "../validations/rental.schema";
-
 /**
  * The rental being assembled.
  *
@@ -17,8 +15,6 @@ import type { Fulfillment } from "../validations/rental.schema";
 
 export interface RentalDraft {
   end: string | null;
-  /** 1 = delivery, 2 = pickup. */
-  method: Fulfillment | null;
   pieceId: string | null;
   /** Inclusive ISO days. */
   start: string | null;
@@ -26,7 +22,6 @@ export interface RentalDraft {
 
 const EMPTY: RentalDraft = {
   end: null,
-  method: null,
   pieceId: null,
   start: null,
 };

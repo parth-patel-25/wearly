@@ -15,6 +15,13 @@
       "when": 1793727547604,
       "tag": "0001_messy_hairball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795024379015,
+      "tag": "0002_striped_pete_wisdom",
+      "breakpoints": true
     }
   ]
 }

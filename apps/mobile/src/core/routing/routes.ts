@@ -13,6 +13,8 @@ import type { Href } from "expo-router";
  */
 
 export const ROUTES = {
+  /** Rental notifications, derived from rental state. Reached from the Home bell. */
+  activity: "/activity",
   auth: "/auth",
   checkout: "/rent/checkout",
   confirmed: "/rent/confirmed",
@@ -26,7 +28,13 @@ export const ROUTES = {
   list: "/(tabs)/list",
   product: (pieceId: string): `/product/${string}` => `/product/${pieceId}`,
   profile: "/(tabs)/profile",
-  rentals: "/(tabs)/rentals",
+  rental: (rentalId: string): `/rental/${string}` => `/rental/${rentalId}`,
+  /**
+   * The complete rental list, as a secondary stack screen rather than a tab.
+   * It is reached from Profile, the Home rental card, Activity and the
+   * post-request confirmation. See `docs/DESIGN_SYSTEM.md` §10.
+   */
+  rentals: "/rentals",
   signIn: "/sign-in",
   splash: "/splash",
   verifyEmail: "/verify-email",
@@ -36,6 +44,14 @@ export const ROUTES = {
 /** Typed navigation target for the dates screen, which needs a query param. */
 export const datesFor = (pieceId: string) =>
   ({ params: { pieceId }, pathname: ROUTES.dates }) as const;
+
+/** Typed navigation target for a rental's detail screen. */
+export const rentalFor = (rentalId: string) =>
+  ({ params: { id: rentalId }, pathname: "/rental/[id]" }) as const;
+
+/** The "request sent" screen, keyed to the rental it created. */
+export const confirmedFor = (rentalId: string) =>
+  ({ params: { rentalId }, pathname: ROUTES.confirmed }) as const;
 
 /** Typed navigation target for the auth screen, which opens on a given tab. */
 export const authTab = (tab: "login" | "signup") =>

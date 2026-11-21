@@ -1,12 +1,12 @@
 import { useSession } from "@core/providers/session-provider";
 import { datesFor, ROUTES } from "@core/routing/routes";
-import { useHeroParallax } from "@features/product/hooks/use-hero-parallax";
 import { FullScreenImageViewer } from "@features/product/components/image-viewer";
 import { ProductSkeleton } from "@features/product/components/product-skeleton";
-import { listingToPiece } from "@shared/data/listing-to-piece";
-import { CONDITION_LABEL, formatRupees, rentalSummary, sizeOf } from "@shared/data/catalogue";
-import { formatDate } from "@shared/lib/format-date";
+import { useHeroParallax } from "@features/product/hooks/use-hero-parallax";
 import type { Piece } from "@shared/data/catalogue";
+import { CONDITION_LABEL, formatRupees, sizeOf } from "@shared/data/catalogue";
+import { distanceLabelOf, listingToPiece } from "@shared/data/listing-to-piece";
+import { formatDate } from "@shared/lib/format-date";
 import { useQuery } from "@tanstack/react-query";
 import { API_ROUTES } from "@wearly/shared/api/routes";
 import { Avatar } from "@wearly/ui-native/avatar";
@@ -19,8 +19,8 @@ import { Icon } from "@wearly/ui-native/icon";
 import { Media } from "@wearly/ui-native/media";
 import { KeyValueRow } from "@wearly/ui-native/status";
 import { Text } from "@wearly/ui-native/text";
-import { useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
@@ -40,27 +40,39 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
  * exactly that, so the section exists and is honestly empty.
  */
 
-const RENTAL_DAYS = 3;
-
 export default function ProductScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { band, id } = useLocalSearchParams<{ band?: string; id: string }>();
   const apiBase = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
-  const { data: listing, isPending, isError } = useQuery({
+  const {
+    data: listing,
+    isPending,
+    isError,
+  } = useQuery({
     enabled: typeof id === "string",
     queryFn: async () => {
-      const response = await fetch(`${apiBase}${API_ROUTES.LISTINGS.BY_ID(id as string)}`);
-      if (!response.ok) throw new Error("Not found");
+      const response = await fetch(
+        `${apiBase}${API_ROUTES.LISTINGS.BY_ID(id as string)}`
+      );
+      if (!response.ok) {
+        throw new Error("Not found");
+      }
       return (await response.json()) as import("@wearly/shared/api/types").Listing;
     },
     queryKey: ["listing", id],
   });
-  const piece = listing ? listingToPiece(listing) : undefined;
+  // The band is the one thing the detail endpoint cannot know: it is relative to
+  // wherever this renter searched from, so Discover hands it over.
+  const piece = listing
+    ? listingToPiece(listing, {
+        band: typeof band === "string" ? band : null,
+      })
+    : undefined;
 
   if (typeof id !== "string") {
     return <MissingProduct />;
   }
 
-  if (isPending || (!listing && !isError)) {
+  if (isPending || !(listing || isError)) {
     return <ProductSkeleton />;
   }
 
@@ -81,7 +93,6 @@ function ProductDetail({ piece }: ProductDetailProps) {
 
   const isSaved = state.favourites.includes(piece.id);
   const size = sizeOf(piece);
-  const summary = rentalSummary(piece, RENTAL_DAYS);
   const parallax = useHeroParallax();
   const { scrollY } = parallax;
   const buttonAnimStyle = useAnimatedStyle(() => {
@@ -89,13 +100,18 @@ function ProductDetail({ piece }: ProductDetailProps) {
     const translateY = y <= 0 ? 0 : -y * 0.5;
     const opacity = y <= 0 ? 1 : Math.max(0, 1 - y / 100);
     return {
-      transform: [{ translateY }],
       opacity,
+      transform: [{ translateY }],
     };
   });
   const { width } = useWindowDimensions();
   const [viewerOpen, setViewerOpen] = useState(false);
-  const [heroFrame, setHeroFrame] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [heroFrame, setHeroFrame] = useState({
+    height: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+  });
 
   return (
     // The status strip is its own `bg-card` backdrop (inset height only),
@@ -180,7 +196,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
           {piece.images
             .filter((img) => !!img)
             .map((img, i) => (
-              <View key={`${img}-${i}`} style={{ width }}>
+              <View key={img} style={{ width }}>
                 <Media
                   aspect="3/4"
                   contentFit="contain"
@@ -191,8 +207,6 @@ function ProductDetail({ piece }: ProductDetailProps) {
             ))}
         </ScrollView>
       </Animated.View>
-
-
 
       <Animated.ScrollView
         className="flex flex-1 flex-col bg-transparent"
@@ -219,7 +233,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
             elevation — so the white lifts off light imagery instead of
             blending into it. Rose-tinted, never grey. */}
         <View className="flex flex-col gap-10 rounded-t-6xl bg-card pt-8 pb-8 shadow-lift">
-           <View className="gap-2 px-gutter">
+          <View className="gap-2 px-gutter">
             {/* Measured (see `useHeroParallax`): when this title scrolls fully
                 past the header, the header takes over showing the piece name. */}
             <View onLayout={parallax.onCrossingLayout} ref={parallax.titleRef}>
@@ -227,7 +241,13 @@ function ProductDetail({ piece }: ProductDetailProps) {
             </View>
             <Text variant="price">{`${formatRupees(piece.dailyRate)} / day`}</Text>
             <Text tone="muted-foreground" variant="bodySm">
-              {`${summary} · ${formatRupees(piece.deposit)} refundable deposit`}
+              {[
+                piece.areaLabel.length > 0 ? `In ${piece.areaLabel}` : null,
+                distanceLabelOf(piece),
+                "Meet in person",
+              ]
+                .filter(Boolean)
+                .join(" · ")}
             </Text>
           </View>
 
@@ -237,9 +257,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
             <Badge variant="success">Available now</Badge>
           </View>
 
-          
-
-           <Section title="About this piece">
+          <Section title="About this piece">
             <Text tone="muted-foreground" variant="bodyMd">
               {piece.description}
             </Text>
@@ -255,7 +273,10 @@ function ProductDetail({ piece }: ProductDetailProps) {
           </Section>
 
           <Section subtitle="You pick the dates next" title="Availability">
-            <KeyValueRow label="Earliest start" value={formatDate(piece.availableFrom)} />
+            <KeyValueRow
+              label="Earliest start"
+              value={formatDate(piece.availableFrom)}
+            />
             <KeyValueRow
               label="Already committed"
               value={`${piece.unavailable.length} days this month`}
@@ -291,16 +312,16 @@ function ProductDetail({ piece }: ProductDetailProps) {
 
           <Section title="Good to know">
             <Policy
-              icon="truck"
-              text="Delivery or pickup, your choice. Chosen before you pay."
+              icon="map-pin"
+              text="You meet the lender in person at a public place. Exact addresses are never shared."
             />
             <Policy
               icon="lock"
-              text={`${formatRupees(piece.deposit)} deposit, released once it comes back.`}
+              text="Payment protection is not connected in this build, so no money is taken or reserved."
             />
             <Policy
               icon="sparkles"
-              text="Dry clean only. The cleaning cost is in the price above."
+              text="Cleaning is included in the price above. Dry clean only."
             />
           </Section>
 
@@ -334,17 +355,16 @@ function ProductDetail({ piece }: ProductDetailProps) {
         </View>
       </Animated.ScrollView>
 
-
       {heroFrame.height > 0 && (
         <Animated.View
           style={[
             buttonAnimStyle,
             {
-              position: "absolute",
-              top: heroFrame.y + heroFrame.height - 120,
-              right: 12,
-              zIndex: 50,
               elevation: 50,
+              position: "absolute",
+              right: 12,
+              top: heroFrame.y + heroFrame.height - 120,
+              zIndex: 50,
             },
           ]}
         >
@@ -363,11 +383,7 @@ function ProductDetail({ piece }: ProductDetailProps) {
         visible={viewerOpen}
       />
 
-      <StickyCta
-        dailyRate={piece.dailyRate}
-        days={RENTAL_DAYS}
-        pieceId={piece.id}
-      />
+      <StickyCta dailyRate={piece.dailyRate} pieceId={piece.id} />
     </View>
   );
 }
@@ -389,7 +405,7 @@ function Section({ children, subtitle, title }: SectionProps) {
 }
 
 interface PolicyProps {
-  icon: Extract<IconName, "lock" | "sparkles" | "truck">;
+  icon: Extract<IconName, "lock" | "map-pin" | "sparkles">;
   text: string;
 }
 
@@ -408,19 +424,18 @@ function Policy({ icon, text }: PolicyProps) {
 
 interface StickyCtaProps {
   dailyRate: number;
-  days: number;
   pieceId: string;
 }
 
-function StickyCta({ dailyRate, days, pieceId }: StickyCtaProps) {
+function StickyCta({ dailyRate, pieceId }: StickyCtaProps) {
   const router = useRouter();
 
   return (
     <View className="border-border border-t bg-card px-gutter pt-4 pb-10">
       <Button onPress={() => router.push(datesFor(pieceId))} size="lg">
-        {`Rent this · ${formatRupees(dailyRate * days)}`}
+        Rent this
         <Text tone="primary-foreground" variant="caption">
-          {`/${days} ${days === 1 ? "day" : "days"}`}
+          {`${formatRupees(dailyRate)} / day`}
         </Text>
       </Button>
     </View>

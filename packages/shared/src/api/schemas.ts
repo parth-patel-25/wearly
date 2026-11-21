@@ -1,11 +1,71 @@
 import { z } from "zod";
-import {
-  INVITE_STATUSES,
-  LISTING_STATUS_VALUES,
-  STORAGE_FOLDER_VALUES,
-  STORAGE_FOLDERS,
-  USER_ROLES,
-} from "../enums/index.js";
+
+// biome-ignore lint/performance/noBarrelFile: public package entry point for `@wearly/shared/api/schemas`; submodules keep each contract file small while callers keep one import surface.
+export {
+  type DiscoverListingsInput,
+  type DiscoverListingsResponse,
+  type DiscoveryListing,
+  discoverListingsResponseSchema,
+  discoverListingsSchema,
+  discoveryListingSchema,
+} from "./discovery-schemas.js";
+// Listing and upload contracts live in their own module to keep this file under
+// the repository's size limit. Re-exported here so every caller keeps using the
+// single `@wearly/shared/api/schemas` entry point.
+export {
+  type CreateListingInput,
+  type CreateUploadUrlInput,
+  type CreateUploadUrlResponse,
+  createListingSchema,
+  createUploadUrlResponseSchema,
+  createUploadUrlSchema,
+  type Listing,
+  listingSchema,
+} from "./listing-schemas.js";
+export {
+  type ListRentalsResponse,
+  listRentalsResponseSchema,
+  type RentalCancellation,
+  type RentalCapabilitiesResponse,
+  type RentalCounterparty,
+  type RentalDetail,
+  type RentalDispute,
+  type RentalEvent,
+  type RentalMeetup,
+  type RentalPayment,
+  type RentalSummary,
+  rentalCancellationSchema,
+  rentalCapabilitiesSchema,
+  rentalCounterpartySchema,
+  rentalDetailSchema,
+  rentalDisputeSchema,
+  rentalEventSchema,
+  rentalMeetupSchema,
+  rentalPaymentSchema,
+  rentalSummarySchema,
+} from "./rental-response-schemas.js";
+export {
+  type CreateRentalInput,
+  createRentalSchema,
+  type DeclineRentalInput,
+  type DisputeInput,
+  declineRentalSchema,
+  disputeSchema,
+  emptyActionSchema,
+  type HandoverAcknowledgeInput,
+  type HandoverConfirmInput,
+  handoverAcknowledgeSchema,
+  handoverConfirmSchema,
+  isoDaySchema,
+  type ListRentalsQuery,
+  listRentalsQuerySchema,
+  type MeetupProposalInput,
+  meetupProposalSchema,
+  type NoShowInput,
+  noShowSchema,
+  type RentalReasonInput,
+  rentalReasonSchema,
+} from "./rental-schemas.js";
 
 /** Shape returned by `GET /api/health`. */
 export const healthResponseSchema = z.object({
@@ -73,143 +133,23 @@ export type ErrorResponse = z.infer<typeof errorResponseSchema>;
 
 /* ------------------------------------------------------------------ admin */
 
-/** Role model shared by the API guards and the admin UI. */
-export const userRoleSchema = z.enum(USER_ROLES);
-export type { UserRole } from "../enums/index.js";
-
-/** A user row as the admin endpoints return it. `role` is always filled
- * server-side (`row.role ?? "user"`), so it is required here. */
-export const adminUserSchema = z.object({
-  banned: z.boolean().nullish(),
-  createdAt: z.iso.datetime(),
-  deletedAt: z.iso.datetime().nullish(),
-  email: z.string(),
-  emailVerified: z.boolean(),
-  id: z.string().min(1),
-  image: z.string().nullish(),
-  name: z.string(),
-  role: userRoleSchema,
-  updatedAt: z.iso.datetime(),
-});
-export type AdminUser = z.infer<typeof adminUserSchema>;
-
-/** Query string accepted by `GET /api/admin/users`. */
-export const listAdminUsersQuerySchema = z.object({
-  includeDeleted: z.stringbool().default(false),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
-  offset: z.coerce.number().int().min(0).default(0),
-  search: z.string().trim().max(200).optional(),
-});
-export type ListAdminUsersQuery = z.infer<typeof listAdminUsersQuerySchema>;
-
-/** Response of `GET /api/admin/users`. */
-export const listAdminUsersResponseSchema = z.object({
-  items: z.array(adminUserSchema),
-  limit: z.number().int().positive(),
-  offset: z.number().int().nonnegative(),
-  total: z.number().int().nonnegative(),
-});
-export type ListAdminUsersResponse = z.infer<
-  typeof listAdminUsersResponseSchema
->;
-
-/** Lifecycle state of an admin invite, computed by the API. */
-export const adminInviteStatusSchema = z.enum(INVITE_STATUSES);
-export type { AdminInviteStatus } from "../enums/index.js";
-
-/** An admin invitation as the admin endpoints return it (never the token). */
-export const adminInviteSchema = z.object({
-  acceptedAt: z.iso.datetime().nullish(),
-  createdAt: z.iso.datetime(),
-  email: z.string(),
-  expiresAt: z.iso.datetime(),
-  id: z.uuid(),
-  invitedBy: z.string(),
-  invitedByEmail: z.string().nullish(),
-  revokedAt: z.iso.datetime().nullish(),
-  role: userRoleSchema,
-  status: adminInviteStatusSchema,
-});
-export type AdminInvite = z.infer<typeof adminInviteSchema>;
-
-/** Response of `GET /api/admin/invites`. */
-export const listAdminInvitesResponseSchema = z.object({
-  items: z.array(adminInviteSchema),
-});
-export type ListAdminInvitesResponse = z.infer<
-  typeof listAdminInvitesResponseSchema
->;
-
-/** Body accepted by `POST /api/admin/invites`. */
-export const createAdminInviteSchema = z.object({
-  email: z
-    .string()
-    .min(1, "email is required")
-    .transform((value) => value.trim().toLowerCase())
-    .pipe(z.email("enter a valid email")),
-});
-export type CreateAdminInviteInput = z.infer<typeof createAdminInviteSchema>;
-
-/** Body accepted by `POST /api/admin/invites/accept`. */
-export const acceptAdminInviteSchema = z.object({
-  token: z.string().min(1),
-});
-
-export const createListingSchema = z.object({
-  availability: z.array(z.string()).optional(),
-  brand: z.string().optional(),
-  category: z.string().min(1),
-  color: z.string().optional(),
-  condition: z.string().min(1),
-  description: z.string().optional(),
-  material: z.string().optional(),
-  photos: z.array(z.string()).optional(),
-  pricePerDay: z.string().min(1),
-  size: z.string().min(1),
-  status: z.enum(LISTING_STATUS_VALUES).optional(),
-  subcategory: z.string().optional(),
-  title: z.string().min(1),
-});
-export type CreateListingInput = z.infer<typeof createListingSchema>;
-
-/** Body accepted by `POST /storage/upload-url`. */
-export const createUploadUrlSchema = z.object({
-  contentType: z.string().min(1),
-  filename: z.string().min(1).max(255),
-  /** Bucket folder; defaults to `listings` so existing callers are unchanged. */
-  folder: z.enum(STORAGE_FOLDER_VALUES).default(STORAGE_FOLDERS.LISTINGS),
-});
-export type CreateUploadUrlInput = z.infer<typeof createUploadUrlSchema>;
-
-/** Response of `POST /storage/upload-url`. */
-export const createUploadUrlResponseSchema = z.object({
-  path: z.string().min(1),
-  publicUrl: z.string().url(),
-  uploadUrl: z.string().url(),
-});
-export type CreateUploadUrlResponse = z.infer<
-  typeof createUploadUrlResponseSchema
->;
-
-export const listingSchema = z.object({
-  availability: z.array(z.string()).optional(),
-  brand: z.string().nullable().optional(),
-  category: z.string(),
-  color: z.string().nullable().optional(),
-  condition: z.string(),
-  createdAt: z.string(),
-  description: z.string().nullable().optional(),
-  id: z.string(),
-  lenderId: z.string(),
-  lenderName: z.string().nullable().optional(),
-  material: z.string().nullable().optional(),
-  photos: z.array(z.string()).optional(),
-  pricePerDay: z.string(),
-  size: z.string(),
-  status: z.enum(LISTING_STATUS_VALUES),
-  subcategory: z.string().nullable().optional(),
-  title: z.string(),
-  updatedAt: z.string(),
-});
-export type Listing = z.infer<typeof listingSchema>;
-export type AcceptAdminInviteInput = z.infer<typeof acceptAdminInviteSchema>;
+export {
+  type AcceptAdminInviteInput,
+  type AdminInvite,
+  type AdminInviteStatus,
+  type AdminUser,
+  acceptAdminInviteSchema,
+  adminInviteSchema,
+  adminInviteStatusSchema,
+  adminUserSchema,
+  type CreateAdminInviteInput,
+  createAdminInviteSchema,
+  type ListAdminInvitesResponse,
+  type ListAdminUsersQuery,
+  type ListAdminUsersResponse,
+  listAdminInvitesResponseSchema,
+  listAdminUsersQuerySchema,
+  listAdminUsersResponseSchema,
+  type UserRole,
+  userRoleSchema,
+} from "./admin-schemas.js";

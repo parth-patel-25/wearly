@@ -1,4 +1,6 @@
 import { useSession } from "@core/providers/session-provider";
+import { rentalKeys } from "@features/rental/hooks/use-rentals";
+import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@wearly/ui-native/toast";
 import { useCallback, useState } from "react";
 import { authClient } from "@/lib/auth-client";
@@ -18,6 +20,7 @@ import { authClient } from "@/lib/auth-client";
 export function useSignOut() {
   const toast = useToast();
   const { refreshSession } = useSession();
+  const queryClient = useQueryClient();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const signOut = useCallback(async (): Promise<boolean> => {
@@ -29,6 +32,10 @@ export function useSignOut() {
         return false;
       }
       await refreshSession();
+      // Rentals are account data, not device data. Dropping the cache on the
+      // way out means the next account never sees a frame of the previous
+      // account's Home card or list while the first fetch is in flight.
+      queryClient.removeQueries({ queryKey: rentalKeys.all });
       toast.show("Signed out", "success");
       return true;
     } catch {
@@ -37,7 +44,7 @@ export function useSignOut() {
     } finally {
       setIsSigningOut(false);
     }
-  }, [refreshSession, toast]);
+  }, [queryClient, refreshSession, toast]);
 
   return { isSigningOut, signOut };
 }

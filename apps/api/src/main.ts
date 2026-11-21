@@ -11,7 +11,10 @@ async function bootstrap() {
 
   await app.listen(PORT);
 
-  Logger.log(`API ready on http://localhost:${PORT}/${API_PREFIX}`, "Bootstrap");
+  Logger.log(
+    `API ready on http://localhost:${PORT}/${API_PREFIX}`,
+    "Bootstrap"
+  );
 }
 
 bootstrap().catch((error: unknown) => {

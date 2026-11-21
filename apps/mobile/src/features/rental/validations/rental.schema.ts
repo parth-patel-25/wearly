@@ -30,15 +30,6 @@ export const RentalRangeSchema = z
 
 export type RentalRange = z.infer<typeof RentalRangeSchema>;
 
-export const FULFILLMENT_OPTIONS = ["delivery", "pickup"] as const;
-
-/** The option itself, not an object wrapping it — that is what a chip toggles. */
-export type Fulfillment = (typeof FULFILLMENT_OPTIONS)[number];
-
-export const FulfillmentSchema = z.object({
-  method: z.enum(FULFILLMENT_OPTIONS),
-});
-
 export const SignInSchema = z.object({
   email: z
     .string()

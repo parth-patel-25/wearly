@@ -1,22 +1,21 @@
 import { ROUTES } from "@core/routing/routes";
+import { RentalQuoteCard } from "@features/rental/components/rental-quote-card";
 import { useRentalDraft } from "@features/rental/providers/rental-draft-provider";
 import { countDays } from "@features/rental/validations/rental.schema";
 import type { Piece } from "@shared/data/catalogue";
-import { formatRupees, rentalSummary } from "@shared/data/catalogue";
 import { listingToPiece } from "@shared/data/listing-to-piece";
 import { useQuery } from "@tanstack/react-query";
-import { authClient } from "@/lib/auth-client";
 import { API_ROUTES } from "@wearly/shared/api/routes";
+import { quoteRental } from "@wearly/shared/rentals/pricing";
 import { Button, IconButton } from "@wearly/ui-native/button";
 import type { CalendarRange } from "@wearly/ui-native/calendar";
 import { Calendar } from "@wearly/ui-native/calendar";
-import { Card } from "@wearly/ui-native/card";
-import { PriceRow } from "@wearly/ui-native/status";
 import { Text } from "@wearly/ui-native/text";
 import { useToast } from "@wearly/ui-native/toast";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
+import { authClient } from "@/lib/auth-client";
 
 /**
  * Date selection.
@@ -43,11 +42,15 @@ export default function DatesScreen() {
   const { data: listing } = useQuery({
     enabled: !!id,
     queryFn: async () => {
-      const res = (await authClient.$fetch(`${apiBase}${API_ROUTES.LISTINGS.BY_ID(id)}`)) as {
+      const res = (await authClient.$fetch(
+        `${apiBase}${API_ROUTES.LISTINGS.BY_ID(id)}`
+      )) as {
         data?: import("@wearly/shared/api/types").Listing;
         error?: { message?: string };
       };
-      if (res.error || !res.data) return null;
+      if (res.error || !res.data) {
+        return null;
+      }
       return res.data;
     },
     queryKey: ["listing", id],
@@ -83,6 +86,14 @@ function DatesBody({ piece }: DatesBodyProps) {
 
   const days =
     draft.start && draft.end ? countDays(draft.start, draft.end) : null;
+  const quote =
+    draft.start && draft.end
+      ? quoteRental({
+          endDate: draft.end,
+          pricePerDay: piece.dailyRate,
+          startDate: draft.start,
+        })
+      : null;
   const range: CalendarRange = {
     end: draft.end,
     start: draft.start ?? piece.availableFrom,
@@ -168,22 +179,7 @@ function DatesBody({ piece }: DatesBodyProps) {
       </ScrollView>
 
       <View className="gap-4 border-border border-t bg-card px-gutter pt-5 pb-10">
-        <Card className="gap-2 p-5">
-          <PriceRow
-            hint={
-              days === null
-                ? "Choose your dates"
-                : `${days} ${days === 1 ? "day" : "days"} at ${formatRupees(piece.dailyRate)}`
-            }
-            label="Rental"
-            value={days === null ? "—" : rentalSummary(piece, days)}
-          />
-          <PriceRow
-            emphasis="muted"
-            label="Refundable deposit"
-            value={formatRupees(piece.deposit)}
-          />
-        </Card>
+        <RentalQuoteCard days={days} quote={quote} />
 
         <Button disabled={days === null} onPress={continueToCheckout} size="lg">
           {days === null ? "Pick your dates" : "Review and continue"}

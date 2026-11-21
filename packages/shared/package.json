@@ -27,6 +27,30 @@
     "./api/client-core": {
       "types": "./dist/api/client-core.d.ts",
       "default": "./dist/api/client-core.js"
+    },
+    "./geo/distance": {
+      "types": "./dist/geo/distance.d.ts",
+      "default": "./dist/geo/distance.js"
+    },
+    "./geo/ranking": {
+      "types": "./dist/geo/ranking.d.ts",
+      "default": "./dist/geo/ranking.js"
+    },
+    "./rentals/capabilities": {
+      "types": "./dist/rentals/capabilities.d.ts",
+      "default": "./dist/rentals/capabilities.js"
+    },
+    "./rentals/pricing": {
+      "types": "./dist/rentals/pricing.d.ts",
+      "default": "./dist/rentals/pricing.js"
+    },
+    "./rentals/rental-transitions": {
+      "types": "./dist/rentals/rental-transitions.d.ts",
+      "default": "./dist/rentals/rental-transitions.js"
+    },
+    "./rentals/state-machine": {
+      "types": "./dist/rentals/state-machine.d.ts",
+      "default": "./dist/rentals/state-machine.js"
     }
   },
   "main": "./dist/api/routes.js",

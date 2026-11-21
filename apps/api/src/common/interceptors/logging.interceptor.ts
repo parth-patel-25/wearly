@@ -27,8 +27,11 @@ export class LoggingInterceptor implements NestInterceptor {
       tap({
         next: () => {
           const ms = Date.now() - startedAt;
+          // Strip the query string: discovery coordinates and filters must
+          // never reach a log line.
+          const path = request.url.split("?")[0] ?? request.url;
           this.logger.log(
-            `${request.method} ${request.url} ${http.getResponse().statusCode} ${ms}ms`
+            `${request.method} ${path} ${http.getResponse().statusCode} ${ms}ms`
           );
         },
       })

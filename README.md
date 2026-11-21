@@ -82,6 +82,24 @@ bun run dev --filter=@wearly/mobile
 ```
 
 Press `a` for an Android device or emulator, or scan the QR code with Expo Go.
+
+#### API tunnel for a physical Android device
+
+The app reads `EXPO_PUBLIC_API_URL` (`http://localhost:4000` in
+`apps/mobile/.env`). On a physical Android device `localhost` is the phone
+itself, so the port must be forwarded over USB:
+
+```bash
+adb reverse tcp:4000 tcp:4000
+```
+
+`bun run dev --filter=@wearly/mobile` runs this automatically, best effort, so
+reconnecting the cable or restarting the adb server re-establishes it on the
+next run. Without the tunnel the Home screen has nothing to render — the
+request is refused on the device and never reaches the API, which is why the
+screen looks empty rather than showing an error. The emulator needs the tunnel
+too, because the bundled URL is `localhost`, not `10.0.2.2`; the iOS simulator
+shares the host network and needs nothing.
 Note that `expo start --web` does **not** currently work in this repository:
 `react-native-web@0.21.3` and `uniwind@1.12.0` disagree about
 `uniwind/components/InputAccessoryView`, and `expo-router` pulls that in through

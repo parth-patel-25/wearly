@@ -26,7 +26,7 @@ Proves the design language and the hero-expansion interaction end to end.
 - [x] 08 Image gallery — full-bleed 3:4 hero image in product detail; header floats over it, content sheet overlaps its bottom edge with `rounded-t-5xl` (multi-frame strip removed 2026-10-06)
 - [x] 11 Date selection — calendar, range selection; Stack header off (`headerShown: false`), in-screen row instead (outline back · centred `headingSm` "Choose dates" · mirror spacer), headline "When will you wear it?"
 - [x] 12 Price breakdown — in checkout
-- [x] 13 Checkout — Stack header off (`headerShown: false`), in-screen row instead (outline back · centred `headingSm` "Checkout" · mirror spacer)
+- [x] 13 Checkout — Stack header off (`headerShown: false`), in-screen row instead (outline back · centred `headingSm` "Checkout" · mirror spacer). **Superseded by the in-person review screen below**; the delivery/pickup prototype is removed with Phase 2a.
 - [x] 15 Confirmation
 - [x] 16 Orders / rentals — honest empty state
 - [x] 18 Profile — Phase 1 complete: identity (photo + initials fallback, name,
@@ -96,12 +96,64 @@ The bar keeps one sliding pill across all four; see `DESIGN_SYSTEM.md` §10.
 
 - [ ] 09 Size selection
 - [ ] 10 Availability — calendar ships in 11; this is the owner's view
-- [ ] 14 Payment
-- [ ] 17 Tracking
+- [ ] 14 Payment — **scaffolded only**: provider interface, payment state and
+  honest placeholder copy exist; no money moves and the screen must say so
+- [ ] 17 Tracking — out of scope while rentals are in person
 - [ ] 19 Reviews — must ship as an honest empty state, never fabricated
 - [ ] 20 Seller profile
 - [ ] Profile completion (progressive, §6.2) — progress logic fixed in Phase 1
   (`docs/PROFILE_PHASES.md`); the Phase 2 profile destinations are still pending
+
+## Phase 2a — In-person rentals
+
+Peer-to-peer handover, no delivery. Architecture, state machine and data model
+are in `docs/RENTALS_ARCHITECTURE.md`. **Infrastructure landed first** (shared
+enums/contracts/pure logic, DB tables, migration); the boxes below track the
+screens and endpoints, so they stay unticked until the UI ships.
+
+**Backend (not a screen):**
+
+- [x] Shared rental enums, contracts and pure logic in `@wearly/shared`
+- [x] `rentals`, `rental_events`, `meetup_proposals`, `disputes` tables plus
+  private listing coordinates and public `areaLabel`
+- [x] Rental endpoints — create/list/detail, accept, decline, cancel, expiry
+- [x] Meetup proposal/accept and check-in
+- [x] Handover confirm (renter) / acknowledge (lender) / issues
+- [x] Return, return confirmation, no-show, dispute entry
+- [x] `POST /api/listings/discover` nearby ranking
+- [x] Payment provider interface + placeholder implementation
+
+**Screens:**
+
+- [x] 13a Review request — replaces 13 Checkout; item, duration, rental cost,
+  cleaning fee, total, in-person handover explanation, honest payment block
+- [x] 13b Request sent / confirmation — states the lender has 48 hours and that
+  nothing is charged on acceptance
+- [x] 26 Discover location — opt-in explainer, one-shot foreground location,
+  "Not now" fallback to all listings and area/text search; area + rounded
+  distance on cards, never a pin
+- [x] 27 Rental detail — status hero, counterparty, timeline, server-computed
+  primary action, payment summary
+- [x] 28 Meetup proposal — public place (café/mall/station/other), area, time,
+  note; "never share your home address"; accept or counter-propose
+- [x] 29 Handover confirmation — renter inspects, ticks item received and
+  condition accepted, confirms receipt → rental active
+- [x] 30 Return and completion — return due date, renter marks returned, lender
+  confirms
+- [x] 31 Cancel / no-show / dispute sheets — reason required, honest copy, no
+  fake refund promise
+- [x] 32 Rentals list — Renting/Lending switch, upcoming/active/past groups,
+  capability-driven actions (replaces the current empty-state placeholder).
+  Lives at the root-stack route `/rentals` (moved out of the `(tabs)` group):
+  in-screen back row, no tab-bar highlight, reached from Profile → Your
+  rentals, the Home rental card, Activity and the post-request confirmation.
+  Session loading is a third state, so a signed-in cold start no longer flashes
+  the guest view.
+- [x] 33 Activity — attention inbox at `/activity` (Home bell). Derived from
+  `GET /rentals?role=all`; every row maps to a real status and deep-links to
+  `/rental/[id]`. No unread state, no new backend.
+- [x] 34 Home rental card — compact contextual card shown only when a rental
+  needs attention; links straight to `/rental/[id]`.
 
 ## Phase 3 — The listing flow
 

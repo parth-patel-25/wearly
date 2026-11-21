@@ -51,29 +51,33 @@ on. No placeholder is shown while they are unset.
 - `EXPO_PUBLIC_PRIVACY_URL` — published privacy policy.
 - `EXPO_PUBLIC_TERMS_URL` — published terms of service.
 
-## Phase 2 — Blocked on rental infrastructure
+## Phase 2 — Waiting on the rental UI
 
-None of these have a data model, service or API yet. They are listed so the
-Profile destinations have a defined shape, and are **not** implemented with fake
-data.
+The rental **backend foundation now exists** on `feat/p2p-in-person-rentals`:
+shared enums/contracts, the rental state machine, DB tables (`rentals`,
+`rental_events`, `meetup_proposals`, `disputes`) and a generated migration. What
+is still missing is the API module and the mobile screens, so every box below
+stays unticked — a destination is never shown with fake data.
 
-- [ ] My rentals — bookings, rental status, rental history and returns.
-      Depends on: a rentals table, create/read endpoints, status transitions.
+- [ ] My rentals — requests, rental status, rental history and returns.
+      Depends on: the `/api/rentals` endpoints and the rentals list screen.
 - [ ] My listings — items lent and listing status.
       Depends on: listing creation/management (Phase 3 listing flow).
 - [ ] Rental and return status.
-      Depends on: rental lifecycle states in the API.
-- [ ] Delivery addresses — saved delivery details.
-      Depends on: an address model + CRUD endpoints.
+      Depends on: the rental lifecycle endpoints (state machine already exists).
 - [ ] Notifications — supported notification preferences.
       Depends on: notification settings storage + delivery infrastructure.
 - [ ] Payment methods — payment-provider-backed methods.
-      Depends on: a payment provider integration.
+      Depends on: a real payment provider; the interface and placeholder exist,
+      but no money moves.
 
-Suggested order once rental infrastructure exists: My rentals → Rental/return
-status → Addresses → My listings → Notifications → Payment methods. The first
-three share the rental lifecycle; listings depend on the listing flow; payment
-and notifications depend on external providers.
+~~Delivery addresses~~ — **removed from scope.** Rentals are in person: the renter
+and lender agree on a public place, and Wearly never stores a home address. If
+delivery returns as a fulfilment method later, this row comes back with it.
+
+Suggested order: My rentals → Rental/return status → My listings → Notifications
+→ Payment methods. The first two share the rental lifecycle; listings depend on
+the listing flow; payment and notifications depend on external providers.
 
 ## Phase 3 — Future marketplace capabilities
 

@@ -40,7 +40,9 @@ export function useCatalogueGrid(
 
 export function toCardItem(piece: Piece): ProductGridItem {
   return {
-    fact: piece.lender.neighbourhood,
+    // Distance is a ranking hint, not a promise: the API rounds it, and it is
+    // absent when the renter did not share a location.
+    fact: (piece.distanceBand ?? piece.areaLabel) || piece.category,
     id: piece.id,
     name: piece.name,
     placeholderTone: piece.gallery[0] ?? "muted",

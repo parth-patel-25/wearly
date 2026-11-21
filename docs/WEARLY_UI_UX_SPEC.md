@@ -298,12 +298,47 @@ Search, categories, filters, discovery, saving. Search stays visually simple.
 Filters are **not** a settings form — use bottom sheets, chips, large touch
 targets, clear selections, simple hierarchy.
 
+**One request owns the grid.** Discovery is a `POST /api/listings/discover`
+because the search coordinate must not land in a URL or access log. The API
+ranks and filters; the app renders its response and never re-filters locally,
+so the distance rules cannot disagree with the screen.
+
+**Location is opt-in, never a prompt on mount.** A card under the search field
+explains the trade: *"Share a one-time location so pieces close to you come
+first. It is not stored, and exact addresses are never shown."* The card offers
+"Use my location" and "Not now". Denied or unavailable permission is not an
+error state — the same grid works by area and text search, and the card says so.
+Once a fix exists it collapses to a quiet row ("Sorted by distance within
+5 km") with a "Stop using location" action.
+
+Distance is a ranking signal, not a filter: the bands are progressive and a
+listing without coordinates still appears by area label. Cards show **one extra
+fact** — the rounded band, otherwise the public area, otherwise the category.
+There is never a pin, a map or an address.
+
 ### 7.3 Product detail — the most important screen
 
 Premium and immersive. Large photography, name, rental price, duration,
-availability, size, condition, owner, reviews, location/delivery, deposit,
-policies. Do not expose everything at once — use sections and progressive
-disclosure. The primary CTA (`Rent this`) stays accessible while scrolling.
+availability, size, condition, owner, reviews, and the lender's **public area
+plus approximate distance** (`48 m away`, `1.2 km away`, or just
+`Bandra West` when they did not share a location). Do not expose everything at
+once — use sections and progressive disclosure. The primary CTA (`Rent this`)
+stays accessible while scrolling.
+
+**In-person only in this phase.** The detail screen never offers a delivery
+option and never shows a delivery fee or a deposit. The lines under the price
+read **"In Bandra West · 50–100 m away · Meet in person"** (area and band are
+omitted when unknown), and the "Good to know" section states that you meet at a
+public place, that exact addresses are never shared, and that payment protection
+is not connected in this build.
+
+The distance band is relative to the renter's search position, so Discover
+hands it to the detail route as a parameter; the detail endpoint cannot know it.
+No coordinates travel with it — only the band and the API-rounded distance.
+
+Distance is a ranking hint, not a promise of proximity: it is rounded, it is
+never accompanied by a pin or a map, and it disappears when the renter has not
+shared a location.
 
 Structure: a full-bleed 3:4 photograph leads, with the header row (back ·
 centred "Product Details" title · favourite) floating over its top. The
@@ -320,12 +355,61 @@ everything below keeps its place in the flow.
 
 ### 7.4 Rental flow
 
+The exchange happens in person. Every stage answers three questions: what is
+happening, who needs to act, and what happens next.
+
 ```
-Product → Choose dates → Review rental → Delivery/pickup → Price summary
-        → Authentication (only if needed) → Payment → Confirmation
+Product → Choose dates → Review request → Authentication (only if needed)
+        → Request sent → Lender accepts → Propose a public meetup
+        → Meetup scheduled → Check in → Inspect the piece
+        → Renter confirms receipt → Rental active
+        → Return by the due date → Lender confirms → Completed
 ```
 
-Do not add unnecessary steps.
+Acceptance is **not** a handover. A rental never becomes active, and the renter
+is never charged, merely because the lender said yes. Only the renter confirming
+they physically received the piece activates the rental.
+
+Do not add unnecessary steps. Do not add a chat system, a map, or a delivery
+address in this phase.
+
+#### Meetup — a public place, agreed together
+
+After acceptance either party proposes a **public place** (café, mall, station),
+an area label and a time; the other party accepts or counter-proposes. The UI
+repeats the rule in plain words: *"Meet somewhere public. Never share your home
+address."* There is no map pin and no coordinate entry. `MEETUP_PENDING` shows
+the pending proposal with **Accept** and **Suggest another place**;
+`MEETUP_SCHEDULED` shows the confirmed place, time and a **Check in when you
+arrive** action.
+
+#### Handover — the renter decides
+
+At the meetup the renter inspects the piece and then confirms receipt. The
+confirmation sheet is explicit: condition accepted and item received are both
+ticked, the rental clock start is stated, and the payment step (once a provider
+exists) is named. Only then does the rental become **Active**.
+
+The lender gets a one-tap **I handed it over** acknowledgement. It is recorded
+in the timeline and is never required for activation. If the piece does not
+match the listing, the renter reports the problem from the same screen and the
+rental moves to **Disputed** with no capture.
+
+#### Return and completion
+
+The detail screen shows the return date, computed from the actual handover, not
+from the originally chosen start day. The renter marks the piece returned after
+the in-person hand back; the lender confirms and the rental completes. No
+deposit is held and no payout is shown in this phase.
+
+#### Cancellations, no-shows and disputes
+
+Cancelling before activation is always available to both parties, with a reason.
+Declining, cancelling or letting a request expire voids the payment
+authorization. A party who is not met can report a no-show once the meetup time
+plus a 30-minute grace period has passed. Every exception state has its own
+honest explanation and a single next step; none of them pretends the rental is
+active.
 
 ### 7.5 Date selection — a core interaction
 
@@ -333,32 +417,68 @@ A beautiful calendar. Clearly communicate start date, end date, duration,
 availability and price. Selected dates are visually obvious. Smooth
 interactions.
 
+The calendar reflects the lender's blocked days — a day is unavailable because
+the lender marked it blocked, never because the app guessed. The chosen window
+is the **intended** rental window; the real return date starts at handover and
+is shown that way.
+
+The footer quote comes from the same shared pricing function the review screen
+uses: rental, cleaning (included), total. **No deposit row**. When no dates are
+chosen the total reads "—" rather than a guessed number.
+
 No native header on this screen — the Stack header is off for the route, and
 an in-screen row carries the back button and the centred step title
 **"Choose dates"**. The editorial question *"When will you wear it?"* leads
 the scroll beneath it.
 
-### 7.6 Checkout — simple and trustworthy
+### 7.6 Review request — simple and trustworthy
 
-Item, duration, rental cost, deposit, delivery/pickup, fees, total. **No
-surprise charges** — the user knows exactly what they are paying before
-confirming.
+Item, duration, rental cost, cleaning fee, total, and how the handover works.
+**No surprise charges** — the user knows exactly what they are agreeing to
+before sending. No deposit line and no delivery option in this phase.
 
 Like dates, the native Stack header is off for the route; an in-screen row
-carries the back button and the centred step title **"Checkout"**.
+carries the back button and the centred step title **"Review request"**.
+
+Payment honesty is part of the screen, not a footnote:
+
+> Payment protection is not connected in this build. No money has been taken or
+> reserved. Your request will be sent to the lender and you'll agree on a public
+> meetup.
+
+When a provider is connected the same block becomes the authorization summary.
+The layout and the rental lifecycle stay identical — only the payment block
+changes.
+
+**Signed-out renters** are asked to sign in at this point and returned to the
+same request, with the chosen dates intact.
 
 ### 7.7 List your clothing
 
 Wearly is two-sided. A simple guided flow — photos, name/category, size,
-condition, description, rental price, availability, pickup/delivery, preview,
-publish. Friendly and guided, never a seller dashboard.
+condition, description, rental price, availability, location, preview, publish.
+Friendly and guided, never a seller dashboard.
+
+**Location is two fields, and they mean different things.** The public
+`areaLabel` ("Bandra West") is what renters see, and the details step requires
+it. The private coordinates are optional, never displayed, and used only to
+rank the listing in nearby discovery. The field hint reads *"Public. Your exact
+address is never shown."*; the success line reads *"Location added — used only
+to rank you nearby."* Declining location still publishes the listing; it is
+discoverable by area and search, just without a distance, and the screen says
+so.
+
+`availability` is captured as **blocked days**. Pickup and delivery toggles are
+removed from this flow; every listing is in-person for now, and the model keeps
+room for delivery later.
 
 ### 7.8 Trust
 
 Trust is communicated through **consistency, transparency and predictability**:
 clear pricing, clear duration, clear condition, owner information, verification
-where applicable, reviews, policies, transparent checkout, predictable
-navigation.
+where applicable, reviews, policies, transparent review, predictable
+navigation — and, for in-person rentals, a meetup rule that is stated every
+time a place is proposed.
 
 > **Hard rule.** Do **not** invent fake user counts, fake reviews, fake ratings
 > or fake marketplace activity. If the marketplace is empty, the interface is
@@ -366,10 +486,22 @@ navigation.
 > always better than fabricated social proof. All data in this repository is
 > prototype data and is labelled as such in the UI.
 
+The same rule applies to payments: never display "Paid", "Protected" or "Refunded"
+while the provider is a placeholder.
+
 ### 7.9 My rentals
 
-Upcoming, active and previous rentals; return status, delivery status, rental
-dates. Large cards, clear status indicators. Not a dashboard.
+Two roles, one screen: **Renting** (pieces the user borrowed) and **Lending**
+(pieces the user shared), switchable, each grouped into upcoming, active and
+past. Every card carries the piece, the counterparty, the dates and one clear
+status line — *Waiting for lender*, *Agree on a meetup*, *Meet Priya at Blue
+Tokai*, *Active until 22 Nov*, *Return due today*, *Completed*.
+
+The card's primary action is whatever the server-computed capabilities allow:
+accept or decline, propose or accept a meetup, check in, confirm receipt, mark
+returned, confirm return. The app never derives these from the status in the
+screen; it renders what the API returned. Large cards, clear status indicators.
+Not a dashboard.
 
 ### 7.10 Profile
 
@@ -478,8 +610,12 @@ confirmation, and honest empty states for Rentals and Profile.
 
 ### Phase 2 — the rest of the rental journey
 
-Categories · size selection · availability · price breakdown as its own screen ·
-payment · tracking · reviews · seller profile · profile completion.
+Categories · size selection · availability · in-person request, meetup,
+handover and return · reviews · seller profile · profile completion.
+
+Payment is scaffolded only: the provider interface and payment state exist, but
+no money moves and the UI says so. Delivery, tracking, deposits and payouts stay
+out of this phase.
 
 ### Phase 3 — the listing flow
 
@@ -512,6 +648,8 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
+| 2026-11-19 | Mobile Phase 2a UI completed: request-sent screen, capability-driven rental detail with sheets, rentals list, opt-in nearby discovery on `POST /api/listings/discover`, area + rounded band on cards and detail, listing area/optional location, and removal of delivery/deposit copy and device-local confirmed rentals. §7.2–7.7. |
+| 2026-11-18 | Rental flow rewritten for peer-to-peer in-person handover: delivery and delivery fees removed, public-area + rounded distance replaces any address, request/review/meetup/handover/return stages defined, renter-confirmed handover is the only path to Active, and payment is documented as an honest placeholder. §7.3–7.9, §11. |
 | 2026-11-17 | Onboarding step 1 restructured to the reference layout: full-bleed hero (pink gradient backdrop across the whole top, cutout subject anchored to its bottom edge, subtle wash kept over the photograph) and the headline/description/swipe block moved onto a bottom sheet whose top edge is a full-width dome curve (~43dp rise from each side to the centre, SVG-drawn) overlapping the photo; the sheet's background is a subtle diagonal tint (background top-left → faint pink bottom-right) behind the content, and the curve carries a subtle drop shadow as an elevated-edge cue. Headline, supporting line, swipe-to-continue and step dots are untouched. §6. |
 
 | 2026-11-17 | Onboarding sheet's top padding tightened `pt-4` → `pt-2` so the headline sits closer beneath the dome curve — the white gap above "Get Ready For" is halved. §6. |

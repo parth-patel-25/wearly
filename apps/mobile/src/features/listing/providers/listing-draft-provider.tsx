@@ -2,18 +2,23 @@ import type { ReactNode } from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 
 export interface ListingPhoto {
+  cover?: boolean;
   id: string;
   uri: string;
-  cover?: boolean;
 }
 
 export interface ListingDraft {
+  /** Public neighbourhood, e.g. "Bandra West". Never an address. */
+  areaLabel: string;
   availability: string[];
   brand: string;
   category: string;
   color: string;
   condition: string;
   description: string;
+  /** Private, used only for nearby ranking. Never returned publicly. */
+  latitude: number | null;
+  longitude: number | null;
   material: string;
   measurements: Record<string, string>;
   photos: ListingPhoto[];
@@ -24,12 +29,15 @@ export interface ListingDraft {
 }
 
 const EMPTY: ListingDraft = {
+  areaLabel: "",
   availability: [],
   brand: "",
   category: "",
   color: "",
   condition: "",
   description: "",
+  latitude: null,
+  longitude: null,
   material: "",
   measurements: {},
   photos: [],
@@ -62,6 +70,8 @@ export function ListingDraftProvider({ children }: { children: ReactNode }) {
 
 export function useListingDraft(): ListingDraftApi {
   const api = useContext(Ctx);
-  if (!api) throw new Error("useListingDraft must be inside provider");
+  if (!api) {
+    throw new Error("useListingDraft must be inside provider");
+  }
   return api;
 }

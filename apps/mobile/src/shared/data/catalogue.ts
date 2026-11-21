@@ -54,6 +54,10 @@ export interface Lender {
 }
 
 export interface Piece {
+  /** Public neighbourhood label. The exact address never exists on a Piece. */
+  areaLabel: string;
+  /** Already rounded by the API; null when the renter shared no location. */
+  distanceBand: string | null;
   availableFrom: string;
   category: Category;
   condition: Condition;
@@ -71,6 +75,8 @@ export interface Piece {
   images: readonly string[];
   lender: Lender;
   name: string;
+  /** The lender's stated size, used by the size filter and the fit section. */
+  size: string;
   /** ISO date the piece is already committed and cannot be rented. */
   unavailable: readonly string[];
 }
@@ -104,8 +110,8 @@ export const CATEGORIES: readonly Category[] = [
 
 export const SIZE_FILTERS: readonly string[] = ["XS", "S", "M", "L", "XL"];
 
-export function sizeOf(_piece: Piece): string {
-  return "M";
+export function sizeOf(piece: Piece): string {
+  return piece.size.length > 0 ? piece.size : "M";
 }
 
 export function findPiece(id: string): Piece | undefined {

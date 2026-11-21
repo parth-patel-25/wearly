@@ -7,12 +7,12 @@ import { HeroLayer } from "@wearly/ui-native/hero-layer";
 import { HeroProvider } from "@wearly/ui-native/hero-provider";
 
 import { AppProviders } from "@wearly/ui-native/providers";
-import { KeyboardProvider } from "react-native-keyboard-controller";
 import { ToastProvider } from "@wearly/ui-native/toast";
 import { Stack } from "expo-router";
 import { hideAsync, preventAutoHideAsync } from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { useCSSVariable, useUniwind } from "uniwind";
 
 import { useSatoshi } from "../lib/fonts";
@@ -58,76 +58,122 @@ export default function RootLayout() {
     // Outermost: the query client owns the focus events, so every provider and
     // screen below it is covered by refetch-on-focus.
     <KeyboardProvider>
-    <QueryProvider>
-      <AppProviders>
-        <SessionProvider>
-          <RentalDraftProvider>
-            <ListingDraftProvider>
-            <ToastProvider>
-              <HeroProvider>
-                <StatusBar style={theme === "dark" ? "light" : "dark"} />
-                <Stack
-                  screenOptions={{
-                    // The hero expansion is the transition. A slide underneath it
-                    // would fight it, so screen changes are a quiet fade.
-                    animation: "fade",
-                    contentStyle: { backgroundColor: background },
-                  }}
-                >
-                  <Stack.Screen
-                    name="splash"
-                    options={{ animation: "none", headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="welcome"
-                    options={{
-                      animation: "slide_from_right",
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen name="list/photos" options={{ headerShown: false }} />
-                  <Stack.Screen name="list/details" options={{ headerShown: false }} />
-                  <Stack.Screen name="list/price" options={{ headerShown: false }} />
-                  <Stack.Screen name="list/availability" options={{ headerShown: false }} />
-                  <Stack.Screen name="list/review" options={{ headerShown: false }} />
-                  <Stack.Screen name="list/published" options={{ headerShown: false }} />
-                  <Stack.Screen name="list/new" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="product/[id]"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="rent/dates"
-                    options={{ headerShown: false, presentation: "modal" }}
-                  />
-                  <Stack.Screen
-                    name="rent/checkout"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="sign-in"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen name="auth" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="verify-email"
-                    options={{ headerShown: false }}
-                  />
-                </Stack>
-                {/* Above every screen, so the expansion is not clipped by a route. */}
-                <HeroLayer />
-              </HeroProvider>
-            </ToastProvider>
-            </ListingDraftProvider>
-          </RentalDraftProvider>
-        </SessionProvider>
-      </AppProviders>
-    </QueryProvider>
+      <QueryProvider>
+        <AppProviders>
+          <SessionProvider>
+            <RentalDraftProvider>
+              <ListingDraftProvider>
+                <ToastProvider>
+                  <HeroProvider>
+                    <StatusBar style={theme === "dark" ? "light" : "dark"} />
+                    <Stack
+                      screenOptions={{
+                        // The hero expansion is the transition. A slide underneath it
+                        // would fight it, so screen changes are a quiet fade.
+                        animation: "fade",
+                        contentStyle: { backgroundColor: background },
+                      }}
+                    >
+                      <Stack.Screen
+                        name="splash"
+                        options={{ animation: "none", headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="welcome"
+                        options={{
+                          animation: "slide_from_right",
+                          headerShown: false,
+                        }}
+                      />
+                      <Stack.Screen
+                        name="index"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(tabs)"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="list/photos"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="list/details"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="list/price"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="list/availability"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="list/review"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="list/published"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="list/new"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="product/[id]"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="rent/dates"
+                        options={{ headerShown: false, presentation: "modal" }}
+                      />
+                      <Stack.Screen
+                        name="rent/checkout"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="rent/confirmed"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="rental/[id]"
+                        options={{ headerShown: false }}
+                      />
+                      {/* Rentals is a secondary destination, not a tab: a root
+                          stack route draws its own back row and never borrows a
+                          tab's highlight. Activity is the bell's destination. */}
+                      <Stack.Screen
+                        name="rentals"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="activity"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="sign-in"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="auth"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="verify-email"
+                        options={{ headerShown: false }}
+                      />
+                    </Stack>
+                    {/* Above every screen, so the expansion is not clipped by a route. */}
+                    <HeroLayer />
+                  </HeroProvider>
+                </ToastProvider>
+              </ListingDraftProvider>
+            </RentalDraftProvider>
+          </SessionProvider>
+        </AppProviders>
+      </QueryProvider>
     </KeyboardProvider>
   );
 }

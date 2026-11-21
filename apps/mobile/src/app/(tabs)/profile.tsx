@@ -45,7 +45,7 @@ export default function ProfileScreen() {
   const saved = useMemo(
     () =>
       (rawListings ?? [])
-        .map(listingToPiece)
+        .map((listing) => listingToPiece(listing))
         .filter((piece) => state.favourites.includes(piece.id)),
     [rawListings, state.favourites]
   );
@@ -72,7 +72,12 @@ export default function ProfileScreen() {
             onSignOut={() => setSignOutOpen(true)}
           />
         }
-        header={<ProfileHeader onSignIn={() => router.push(ROUTES.signIn)} />}
+        header={
+          <ProfileHeader
+            onOpenRentals={() => router.push(ROUTES.rentals)}
+            onSignIn={() => router.push(ROUTES.signIn)}
+          />
+        }
         items={items}
         onFavourite={onFavourite}
         onOpen={(id) => router.push(ROUTES.product(id))}

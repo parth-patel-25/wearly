@@ -63,7 +63,7 @@ function TabBarRenderer({ state }: Parameters<TabBarProps>[0]) {
 export default function TabsLayout() {
   return (
     // The one place the tab screens get their top safe-area inset, rather than
-    // each of the five guessing a `pt-*` number that is wrong on a notched phone.
+    // each of the four guessing a `pt-*` number that is wrong on a notched phone.
     // `pt-safe` is the raw inset, so a screen's own `pt-6` becomes the *gap*
     // between the status bar and its header instead of doubling as the inset.
     //
@@ -78,10 +78,9 @@ export default function TabsLayout() {
         <Tabs.Screen name="index" />
         <Tabs.Screen name="discover" />
         <Tabs.Screen name="list" />
-        {/* Rentals is registered but not in the bar. It stays routable and
-            deep-linkable; it is reached from Home or a product card instead. See
-            `docs/DESIGN_SYSTEM.md` §10. */}
-        <Tabs.Screen name="rentals" />
+        {/* Rentals is not a tab and not part of this group. It is a root-stack
+            route (`app/rentals.tsx`), reached from Profile, Home, Activity and
+            the post-request confirmation. See `docs/DESIGN_SYSTEM.md` §10. */}
         <Tabs.Screen name="profile" />
       </Tabs>
     </View>

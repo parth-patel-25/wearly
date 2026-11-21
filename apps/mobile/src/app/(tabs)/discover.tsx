@@ -1,19 +1,21 @@
 import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
-import { FilterSheet } from "@features/discover/components/filter-sheet";
-import type { Piece } from "@shared/data/catalogue";
-import { CATEGORIES, CONDITION_LABEL } from "@shared/data/catalogue";
-import { listingToPiece } from "@shared/data/listing-to-piece";
-import { usePublicListings } from "@shared/hooks/use-public-listings";
-import type { Filters } from "@shared/data/filters";
+import { AppliedFilters } from "@features/discover/components/applied-filters";
 import {
-  activeFilterCount,
-  applyFilters,
-  NO_FILTERS,
-} from "@shared/data/filters";
+  DiscoverEmpty,
+  headingFor,
+  LocationSlot,
+} from "@features/discover/components/discover-empty";
+import { FilterSheet } from "@features/discover/components/filter-sheet";
+import { useDiscoverListings } from "@features/discover/hooks/use-discover-listings";
+import { useNearbyLocation } from "@features/discover/hooks/use-nearby-location";
+import { CATEGORIES } from "@shared/data/catalogue";
+import type { Filters } from "@shared/data/filters";
+import { activeFilterCount, NO_FILTERS } from "@shared/data/filters";
+import { listingToPiece } from "@shared/data/listing-to-piece";
 import { useCatalogueGrid } from "@shared/hooks/use-catalogue-grid";
 import { Chip } from "@wearly/ui-native/badge";
-import { EmptyState, SectionHeader } from "@wearly/ui-native/display";
+import { SectionHeader } from "@wearly/ui-native/display";
 import { SearchField } from "@wearly/ui-native/fields";
 import { Icon } from "@wearly/ui-native/icon";
 import { ProductGrid } from "@wearly/ui-native/product-grid";
@@ -25,15 +27,10 @@ import { Pressable, View } from "react-native";
 /**
  * Discover.
  *
- * Search, a category rail, and a filter sheet. Three affordances, no more — the
- * screen's job is to narrow seventy-two pieces down to a handful, and every
- * extra control on it costs a decision the user did not ask to make.
- *
- * The applied-filter summary sits directly under the search field and shows what
- * is currently narrowing the grid, each one individually removable. Without it,
- * an empty result is indistinguishable from a broken screen.
+ * One request, one source of truth: the API ranks and filters, and the grid
+ * renders exactly what it returns. Location is an opt-in card rather than a
+ * prompt on mount, and a distance is never more than a rounded band.
  */
-
 export default function DiscoverScreen() {
   const router = useRouter();
   const { state } = useSession();
@@ -41,6 +38,7 @@ export default function DiscoverScreen() {
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const nearby = useNearbyLocation();
 
   // Home search hands off here: adopt the query once so the field shows what
   // Home promised, then leave the field owned locally afterwards.
@@ -50,40 +48,41 @@ export default function DiscoverScreen() {
     }
   }, [q]);
 
-  const { data: rawListings } = usePublicListings();
+  const { data, error, isPending, refetch } = useDiscoverListings(
+    query,
+    filters,
+    nearby.coords
+  );
+
   const pieces = useMemo(
-    () => (rawListings ?? []).map(listingToPiece),
-    [rawListings]
+    () =>
+      (data?.items ?? []).map((listing) =>
+        listingToPiece(listing, {
+          band: listing.distanceBand,
+          meters: listing.distanceMeters,
+        })
+      ),
+    [data]
   );
-  const results = useMemo(
-    () => search(applyFilters(pieces, filters), query),
-    [pieces, filters, query]
-  );
-  const { favourites, items, onFavourite } = useCatalogueGrid(results);
+  const { favourites, items, onFavourite } = useCatalogueGrid(pieces);
   const count = activeFilterCount(filters);
+  const hasNarrowing = count > 0 || query.trim().length > 0;
 
   return (
     <View className="flex-1 bg-background">
       <ProductGrid
         className="flex-1 px-4"
         emptyState={
-          pieces.length === 0 ? (
-            <EmptyState
-              body="Be the first to share — list a piece from your wardrobe and start earning. Or keep exploring looks."
-              icon="plus"
-              title="Nothing listed yet"
-            />
-          ) : (
-            <EmptyState
-              body="Try removing a filter, or search for something broader."
-              icon="search"
-              title="Nothing matches yet"
-            />
-          )
+          <DiscoverEmpty
+            error={error}
+            hasNarrowing={hasNarrowing}
+            isPending={isPending}
+            onRetry={() => refetch()}
+          />
         }
         favourites={favourites}
         header={
-          <View className="gap-6 pt-6 pb-2">
+          <View className="gap-5 pt-6 pb-2">
             <Text variant="headingXl">Discover</Text>
 
             <View className="flex-row items-center gap-3">
@@ -109,6 +108,8 @@ export default function DiscoverScreen() {
               </Pressable>
             </View>
 
+            <LocationSlot nearby={nearby} />
+
             <View className="flex-row flex-wrap gap-3">
               {CATEGORIES.map((category) => (
                 <Chip
@@ -126,14 +127,25 @@ export default function DiscoverScreen() {
             <AppliedFilters filters={filters} onChange={setFilters} />
 
             <SectionHeader
-              caption={`${results.length} of ${pieces.length} pieces`}
-              title={query ? `Results for “${query}”` : "Everything"}
+              caption={
+                data
+                  ? `${data.total} ${data.total === 1 ? "piece" : "pieces"}${nearby.coords ? " within 5 km" : ""}`
+                  : "Searching…"
+              }
+              title={headingFor(query, nearby.coords !== null)}
             />
           </View>
         }
         items={items}
         onFavourite={onFavourite}
-        onOpen={(id) => router.push(ROUTES.product(id))}
+        onOpen={(id) => {
+          const band = data?.items.find((item) => item.id === id)?.distanceBand;
+          router.push(
+            band
+              ? { params: { band, id }, pathname: "/product/[id]" }
+              : ROUTES.product(id)
+          );
+        }}
       />
 
       <FilterSheet
@@ -141,87 +153,16 @@ export default function DiscoverScreen() {
         onApply={setFilters}
         onClose={() => setSheetOpen(false)}
         open={sheetOpen}
-        resultCount={results.length}
+        resultCount={data?.total ?? 0}
       />
 
       {state.favourites.length > 0 ? (
-        <SavedHint count={state.favourites.length} />
+        <View className="px-4 pb-8">
+          <Text tone="muted-foreground" variant="caption">
+            {`${state.favourites.length} saved ${state.favourites.length === 1 ? "piece" : "pieces"}. Saved items live in your profile.`}
+          </Text>
+        </View>
       ) : null}
-    </View>
-  );
-}
-
-interface AppliedFiltersProps {
-  filters: Filters;
-  onChange: (filters: Filters) => void;
-}
-
-function AppliedFilters({ filters, onChange }: AppliedFiltersProps) {
-  const labels = [
-    ...filters.categories,
-    ...filters.sizes,
-    ...filters.conditions.map((condition) => CONDITION_LABEL[condition]),
-    ...(filters.maxDailyRate ? [`Up to ₹${filters.maxDailyRate}`] : []),
-  ];
-
-  if (labels.length === 0 && !filters.from) {
-    return null;
-  }
-
-  return (
-    <View className="flex-row flex-wrap items-center gap-2">
-      {labels.map((label) => (
-        <Chip key={label} onPress={() => removeOne(filters, onChange, label)}>
-          {`${label} ✕`}
-        </Chip>
-      ))}
-      <Chip onPress={() => onChange(NO_FILTERS)}>Clear all</Chip>
-    </View>
-  );
-}
-
-function removeOne(
-  filters: Filters,
-  onChange: (next: Filters) => void,
-  label: string
-): void {
-  const without = <T,>(list: readonly T[], value: T) =>
-    list.filter((item) => item !== value);
-
-  onChange({
-    ...filters,
-    categories: without(
-      filters.categories,
-      label as (typeof filters.categories)[number]
-    ),
-    conditions: without(
-      filters.conditions,
-      label as (typeof filters.conditions)[number]
-    ),
-    maxDailyRate: label.startsWith("Up to") ? null : filters.maxDailyRate,
-    sizes: without(filters.sizes, label),
-  });
-}
-
-function search(pieces: Piece[], query: string) {
-  const trimmed = query.trim().toLowerCase();
-  if (trimmed.length === 0) {
-    return pieces;
-  }
-  return pieces.filter(
-    (piece) =>
-      piece.name.toLowerCase().includes(trimmed) ||
-      piece.category.toLowerCase().includes(trimmed) ||
-      piece.lender.neighbourhood.toLowerCase().includes(trimmed)
-  );
-}
-
-function SavedHint({ count }: { count: number }) {
-  return (
-    <View className="px-4 pb-8">
-      <Text tone="muted-foreground" variant="caption">
-        {`${count} saved ${count === 1 ? "piece" : "pieces"}. Saved items live in your profile.`}
-      </Text>
     </View>
   );
 }

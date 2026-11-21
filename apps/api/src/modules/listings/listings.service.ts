@@ -1,9 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { db } from "@wearly/db/client";
-import { listings } from "@wearly/db/schema/listings";
 import { user } from "@wearly/db/schema/auth";
+import { listings } from "@wearly/db/schema/listings";
 import type { CreateListingInput, Listing } from "@wearly/shared/api/types";
+import { SUPPORTED_FULFILLMENT_METHODS } from "@wearly/shared/enums";
 import { eq } from "drizzle-orm";
+import { toListing } from "./listing-mapper.js";
 
 @Injectable()
 export class ListingsService {
@@ -11,13 +13,19 @@ export class ListingsService {
     const [row] = await db
       .insert(listings)
       .values({
+        areaLabel: input.areaLabel,
         availability: input.availability ?? [],
         brand: input.brand,
         category: input.category,
         color: input.color,
         condition: input.condition,
         description: input.description,
+        fulfillmentMethods: input.fulfillmentMethods ?? [
+          ...SUPPORTED_FULFILLMENT_METHODS,
+        ],
+        latitude: input.latitude,
         lenderId,
+        longitude: input.longitude,
         material: input.material,
         photos: input.photos ?? [],
         pricePerDay: input.pricePerDay,
@@ -28,7 +36,11 @@ export class ListingsService {
       })
       .returning();
 
-    return toListing(row!);
+    if (!row) {
+      throw new InternalServerErrorException("Listing could not be created");
+    }
+
+    return toListing(row);
   }
 
   async listByLender(lenderId: string): Promise<Listing[]> {
@@ -41,43 +53,32 @@ export class ListingsService {
 
   async listPublished(): Promise<Listing[]> {
     const rows = await db
-      .select({ listing: listings, lenderName: user.name })
+      .select({
+        lenderImage: user.image,
+        lenderName: user.name,
+        listing: listings,
+      })
       .from(listings)
       .leftJoin(user, eq(listings.lenderId, user.id))
       .where(eq(listings.status, "published"));
-    return rows.map(({ listing, lenderName }) =>
-      toListing(listing, lenderName ?? null)
+    return rows.map(({ listing, lenderImage, lenderName }) =>
+      toListing(listing, { image: lenderImage, name: lenderName })
     );
   }
 
   async get(id: string): Promise<Listing | null> {
-    const [row] = await db.select().from(listings).where(eq(listings.id, id)).limit(1);
-    return row ? toListing(row) : null;
+    const [row] = await db
+      .select({
+        lenderImage: user.image,
+        lenderName: user.name,
+        listing: listings,
+      })
+      .from(listings)
+      .leftJoin(user, eq(listings.lenderId, user.id))
+      .where(eq(listings.id, id))
+      .limit(1);
+    return row
+      ? toListing(row.listing, { image: row.lenderImage, name: row.lenderName })
+      : null;
   }
-}
-
-function toListing(
-  row: typeof listings.$inferSelect,
-  lenderName: string | null = null
-): Listing {
-  return {
-    availability: row.availability ?? [],
-    brand: row.brand,
-    category: row.category,
-    color: row.color,
-    condition: row.condition,
-    createdAt: row.createdAt.toISOString(),
-    description: row.description,
-    id: row.id,
-    lenderId: row.lenderId,
-    lenderName,
-    material: row.material,
-    photos: row.photos ?? [],
-    pricePerDay: row.pricePerDay,
-    size: row.size,
-    status: row.status as Listing["status"],
-    subcategory: row.subcategory,
-    title: row.title,
-    updatedAt: row.updatedAt.toISOString(),
-  };
 }
