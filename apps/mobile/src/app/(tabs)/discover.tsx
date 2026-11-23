@@ -9,6 +9,7 @@ import {
 import { FilterSheet } from "@features/discover/components/filter-sheet";
 import { useDiscoverListings } from "@features/discover/hooks/use-discover-listings";
 import { useNearbyLocation } from "@features/discover/hooks/use-nearby-location";
+import { useFavourites } from "@features/favourites/hooks/use-favourites";
 import { CATEGORIES } from "@shared/data/catalogue";
 import type { Filters } from "@shared/data/filters";
 import { activeFilterCount, NO_FILTERS } from "@shared/data/filters";
@@ -48,11 +49,12 @@ export default function DiscoverScreen() {
     }
   }, [q]);
 
-  const { data, error, isPending, refetch } = useDiscoverListings(
+  const { data, error, isFetching, isPending, refetch } = useDiscoverListings(
     query,
     filters,
     nearby.coords
   );
+  const { ids: savedIds } = useFavourites();
 
   const pieces = useMemo(
     () =>
@@ -150,16 +152,17 @@ export default function DiscoverScreen() {
 
       <FilterSheet
         filters={filters}
+        isUpdating={isFetching}
         onApply={setFilters}
         onClose={() => setSheetOpen(false)}
         open={sheetOpen}
         resultCount={data?.total ?? 0}
       />
 
-      {state.favourites.length > 0 ? (
+      {savedIds.length > 0 ? (
         <View className="px-4 pb-8">
           <Text tone="muted-foreground" variant="caption">
-            {`${state.favourites.length} saved ${state.favourites.length === 1 ? "piece" : "pieces"}. Saved items live in your profile.`}
+            {`${savedIds.length} saved ${savedIds.length === 1 ? "piece" : "pieces"}. Saved ${state.isAuthenticated ? "to your account" : "on this device"}.`}
           </Text>
         </View>
       ) : null}

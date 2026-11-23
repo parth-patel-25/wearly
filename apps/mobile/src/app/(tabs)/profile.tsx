@@ -6,13 +6,12 @@ import { EditPhotoSheet } from "@features/profile/components/edit-photo-sheet";
 import { ProfileFooter } from "@features/profile/components/profile-footer";
 import { ProfileHeader } from "@features/profile/components/profile-header";
 import { useSignOut } from "@features/profile/hooks/use-sign-out";
-import { listingToPiece } from "@shared/data/listing-to-piece";
 import { useCatalogueGrid } from "@shared/hooks/use-catalogue-grid";
-import { usePublicListings } from "@shared/hooks/use-public-listings";
+import { useSavedListings } from "@features/favourites/hooks/use-saved-listings";
 import { EmptyState } from "@wearly/ui-native/display";
 import { ProductGrid } from "@wearly/ui-native/product-grid";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 
 /**
@@ -41,14 +40,7 @@ export default function ProfileScreen() {
   const [signOutOpen, setSignOutOpen] = useState(false);
   const hasPhoto = typeof state.image === "string" && state.image.length > 0;
 
-  const { data: rawListings } = usePublicListings();
-  const saved = useMemo(
-    () =>
-      (rawListings ?? [])
-        .map((listing) => listingToPiece(listing))
-        .filter((piece) => state.favourites.includes(piece.id)),
-    [rawListings, state.favourites]
-  );
+  const saved = useSavedListings();
   const { favourites, items, onFavourite } = useCatalogueGrid(saved);
 
   return (

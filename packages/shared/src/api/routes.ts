@@ -22,6 +22,11 @@ export const API_ROUTES = {
         `/api/admin/users/${encodeURIComponent(id)}/soft-delete`,
     },
   },
+  FAVOURITES: {
+    BASE: "/api/favourites",
+    BY_LISTING: (id: string) => `/api/favourites/${encodeURIComponent(id)}`,
+    MERGE: "/api/favourites/merge",
+  },
   health: "/api/health",
   LISTINGS: {
     BASE: "/api/listings",

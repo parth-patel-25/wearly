@@ -17,26 +17,29 @@
  * `bun run images:generate`. See `catalogue-images.generated.ts`.
  */
 
+import type { Listing } from "@wearly/shared/api/types";
+import type { Condition } from "@wearly/shared/enums";
 import type { PlaceholderTone } from "@wearly/ui-native/media";
 
-
+export { CONDITION_VALUES } from "@wearly/shared/enums";
+export type { Condition };
 
 export const CATALOGUE_DISCLAIMER =
   "Prototype catalogue. Every item, lender and price here is invented for design review.";
 
+/** The human labels live here: they describe display, not storage. */
 export const CONDITION_LABEL = {
+  brand_new_with_tags: "Brand New with Tags",
+  brand_new_without_tags: "Brand New without Tags",
   excellent: "Excellent",
-  "good-condition": "Very good",
-  "like-new": "Like new",
-} as const;
+  good: "Good",
+  fair: "Fair",
+} as const satisfies Record<Condition, string>;
 
-export type Condition = keyof typeof CONDITION_LABEL;
-
-export const CONDITION_NOTE = {
-  excellent: "Worn once or twice, no marks.",
-  "good-condition": "Gently worn, no visible flaws.",
-  "like-new": "Unworn, tags on where they can stay.",
-} as const;
+/** The label for a stored condition, or the honest "not said" case. */
+export function conditionLabel(condition: Condition | null): string {
+  return condition === null ? "Not stated" : CONDITION_LABEL[condition];
+}
 
 export type Category =
   | "Dresses"
@@ -47,6 +50,8 @@ export type Category =
   | "Trousers";
 
 export interface Lender {
+  /** Lender photo from the API; null when none was shared. */
+  image: string | null;
   name: string;
   neighbourhood: string;
   /** Kept in the data so the product page can say "verification is not part of this prototype" honestly. */
@@ -60,7 +65,10 @@ export interface Piece {
   distanceBand: string | null;
   availableFrom: string;
   category: Category;
-  condition: Condition;
+  /** Null when the lender never said — never a guessed label. */
+  condition: Condition | null;
+  /** The API state: "published" or "draft". */
+  status: Listing["status"];
   /** Rupees per day. */
   dailyRate: number;
   deposit: number;

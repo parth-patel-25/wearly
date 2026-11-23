@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { View } from "react-native";
 
+import { Badge } from "./badge";
 import { Icon } from "./icon";
 import type { PlaceholderTone } from "./media";
 import { Media } from "./media";
@@ -46,6 +47,13 @@ export interface ProductCardProps {
   id: string;
   isFavourite: boolean;
   name: string;
+  /**
+   * Optional truth line overlaid on the media block's top-left — e.g.
+   * "No longer available" for a saved piece the lender has unpublished. Like
+   * the favourite heart, it is an overlay on the media, not a layout slot, so
+   * it can never resize the card.
+   */
+  notice?: string;
   onFavourite: () => void;
   onPress: (frame: ProductCardFrame) => void;
   placeholderTone: PlaceholderTone;
@@ -63,6 +71,7 @@ export function ProductCard({
   price,
   placeholderTone,
   src,
+  notice,
 }: ProductCardProps) {
   const { animatedStyle, onPressIn, onPressOut } = usePressScale(0.985);
   const heart = useHeartPop();
@@ -99,6 +108,11 @@ export function ProductCard({
       <View className="overflow-hidden rounded-media">
         <View ref={media}>
           <Media aspect="4/5" src={src} tone={placeholderTone} />
+          {notice ? (
+            <View className="absolute top-2 left-2 z-10">
+              <Badge variant="warning">{notice}</Badge>
+            </View>
+          ) : null}
         </View>
 
         <AnimatedPressable

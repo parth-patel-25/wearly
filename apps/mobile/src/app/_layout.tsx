@@ -1,6 +1,7 @@
 import { QueryProvider } from "@core/providers/query-provider";
 import { SessionProvider } from "@core/providers/session-provider";
 import { useThemeOverride } from "@core/theme/use-theme-override";
+import { FavouritesProvider } from "@features/favourites/providers/favourites-provider";
 import { ListingDraftProvider } from "@features/listing/providers/listing-draft-provider";
 import { RentalDraftProvider } from "@features/rental/providers/rental-draft-provider";
 import { HeroLayer } from "@wearly/ui-native/hero-layer";
@@ -64,110 +65,115 @@ export default function RootLayout() {
             <RentalDraftProvider>
               <ListingDraftProvider>
                 <ToastProvider>
-                  <HeroProvider>
-                    <StatusBar style={theme === "dark" ? "light" : "dark"} />
-                    <Stack
-                      screenOptions={{
-                        // The hero expansion is the transition. A slide underneath it
-                        // would fight it, so screen changes are a quiet fade.
-                        animation: "fade",
-                        contentStyle: { backgroundColor: background },
-                      }}
-                    >
-                      <Stack.Screen
-                        name="splash"
-                        options={{ animation: "none", headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="welcome"
-                        options={{
-                          animation: "slide_from_right",
-                          headerShown: false,
+                  <FavouritesProvider>
+                    <HeroProvider>
+                      <StatusBar style={theme === "dark" ? "light" : "dark"} />
+                      <Stack
+                        screenOptions={{
+                          // The hero expansion is the transition. A slide underneath it
+                          // would fight it, so screen changes are a quiet fade.
+                          animation: "fade",
+                          contentStyle: { backgroundColor: background },
                         }}
-                      />
-                      <Stack.Screen
-                        name="index"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="(tabs)"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="list/photos"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="list/details"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="list/price"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="list/availability"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="list/review"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="list/published"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="list/new"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="product/[id]"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="rent/dates"
-                        options={{ headerShown: false, presentation: "modal" }}
-                      />
-                      <Stack.Screen
-                        name="rent/checkout"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="rent/confirmed"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="rental/[id]"
-                        options={{ headerShown: false }}
-                      />
-                      {/* Rentals is a secondary destination, not a tab: a root
-                          stack route draws its own back row and never borrows a
-                          tab's highlight. Activity is the bell's destination. */}
-                      <Stack.Screen
-                        name="rentals"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="activity"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="sign-in"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="auth"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="verify-email"
-                        options={{ headerShown: false }}
-                      />
-                    </Stack>
-                    {/* Above every screen, so the expansion is not clipped by a route. */}
-                    <HeroLayer />
-                  </HeroProvider>
+                      >
+                        <Stack.Screen
+                          name="splash"
+                          options={{ animation: "none", headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="welcome"
+                          options={{
+                            animation: "slide_from_right",
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="index"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="(tabs)"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="list/photos"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="list/details"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="list/price"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="list/availability"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="list/review"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="list/published"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="list/new"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="product/[id]"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="rent/dates"
+                          options={{
+                            headerShown: false,
+                            presentation: "modal",
+                          }}
+                        />
+                        <Stack.Screen
+                          name="rent/checkout"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="rent/confirmed"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="rental/[id]"
+                          options={{ headerShown: false }}
+                        />
+                        {/* Rentals is a secondary destination, not a tab: a root
+                            stack route draws its own back row and never borrows a
+                            tab's highlight. Activity is the bell's destination. */}
+                        <Stack.Screen
+                          name="rentals"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="activity"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="sign-in"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="auth"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="verify-email"
+                          options={{ headerShown: false }}
+                        />
+                      </Stack>
+                      {/* Above every screen, so the expansion is not clipped by a route. */}
+                      <HeroLayer />
+                    </HeroProvider>
+                  </FavouritesProvider>
                 </ToastProvider>
               </ListingDraftProvider>
             </RentalDraftProvider>

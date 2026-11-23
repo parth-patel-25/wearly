@@ -5,21 +5,20 @@ import { authClient } from "@/lib/auth-client";
 /**
  * Session state.
  *
- * One context, one reducer, three *local* facts: what is saved and the two
- * pre-auth personalise answers. Whether there is an account and whose it is
- * are not local facts — they come from the Better Auth session
- * (`authClient.useSession`, cookie in SecureStore), so `sessionStatus`,
- * `isAuthenticated`, `name`, `email` and `image` are derived on every read and
- * the reducer never carries them. A reload keeps you signed in now; favourites
- * stay local, because they belong to this device either way.
+ * One context, one reducer, two *local* facts: the two pre-auth personalise
+ * answers. Whether there is an account and whose it is are not local facts —
+ * they come from the Better Auth session (`authClient.useSession`, cookie in
+ * SecureStore), so `sessionStatus`, `isAuthenticated`, `name`, `email` and
+ * `image` are derived on every read and the reducer never carries them. A
+ * reload keeps you signed in now.
  *
- * Rentals are not here. They belong to the account and their state lives on
- * the server, so a rental that only this device remembered would be a lie.
+ * Rentals and saved pieces are not here. Rentals belong to the account and
+ * their state lives on the server; saved pieces are the neighbouring feature —
+ * `features/favourites` — because they belong to an account when one exists.
  */
 
 /** Device-local state the auth session knows nothing about. */
 interface LocalState {
-  favourites: readonly string[];
   /** Answers collected before anyone was asked to sign up. */
   stylingFor: string | null;
   wears: string | null;
@@ -47,12 +46,13 @@ export interface SessionState extends LocalState {
   sessionStatus: SessionStatus;
 }
 
-export type SessionAction =
-  | { pieceId: string; type: "toggle-favourite" }
-  | { style: string; field: "stylingFor" | "wears"; type: "personalise" };
+export type SessionAction = {
+  style: string;
+  field: "stylingFor" | "wears";
+  type: "personalise";
+};
 
 const INITIAL: LocalState = {
-  favourites: [],
   stylingFor: null,
   wears: null,
 };
@@ -61,13 +61,6 @@ function reducer(state: LocalState, action: SessionAction): LocalState {
   switch (action.type) {
     case "personalise":
       return { ...state, [action.field]: action.style };
-    case "toggle-favourite":
-      return {
-        ...state,
-        favourites: state.favourites.includes(action.pieceId)
-          ? state.favourites.filter((id) => id !== action.pieceId)
-          : [...state.favourites, action.pieceId],
-      };
     default:
       return state;
   }

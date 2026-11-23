@@ -1,4 +1,5 @@
 import type { Listing } from "@wearly/shared/api/types";
+import type { Condition } from "@wearly/shared/enums";
 import type { Piece } from "./catalogue";
 
 const TONES = [
@@ -17,6 +18,32 @@ export interface Proximity {
 }
 
 /**
+ * Legacy stored conditions to canonical values. Unrecognised input is null —
+ * "not stated" — never a guessed condition, because a wrong badge label is
+ * as misleading as an empty one. The canonical five translate to themselves;
+ * the rest are the pre-migration vocabulary (web UI, listing form, seeds).
+ */
+const LEGACY_CONDITION: Readonly<Record<string, Condition>> = {
+  brand_new_with_tags: "brand_new_with_tags",
+  brand_new_without_tags: "brand_new_without_tags",
+  excellent: "excellent",
+  good: "good",
+  fair: "fair",
+  "Brand New with Tags": "brand_new_with_tags",
+  "Brand New without Tags": "brand_new_without_tags",
+  Good: "good",
+  Excellent: "excellent",
+  Fair: "fair",
+  "good-condition": "good",
+  "like-new": "brand_new_without_tags",
+};
+
+/** Displayable condition or null when the lender never said. */
+export function normaliseCondition(raw: string): Condition | null {
+  return LEGACY_CONDITION[raw] ?? null;
+}
+
+/**
  * Listing → piece.
  *
  * The listing contract has no coordinates, so there is nothing private to drop
@@ -32,7 +59,8 @@ export function listingToPiece(listing: Listing, proximity: Proximity = {}): Pie
     areaLabel,
     availableFrom: new Date().toISOString().slice(0, 10),
     category: (listing.category as Piece["category"]) ?? "Dresses",
-    condition: (listing.condition as Piece["condition"]) ?? "good-condition",
+    condition: normaliseCondition(listing.condition),
+    status: listing.status ?? "published",
     dailyRate: Number(listing.pricePerDay) || 0,
     deposit: 0,
     description: listing.description ?? "",
@@ -41,6 +69,7 @@ export function listingToPiece(listing: Listing, proximity: Proximity = {}): Pie
     id: listing.id,
     images,
     lender: {
+      image: listing.lenderImage ?? null,
       name: listing.lenderName ?? "Wearly member",
       neighbourhood: areaLabel,
       verified: false,

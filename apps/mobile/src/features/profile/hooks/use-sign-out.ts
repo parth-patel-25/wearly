@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@wearly/ui-native/toast";
 import { useCallback, useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { clearFavourites } from "@features/favourites/lib/favourites-storage";
 
 /**
  * Sign out.
@@ -13,9 +14,8 @@ import { authClient } from "@/lib/auth-client";
  * session alive on the server. The shared session is then re-fetched so the UI
  * reflects the guest state immediately.
  *
- * Device-local favourites are deliberately left alone: they belong to the
- * device, not the account, and wiping them on sign-out would lose data the user
- * never asked to discard.
+ * Saved pieces: the account context is empty, and the device copy is wiped —
+ * the next sign-in starts from a clean slate on the shared phone.
  */
 export function useSignOut() {
   const toast = useToast();
@@ -36,6 +36,10 @@ export function useSignOut() {
       // way out means the next account never sees a frame of the previous
       // account's Home card or list while the first fetch is in flight.
       queryClient.removeQueries({ queryKey: rentalKeys.all });
+      // Saved pieces on the account, then the device copy, so a shared phone
+      // starts the next account from empty.
+      queryClient.removeQueries({ queryKey: ["favourites"] });
+      await clearFavourites();
       toast.show("Signed out", "success");
       return true;
     } catch {

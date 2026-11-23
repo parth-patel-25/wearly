@@ -1,6 +1,8 @@
 import { AreaLocationField } from "@features/listing/components/area-location-field";
 import { ListingOptionGrid } from "@features/listing/components/listing-option-grid";
 import { useListingDraft } from "@features/listing/providers/listing-draft-provider";
+import { CONDITION_LABEL, CONDITION_VALUES } from "@shared/data/catalogue";
+import type { Condition } from "@wearly/shared/enums";
 import { Chip } from "@wearly/ui-native/badge";
 import { Button } from "@wearly/ui-native/button";
 import { TextField } from "@wearly/ui-native/fields";
@@ -19,13 +21,16 @@ const CATEGORIES = [
   "Trousers",
 ];
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "Free Size", "Other"];
-const CONDITIONS = [
-  "Brand New with Tags",
-  "Brand New without Tags",
-  "Excellent",
-  "Good",
-  "Fair",
-];
+
+/** Condition chips: canonical values in enum order, labelled for humans. */
+const CONDITION_OPTIONS = CONDITION_VALUES.map((condition) =>
+  CONDITION_LABEL[condition],
+);
+
+/** The editor is strict: only an offered condition is selectable. */
+const CONDITION_VALUE_BY_LABEL = Object.fromEntries(
+  CONDITION_VALUES.map((condition) => [CONDITION_LABEL[condition], condition]),
+) as Readonly<Record<string, Condition>>;
 
 export default function DetailsScreen() {
   const router = useRouter();
@@ -130,9 +135,14 @@ export default function DetailsScreen() {
           <View className="gap-2">
             <Text variant="label">Condition</Text>
             <ListingOptionGrid
-              onSelect={(v) => set({ condition: v })}
-              options={CONDITIONS}
-              selected={draft.condition}
+              onSelect={(option) => {
+                const condition = CONDITION_VALUE_BY_LABEL[option];
+                if (condition !== undefined) {
+                  set({ condition });
+                }
+              }}
+              options={CONDITION_OPTIONS}
+              selected={draft.condition ? CONDITION_LABEL[draft.condition as Condition] : ""}
             />
             {errors.condition ? (
               <Text tone="destructive" variant="caption">

@@ -1,5 +1,4 @@
-import { useSession } from "@core/providers/session-provider";
-
+import { useFavourites } from "@features/favourites/hooks/use-favourites";
 import type { ProductGridItem } from "@wearly/ui-native/product-grid";
 import { useCallback, useMemo } from "react";
 import type { Piece } from "../data/catalogue";
@@ -20,19 +19,12 @@ export interface CatalogueGrid {
 }
 
 export function useCatalogueGrid(
-  pieces: readonly Piece[] = CATALOGUE
+  pieces: readonly Piece[] = CATALOGUE,
 ): CatalogueGrid {
-  const { dispatch, state } = useSession();
+  const { ids, toggle } = useFavourites();
 
-  const onFavourite = useCallback(
-    (id: string) => dispatch({ pieceId: id, type: "toggle-favourite" }),
-    [dispatch]
-  );
-
-  const favourites = useMemo(
-    () => new Set(state.favourites),
-    [state.favourites]
-  );
+  const onFavourite = useCallback((id: string) => toggle(id), [toggle]);
+  const favourites = useMemo(() => new Set(ids), [ids]);
   const items = useMemo(() => pieces.map(toCardItem), [pieces]);
 
   return { favourites, items, onFavourite };
@@ -40,11 +32,10 @@ export function useCatalogueGrid(
 
 export function toCardItem(piece: Piece): ProductGridItem {
   return {
-    // Distance is a ranking hint, not a promise: the API rounds it, and it is
-    // absent when the renter did not share a location.
     fact: (piece.distanceBand ?? piece.areaLabel) || piece.category,
     id: piece.id,
     name: piece.name,
+    notice: piece.status !== "published" ? "No longer available" : undefined,
     placeholderTone: piece.gallery[0] ?? "muted",
     price: rentalSummary(piece, 3),
     src: piece.images[0],

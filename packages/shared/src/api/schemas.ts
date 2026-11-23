@@ -13,6 +13,14 @@ export {
 // the repository's size limit. Re-exported here so every caller keeps using the
 // single `@wearly/shared/api/schemas` entry point.
 export {
+  type FavouriteInput,
+  type FavouritesResponse,
+  favouriteInputSchema,
+  favouritesResponseSchema,
+  type MergeFavouritesInput,
+  mergeFavouritesSchema,
+} from "./favourite-schemas.js";
+export {
   type CreateListingInput,
   type CreateUploadUrlInput,
   type CreateUploadUrlResponse,

@@ -311,10 +311,27 @@ error state — the same grid works by area and text search, and the card says s
 Once a fix exists it collapses to a quiet row ("Sorted by distance within
 5 km") with a "Stop using location" action.
 
+**Filter speed.** The sheet opens with the calendar collapsed: "Available from"
+is a compact tappable row (Any date / From 12 Mar) that expands the calendar
+only when tapped, so the day-grid cells never lay out on open. Groups are
+memoised with stable callbacks, so tapping one chip re-renders only its own
+group rather than the sheet. The footer button during an in-flight re-query
+shows a small spinner and reads "Updating…" — the count only ever drops when
+results genuinely change.
+
 Distance is a ranking signal, not a filter: the bands are progressive and a
 listing without coordinates still appears by area label. Cards show **one extra
 fact** — the rounded band, otherwise the public area, otherwise the category.
 There is never a pin, a map or an address.
+
+**Condition vocabulary.** One canonical set everywhere — `CONDITION_VALUES` in
+`packages/shared/enums/condition.ts` — accepted by `createListingSchema`, stored
+after backfill, and displayed through the mobile `CONDITION_LABEL` map
+(`conditionLabel()` renders "Not stated" for a missing one). Legacy stored
+values ("Good", "Excellent", "Brand New with Tags", the old "good-condition" /
+"like-new" seeds) are translated on read; unrecognised strings are never
+guessed — they render as "Not stated". The condition filter values are the
+canonical enum, so a filter always matches what is stored.
 
 ### 7.3 Product detail — the most important screen
 
@@ -325,12 +342,20 @@ plus approximate distance** (`48 m away`, `1.2 km away`, or just
 once — use sections and progressive disclosure. The primary CTA (`Rent this`)
 stays accessible while scrolling.
 
+**Condition badge and truthfulness.** The condition badge on the header is
+rendered only when the listing states a condition — an unstated condition is
+honest silence ("Not stated" in the fit section), never an empty pill. An
+unpublished listing hides the sticky "Rent this" CTA, and a saved listing that
+is no longer published shows a "No longer available" notice on its card.
+
 **In-person only in this phase.** The detail screen never offers a delivery
 option and never shows a delivery fee or a deposit. The lines under the price
 read **"In Bandra West · 50–100 m away · Meet in person"** (area and band are
 omitted when unknown), and the "Good to know" section states that you meet at a
 public place, that exact addresses are never shared, and that payment protection
-is not connected in this build.
+is not connected in this build. The lender's photo renders in the "Who you are
+renting from" card when the API provides one; a lender without a photo gets a
+monogram, never a broken image.
 
 The distance band is relative to the renter's search position, so Discover
 hands it to the detail route as a parameter; the detail endpoint cannot know it.
@@ -648,6 +673,9 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
+| 2026-11-23 | Filter behaviour fixed (§7.2): `use-discover-listings` keeps the previous result (`placeholderData: keepPreviousData`) while re-querying — the footer button shows a small spinner and reads "Updating…" instead of "Show 0 pieces", and the grid keeps previous results rather than flashing a full-screen spinner. §7.2. |
+| 2026-11-23 | Condition vocabulary lands as one enum (`packages/shared/enums/condition.ts`): canonical five values, legacy values translated on read (`normaliseCondition`), filter values match stored data, unknown strings read as "Not stated"; unstated badges are hidden rather than empty; the hardcoded `Care: Dry clean only` row is removed from the product page. §7.2–7.3. Rental and rentals cards (§7.3, §7.9): renter avatars replace the missing counterparty photos, so Activity and Rentals list is no longer missing renderer for the counterparty. Button width contract: see `DESIGN_SYSTEM.md` §9.4 — row buttons size to their labels, fixing the tall Activity/Rentals cards. Product page lender card shows the lender photo when the API provides one (`piece.lender.image`), with the Avatar initials fallback otherwise. Saved-pieces architecture: local storage while a guest; account via `GET /api/favourites` + `POST /api/favourites/merge` on sign-in; sign-out empties the device; the "No longer available" notice on the product grid comes from unpublished saved listings. |
+
 | 2026-11-19 | Mobile Phase 2a UI completed: request-sent screen, capability-driven rental detail with sheets, rentals list, opt-in nearby discovery on `POST /api/listings/discover`, area + rounded band on cards and detail, listing area/optional location, and removal of delivery/deposit copy and device-local confirmed rentals. §7.2–7.7. |
 | 2026-11-18 | Rental flow rewritten for peer-to-peer in-person handover: delivery and delivery fees removed, public-area + rounded distance replaces any address, request/review/meetup/handover/return stages defined, renter-confirmed handover is the only path to Active, and payment is documented as an honest placeholder. §7.3–7.9, §11. |
 | 2026-11-17 | Onboarding step 1 restructured to the reference layout: full-bleed hero (pink gradient backdrop across the whole top, cutout subject anchored to its bottom edge, subtle wash kept over the photograph) and the headline/description/swipe block moved onto a bottom sheet whose top edge is a full-width dome curve (~43dp rise from each side to the centre, SVG-drawn) overlapping the photo; the sheet's background is a subtle diagonal tint (background top-left → faint pink bottom-right) behind the content, and the curve carries a subtle drop shadow as an elevated-edge cue. Headline, supporting line, swipe-to-continue and step dots are untouched. §6. |

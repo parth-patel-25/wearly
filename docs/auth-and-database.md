@@ -116,6 +116,7 @@ apps/api/src/
 │   └── email/            # transactional email
 ├── modules/              # Feature-based business domains
 │   ├── admin/            # admin users + invites
+│   ├── favourites/       # saved pieces (GET /api/favourites, POST/DELETE, merge)
 │   ├── health/
 │   └── notes/
 ├── app.module.ts         # Root module wiring feature modules
@@ -130,6 +131,17 @@ provides them:
 | `shared/` (mailer, prisma) | `packages/shared`, `packages/db` |
 | `core/database` + `modules/*/entities` | `packages/db/src/schema` (Drizzle) |
 | `modules/*/dto` | Zod schemas in `packages/shared/src/api/schemas.ts` |
+
+- **`favourites` table** — userId FK → `user` (the lender), listingId FK →
+  `listings`, composite PK (userId, listingId), index on userId. `createdAt`
+  orders the "newest first" read. Generate with
+  `cd packages/db && bun run db:generate`; migration
+  `0003_acoustic_wendell_rand.sql` also carries the idempotent condition
+  backfill for legacy stored values.
+
+Generate with `cd packages/db && bun run db:generate` after any `favourites.ts`
+edit; migration `0003_acoustic_wendell_rand.sql` also carries the idempotent
+condition backfill for legacy stored values.
 
 #### Shared enums
 
@@ -148,6 +160,15 @@ The Zod schemas in `../api/schemas.ts` build from these tuples
 (`z.enum(USER_ROLES)`), so the runtime validator, the static type and both
 clients share one source. Never re-type `"admin"`, `"super_admin"`, `"user"`,
 `"pending"`, `"production"`, etc. — import the member.
+
+**Favourites API** (`apps/api/src/modules/favourites/`, session-scoped —
+no `@AllowAnonymous()`):
+
+- `GET /api/favourites` — saved listings (with lender name/photo), newest first.
+- `POST /api/favourites` — idempotent insert; body `{ listingId }` (uuid).
+- `DELETE /api/favourites/:listingId` — idempotent delete.
+- `POST /api/favourites/merge` — union-insert the guest ids on sign-in, returns
+  the full list; body `{ listingIds }` (≤200).
 
 ---
 

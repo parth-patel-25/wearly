@@ -2,6 +2,7 @@ import { listingToPiece } from "@shared/data/listing-to-piece";
 import { formatDateRange } from "@shared/lib/format-date";
 import type { RentalSummary } from "@wearly/shared/api/types";
 import { RENTAL_STATUSES } from "@wearly/shared/enums";
+import { Avatar } from "@wearly/ui-native/avatar";
 import { Button } from "@wearly/ui-native/button";
 import { Card } from "@wearly/ui-native/card";
 import { Media } from "@wearly/ui-native/media";
@@ -33,7 +34,7 @@ export function RentalCard({ onOpen, rental }: RentalCardProps) {
     >
       <Card className="gap-4 p-4">
         <View className="flex-row gap-4">
-          <View className="w-20 self-stretch overflow-hidden rounded-media">
+          <View className="w-20 overflow-hidden rounded-media">
             <Media aspect="1/1" src={piece.images[0]} tone={piece.gallery[0]} />
           </View>
           <View className="flex-1 gap-1">
@@ -50,7 +51,12 @@ export function RentalCard({ onOpen, rental }: RentalCardProps) {
           </View>
         </View>
 
-        <View className="flex-row items-center justify-between gap-3">
+        <View className="flex-row items-center gap-2">
+          <Avatar
+            name={counterparty}
+            size="md"
+            src={rental.counterparty.image ?? undefined}
+          />
           <Text className="flex-1" tone="muted-foreground" variant="caption">
             {counterparty}
           </Text>

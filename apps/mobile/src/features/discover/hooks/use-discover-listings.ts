@@ -1,5 +1,5 @@
 import type { Filters } from "@shared/data/filters";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { API_ROUTES } from "@wearly/shared/api/routes";
 import type {
   DiscoverListingsInput,
@@ -41,6 +41,10 @@ export function useDiscoverListings(
   };
 
   return useQuery<DiscoverListingsResponse>({
+    // Keep the previous results during a re-query: the grid flashes neither a
+    // "Show 0 pieces" footer nor a full-screen spinner, and the sheet's footer
+    // can say "Updating…" while the new results are in.
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       const response = await fetch(
         `${apiBase}${API_ROUTES.LISTINGS.DISCOVER}`,

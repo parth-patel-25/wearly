@@ -1,5 +1,8 @@
+import { CONDITION_VALUES } from "@wearly/shared/enums";
 import type { Category, Condition, Piece } from "./catalogue";
-import { CONDITION_LABEL, isAvailable, sizeOf } from "./catalogue";
+import { isAvailable, sizeOf } from "./catalogue";
+
+export type { Condition } from "./catalogue";
 
 /**
  * Discovery filters.
@@ -54,7 +57,7 @@ export function applyFilters(
     }
     if (
       filters.conditions.length > 0 &&
-      !filters.conditions.includes(piece.condition)
+      (piece.condition === null || !filters.conditions.includes(piece.condition))
     ) {
       return false;
     }
@@ -81,7 +84,5 @@ export function toggleIn<T>(list: readonly T[], value: T): T[] {
     : [...list, value];
 }
 
-/** Human labels for the condition filter, in the order the sheet shows them. */
-export const CONDITION_OPTIONS: readonly Condition[] = Object.keys(
-  CONDITION_LABEL
-) as Condition[];
+/** The condition filter values. Canonical: nothing matches a null condition. */
+export const CONDITION_OPTIONS: readonly Condition[] = [...CONDITION_VALUES];

@@ -1,4 +1,6 @@
 import { useListingDraft } from "@features/listing/providers/listing-draft-provider";
+import { CONDITION_LABEL } from "@shared/data/catalogue";
+import type { Condition } from "@wearly/shared/enums";
 import { useQueryClient } from "@tanstack/react-query";
 import { API_ROUTES } from "@wearly/shared/api/routes";
 import type { Listing } from "@wearly/shared/api/types";
@@ -33,7 +35,7 @@ export default function ReviewScreen() {
             brand: draft.brand || undefined,
             category: draft.category,
             color: draft.color || undefined,
-            condition: draft.condition,
+            condition: draft.condition as Condition,
             description: draft.description || undefined,
             fulfillmentMethods: [FULFILLMENT_METHODS.IN_PERSON],
             latitude: draft.latitude ?? undefined,
@@ -87,7 +89,7 @@ export default function ReviewScreen() {
         <View className="mt-4 gap-2">
           <Text variant="headingMd">{draft.title}</Text>
           <Text tone="muted-foreground" variant="bodySm">
-            {draft.category} · {draft.size} · {draft.condition}
+            {draft.category} · {draft.size} · {draft.condition ? CONDITION_LABEL[draft.condition as Condition] : ""}
           </Text>
           <Text tone="muted-foreground" variant="bodySm">
             In person{draft.areaLabel ? ` · ${draft.areaLabel}` : ""}

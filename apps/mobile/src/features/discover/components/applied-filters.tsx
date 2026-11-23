@@ -9,25 +9,54 @@ interface AppliedFiltersProps {
   onChange: (filters: Filters) => void;
 }
 
+/** One removable chip. `key` is the state value it represents. */
+interface Chip {
+  kind: "category" | "condition" | "rate" | "size" | "from";
+  key: string;
+  label: string;
+}
+
 /** What is currently narrowing the grid, each label removable in one tap. */
 export function AppliedFilters({ filters, onChange }: AppliedFiltersProps) {
-  const labels = [
-    ...filters.categories,
-    ...filters.sizes,
-    ...filters.conditions.map((condition) => CONDITION_LABEL[condition]),
-    ...(filters.maxDailyRate ? [`Up to ₹${filters.maxDailyRate}`] : []),
-    ...(filters.from ? [`From ${filters.from}`] : []),
-  ];
+  const chips: Chip[] = [];
+  chips.push(
+    ...filters.categories.map(
+      (category): Chip => ({ key: category, kind: "category", label: category }),
+    ),
+    ...filters.sizes.map(
+      (size): Chip => ({ key: size, kind: "size", label: size }),
+    ),
+    ...filters.conditions.map(
+      (condition): Chip => ({
+        key: condition,
+        kind: "condition",
+        label: CONDITION_LABEL[condition],
+      }),
+    ),
+  );
+  if (filters.maxDailyRate) {
+    chips.push({
+      key: "rate",
+      kind: "rate",
+      label: `Up to ₹${filters.maxDailyRate}`,
+    });
+  }
+  if (filters.from) {
+    chips.push({ key: "from", kind: "from", label: `From ${filters.from}` });
+  }
 
-  if (labels.length === 0) {
+  if (chips.length === 0) {
     return null;
   }
 
   return (
     <View className="flex-row flex-wrap items-center gap-2">
-      {labels.map((label) => (
-        <Chip key={label} onPress={() => removeOne(filters, onChange, label)}>
-          {`${label} ✕`}
+      {chips.map((chip) => (
+        <Chip
+          key={`${chip.kind}-${chip.key}`}
+          onPress={() => removeOne(filters, onChange, chip)}
+        >
+          {`${chip.label} ✕`}
         </Chip>
       ))}
       <Chip onPress={() => onChange(NO_FILTERS)}>Clear all</Chip>
@@ -38,23 +67,32 @@ export function AppliedFilters({ filters, onChange }: AppliedFiltersProps) {
 function removeOne(
   filters: Filters,
   onChange: (next: Filters) => void,
-  label: string
+  chip: Chip,
 ): void {
-  const without = <T,>(list: readonly T[], value: T) =>
+  const without = <T extends string>(list: readonly T[], value: string) =>
     list.filter((item) => item !== value);
 
-  onChange({
-    ...filters,
-    categories: without(
-      filters.categories,
-      label as (typeof filters.categories)[number]
-    ),
-    conditions: without(
-      filters.conditions,
-      label as (typeof filters.conditions)[number]
-    ),
-    from: label.startsWith("From ") ? null : filters.from,
-    maxDailyRate: label.startsWith("Up to") ? null : filters.maxDailyRate,
-    sizes: without(filters.sizes, label),
-  });
+  switch (chip.kind) {
+    case "category":
+      onChange({
+        ...filters,
+        categories: without(filters.categories, chip.key),
+      });
+      break;
+    case "condition":
+      onChange({
+        ...filters,
+        conditions: without(filters.conditions, chip.key),
+      });
+      break;
+    case "size":
+      onChange({ ...filters, sizes: without(filters.sizes, chip.key) });
+      break;
+    case "rate":
+      onChange({ ...filters, maxDailyRate: null });
+      break;
+    case "from":
+      onChange({ ...filters, from: null });
+      break;
+  }
 }

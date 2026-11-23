@@ -457,10 +457,24 @@ keeping the label mounted so the button does not resize mid-request.
 <Button className="rounded-[27px] bg-[#E86A93]" />
 ```
 
-**Do** keep a control label to one line. `Button` is `w-full`, and a button
-nested in a card inside a page carries padding at all three levels — roughly 96px
-of a 390px phone is gone before a single letter is drawn. Long enough and the
-label wraps, which reads as a mistake even though the lines are now centred.
+**The `className` API**: the button renders as one line at every font scale;
+there is no `w-full` to override, so when a caller wants a custom width it
+passes classes that sit *after* the defaults — `w-full` to force full width,
+`w-auto` to shrink a column button to its label, `flex-1` to fill a row's
+remaining space.
+
+**Do** keep a control label to one line. A button nested in a card inside a page
+carries padding at all three levels — roughly 96px of a 390px phone is gone
+before a single letter is drawn. Long enough and the label wraps, which reads as
+a mistake even though the lines are now centred.
+
+**Width is owned by the layout, not the button.** `Button` no longer forces
+`w-full`: in a column its parent's default `stretch` still makes it full-width,
+while in a `flex-row` it sizes to its label. That is what keeps a button beside
+a caption from claiming the whole row and squeezing the text to zero width — the
+old `w-full` behaviour produced character-per-line wrapping and very tall cards.
+When a row needs the button to grow, pass `className="flex-1"`; when it must stay
+content-sized, pass nothing.
 
 ```tsx
 <Button>Keep browsing</Button>   // ✅ one line at any font scale
@@ -532,6 +546,14 @@ card that shows everything communicates nothing.
 
 The favourite heart uses `text-primary`, not `brand` — it is `aria-pressed`, so
 it is a control with text-equivalent state, not decoration.
+
+A card can carry one optional `notice` — the `notice` prop — rendered as a
+small `warning` badge overlaid on the media block's top-left. Its only current
+use is **"No longer available"** for a saved piece the lender has unpublished:
+the card stays in Saved pieces so the save is not silently destroyed, but the
+grid states the truth and the detail screen hides `Rent this`. Overlay, not
+layout: the media block itself is unchanged, so the notice never resizes the
+card.
 
 ### Tables
 
@@ -833,8 +855,8 @@ Rentals is reached from three deliberate places:
 - **Home → bell → Activity** — the attention inbox, derived from the same rental
   list. No unread state is claimed, because none is stored.
 
-`ROUTES.TABS` in `apps/mobile/src/core/routing/routes.ts` now lists the four real
-destinations and matches the bar.
+`TABS` in `apps/mobile/src/core/routing/routes.ts` lists the four real
+destinations and matches the bar; it no longer mentions rentals.
 
 ### The bar's bottom padding is `max(inset, 1rem)`
 
@@ -1027,6 +1049,7 @@ Never introduce a second styling system, and never add a component library.
 
 | Date | Change |
 | --- | --- |
+| 2026-11-23 | `Button` width contract fixed: the forced `w-full` is gone (the layout contract is now documented at §9 — "in a column its parent's default `stretch` still makes it full-width, while in a `flex-row` it sizes to its label"). The `className` prop lets callers opt into other widths. `RentalCard`: the square thumbnail no longer self-stretches, the footer carries the renter `Avatar` (photo or initials) beside the counterparty name, and the Open/Review request button is content-sized. `ProductCard` gains `notice` — the "No longer available" badge used by the Saved grid. §9. |
 | 2026-11-17 | Onboarding step 1 restructured to the reference layout: the hero goes full-bleed edge-to-edge — pink gradient backdrop spanning the whole top, the shopping-spree cutout anchored to its bottom edge (transparent-background cutout swapped in, rendered `contentFit="contain"` + `contentPosition="bottom"` so the subject stands on the sheet's curve), subtle wash kept over the photograph — and the headline/support/swipe block becomes a `bg-background` sheet whose top edge is a **full-width dome curve** (SVG quadratic, ~43dp rise from each side edge to the centre, fill resolved through `useCSSVariable` so it stays theme-aware), overlapping the photo by the same 43dp. A border radius cannot paint that shape — it only rounds corners — so the curve is drawn, not radiused. The sheet body's background is a subtle diagonal tint — background at the top-left deepening to faint pink at the bottom-right — carried by the body itself so the colour sits behind the content, never over it, and the dome curve carries the same diagonal so no part of the sheet reads as untinted white. The photo wash runs the opposite diagonal — deepest at the top-right, fading to the bottom-left. The dome path carries a subtle SVG drop shadow so the curve reads as a soft elevated edge (native shadow props can't follow a drawn curve). The intro branch drops the gutter wrapper and `Screen` gains an `edges` pass-through so the gradient can reach the status bar; steps 2/3 keep their padding. `Media` reverts to its original contract — the hero composes its own layers instead. §10. |
 
 | 2026-11-17 | Onboarding sheet's top padding tightened `pt-4` → `pt-2` (16 → 8px) — the white gap between the dome curve and the headline halved so the title sits closer to the curve. §10. |

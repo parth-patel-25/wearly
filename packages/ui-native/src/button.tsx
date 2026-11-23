@@ -24,8 +24,15 @@ import type { Tone } from "./tone";
  * element, and `text-center` on the text centres the *lines inside it*. The
  * second one only matters when a label wraps, but that is exactly when it is
  * needed — a wrapped element fills the row and its lines would otherwise hang
- * off the left. Keep labels to one line where you can: `w-full` plus three
- * layers of padding leaves a button roughly 96px narrower than its container.
+ * off the left. Keep labels to one line where you can.
+ *
+ * Width contract: inside a column the button stretches to the container
+ * (React Native's default cross-axis stretch), so footers and CTAs keep
+ * working; inside a row it sizes to its label, so a button in a row never
+ * steals space from its neighbours or squeezes them to one character per
+ * line. Callers pass `className` when the design intends another width:
+ * `w-full` to force full width, `w-auto` to shrink a column button to its
+ * label, `flex-1` to fill a row's remaining space.
  *
  * `loading` swaps the leading glyph for a themed spinner in the variant's own
  * foreground tone and leaves the label mounted, so the control reports the wait
@@ -65,6 +72,8 @@ export type ButtonSize = keyof typeof SIZE;
 export interface ButtonProps
   extends Omit<PressableProps, "children" | "style"> {
   children: ReactNode;
+  /** Extra classes, merged after the defaults so callers can set width. */
+  className?: string;
   disabled?: boolean;
   /** An icon before the label. Decorative — the label carries the meaning. */
   icon?: IconName;
@@ -107,6 +116,7 @@ function leadingGlyph({
 /** A single, obvious action. */
 export function Button({
   children,
+  className,
   disabled = false,
   icon,
   loading = false,
@@ -126,11 +136,10 @@ export function Button({
         VARIANT[variant],
         SIZE[size].container,
         SIZE[size].padding,
-        "w-full",
         disabled ? PRESS_DISABLED : "",
       ]
         .filter(Boolean)
-        .join(" ")}
+        .join(" ") + (className ? ` ${className}` : "")}
       disabled={isInactive}
       onPressIn={onPressIn}
       onPressOut={onPressOut}

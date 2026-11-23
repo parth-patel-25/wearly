@@ -1,5 +1,10 @@
 // biome-ignore lint/performance/noBarrelFile: public package entry point for `@wearly/shared/enums` — the single import surface for every enum, re-exported from the per-concern files that define them.
 export {
+  CONDITION_VALUES,
+  CONDITIONS,
+  type Condition,
+} from "./condition.js";
+export {
   DISPUTE_CATEGORIES,
   DISPUTE_CATEGORY_VALUES,
   DISPUTE_STATUS_VALUES,

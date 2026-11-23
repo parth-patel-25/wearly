@@ -1,6 +1,8 @@
 import { useSession } from "@core/providers/session-provider";
 import { ROUTES } from "@core/routing/routes";
 import { ListingEmptyState } from "@features/listing/components/listing-empty-state";
+import { conditionLabel } from "@shared/data/catalogue";
+import { normaliseCondition } from "@shared/data/listing-to-piece";
 import type { ListRenderItem } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
 import { API_ROUTES } from "@wearly/shared/api/routes";
@@ -136,7 +138,7 @@ function ListingCard({ listing }: { listing: Listing }) {
       <View className="gap-1">
         <Text variant="headingSm">{listing.title}</Text>
         <Text tone="muted-foreground" variant="bodySm">
-          {listing.category} · {listing.size} · {listing.condition}
+          {listing.category} · {listing.size} · {conditionLabel(normaliseCondition(listing.condition))}
         </Text>
         <Text variant="bodyMd">₹{listing.pricePerDay}/day</Text>
       </View>

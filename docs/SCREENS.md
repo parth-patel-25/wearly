@@ -195,6 +195,9 @@ sign-in with Better Auth (`expoClient` + SecureStore, scheme `wearly`).
 - [x] Google account picker — `GoogleSignin.signOut()` is called before
   `signIn()` so the device always shows the account chooser instead of
   silently reusing the last-selected account.
+- [x] Favourites — device-local JSON while a guest; merged into the account on
+  sign-in (`POST /api/favourites/merge`); account screens use `GET
+  /api/favourites`; sign-out empties the device copy.
 
 ## Web — auth + admin panel (`apps/web`)
 

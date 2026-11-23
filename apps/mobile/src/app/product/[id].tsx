@@ -1,10 +1,15 @@
-import { useSession } from "@core/providers/session-provider";
 import { datesFor, ROUTES } from "@core/routing/routes";
 import { FullScreenImageViewer } from "@features/product/components/image-viewer";
 import { ProductSkeleton } from "@features/product/components/product-skeleton";
 import { useHeroParallax } from "@features/product/hooks/use-hero-parallax";
+import { useFavourites } from "@features/favourites/hooks/use-favourites";
 import type { Piece } from "@shared/data/catalogue";
-import { CONDITION_LABEL, formatRupees, sizeOf } from "@shared/data/catalogue";
+import {
+  CONDITION_LABEL,
+  conditionLabel,
+  formatRupees,
+  sizeOf,
+} from "@shared/data/catalogue";
 import { distanceLabelOf, listingToPiece } from "@shared/data/listing-to-piece";
 import { formatDate } from "@shared/lib/format-date";
 import { useQuery } from "@tanstack/react-query";
@@ -89,9 +94,7 @@ interface ProductDetailProps {
 
 function ProductDetail({ piece }: ProductDetailProps) {
   const router = useRouter();
-  const { dispatch, state } = useSession();
-
-  const isSaved = state.favourites.includes(piece.id);
+  const { isSaved, toggle } = useFavourites();
   const size = sizeOf(piece);
   const parallax = useHeroParallax();
   const { scrollY } = parallax;
@@ -162,12 +165,10 @@ function ProductDetail({ piece }: ProductDetailProps) {
           </Animated.View>
           <IconButton
             accessibilityLabel={
-              isSaved ? "Remove from saved" : "Save this piece"
+              isSaved(piece.id) ? "Remove from saved" : "Save this piece"
             }
-            icon={isSaved ? "heart-filled" : "heart"}
-            onPress={() =>
-              dispatch({ pieceId: piece.id, type: "toggle-favourite" })
-            }
+            icon={isSaved(piece.id) ? "heart-filled" : "heart"}
+            onPress={() => toggle(piece.id)}
             tone="primary"
             variant="soft"
           />
@@ -252,7 +253,9 @@ function ProductDetail({ piece }: ProductDetailProps) {
           </View>
 
           <View className="flex-row flex-wrap gap-2 px-gutter">
-            <Badge variant="primary">{CONDITION_LABEL[piece.condition]}</Badge>
+            {piece.condition ? (
+              <Badge variant="primary">{CONDITION_LABEL[piece.condition]}</Badge>
+            ) : null}
             <Badge>{`Size ${size}`}</Badge>
             <Badge variant="success">Available now</Badge>
           </View>
@@ -267,9 +270,8 @@ function ProductDetail({ piece }: ProductDetailProps) {
             <KeyValueRow label="Size" value={size} />
             <KeyValueRow
               label="Condition"
-              value={CONDITION_LABEL[piece.condition]}
+              value={conditionLabel(piece.condition)}
             />
-            <KeyValueRow label="Care" value="Dry clean only" />
           </Section>
 
           <Section subtitle="You pick the dates next" title="Availability">
@@ -292,7 +294,11 @@ function ProductDetail({ piece }: ProductDetailProps) {
 
           <Section title="Who you are renting from">
             <Card className="flex-row items-center gap-4 p-5">
-              <Avatar name={piece.lender.name} size="lg" />
+              <Avatar
+                name={piece.lender.name}
+                size="lg"
+                src={piece.lender.image ?? undefined}
+              />
               <View className="flex-1 gap-1">
                 <Text variant="bodyMd">{piece.lender.name}</Text>
                 <View className="flex-row items-center gap-1">
@@ -383,7 +389,11 @@ function ProductDetail({ piece }: ProductDetailProps) {
         visible={viewerOpen}
       />
 
-      <StickyCta dailyRate={piece.dailyRate} pieceId={piece.id} />
+      <StickyCta
+        dailyRate={piece.dailyRate}
+        pieceId={piece.id}
+        status={piece.status}
+      />
     </View>
   );
 }
@@ -425,10 +435,16 @@ function Policy({ icon, text }: PolicyProps) {
 interface StickyCtaProps {
   dailyRate: number;
   pieceId: string;
+  /** Hidden when the listing is not published — you cannot rent a draft. */
+  status: Piece["status"];
 }
 
-function StickyCta({ dailyRate, pieceId }: StickyCtaProps) {
+function StickyCta({ dailyRate, pieceId, status }: StickyCtaProps) {
   const router = useRouter();
+
+  if (status !== "published") {
+    return null;
+  }
 
   return (
     <View className="border-border border-t bg-card px-gutter pt-4 pb-10">

@@ -8,6 +8,10 @@
       "types": "./dist/enums/index.d.ts",
       "default": "./dist/enums/index.js"
     },
+    "./api/favourite-schemas": {
+      "types": "./dist/api/favourite-schemas.d.ts",
+      "default": "./dist/api/favourite-schemas.js"
+    },
     "./api/routes": {
       "types": "./dist/api/routes.d.ts",
       "default": "./dist/api/routes.js"

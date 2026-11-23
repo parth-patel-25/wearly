@@ -56,7 +56,9 @@ export function ProfileHeader({ onOpenRentals, onSignIn }: ProfileHeaderProps) {
       <View className="gap-1">
         <Text variant="headingSm">Saved pieces</Text>
         <Text tone="muted-foreground" variant="caption">
-          Saved on this device. Favourites are not synced to your account yet.
+          {state.isAuthenticated
+            ? "Saved to your account."
+            : "Saved on this device."}
         </Text>
       </View>
     </View>

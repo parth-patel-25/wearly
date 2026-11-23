@@ -16,6 +16,10 @@
       "types": "./dist/schema/auth.d.ts",
       "default": "./dist/schema/auth.js"
     },
+    "./schema/favourites": {
+      "types": "./dist/schema/favourites.d.ts",
+      "default": "./dist/schema/favourites.js"
+    },
     "./schema/disputes": {
       "types": "./dist/schema/disputes.d.ts",
       "default": "./dist/schema/disputes.js"

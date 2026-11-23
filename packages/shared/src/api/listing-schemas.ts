@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  CONDITION_VALUES,
   LISTING_STATUS_VALUES,
   STORAGE_FOLDER_VALUES,
   STORAGE_FOLDERS,
@@ -20,7 +21,7 @@ export const createListingSchema = z
     brand: z.string().optional(),
     category: z.string().min(1),
     color: z.string().optional(),
-    condition: z.string().min(1),
+    condition: z.enum(CONDITION_VALUES),
     description: z.string().optional(),
     /** In-person only for now; the enum is narrowed at the boundary. */
     fulfillmentMethods: z
