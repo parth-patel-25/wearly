@@ -12,8 +12,8 @@ import { listings } from "./listings.js";
 /**
  * Saved pieces.
  *
- * `userId` is the lender: the same `user` row that `listings.lenderId` points
- * at, so "the saves of this account" means "listings this lender favourited".
+ * `userId` is the account that saved the piece, independent of the listing's
+ * lender: you save other people's pieces, and the row records who saved what.
  * The pair is one favouriting event — idempotent on both the API surface and
  * the database.
  */
@@ -31,5 +31,5 @@ export const favourites = pgTable(
   (table) => [
     primaryKey({ columns: [table.userId, table.listingId] }),
     index("favourites_user_id_idx").on(table.userId),
-  ],
+  ]
 );

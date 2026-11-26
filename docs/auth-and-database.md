@@ -132,16 +132,12 @@ provides them:
 | `core/database` + `modules/*/entities` | `packages/db/src/schema` (Drizzle) |
 | `modules/*/dto` | Zod schemas in `packages/shared/src/api/schemas.ts` |
 
-- **`favourites` table** — userId FK → `user` (the lender), listingId FK →
-  `listings`, composite PK (userId, listingId), index on userId. `createdAt`
-  orders the "newest first" read. Generate with
-  `cd packages/db && bun run db:generate`; migration
-  `0003_acoustic_wendell_rand.sql` also carries the idempotent condition
-  backfill for legacy stored values.
-
-Generate with `cd packages/db && bun run db:generate` after any `favourites.ts`
-edit; migration `0003_acoustic_wendell_rand.sql` also carries the idempotent
-condition backfill for legacy stored values.
+- **`favourites` table** — userId FK → `user` (the account that saved the
+  piece), listingId FK → `listings`, composite PK (userId, listingId), index on
+  userId. `createdAt` orders the "newest first" read. Generate with
+  `cd packages/db && bun run db:generate` after any `favourites.ts` edit;
+  migration `0003_acoustic_wendell_rand.sql` also carries the idempotent
+  condition backfill for legacy stored values.
 
 #### Shared enums
 

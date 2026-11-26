@@ -553,8 +553,13 @@ and the monogram returns. Failures surface as a toast; the session is
 re-fetched after every change so all screens read the new photo from one
 source.
 
-Saved pieces are device-local and the screen says so; it never implies account
-sync. Privacy and terms rows appear only when `EXPO_PUBLIC_PRIVACY_URL` /
+Saved pieces follow the account when signed in and stay on the device for
+guests; the screen says which, and never implies sync it does not have. Every
+completed toggle confirms itself: a save is the success tone — "Saved — it'll
+be waiting in your profile" on the account, "Saved on this device — sign in to
+keep it with you" as a guest — and a removal is the quieter information tone. A
+failed write reverts the optimistic heart and says so in the error tone. Privacy
+and terms rows appear only when `EXPO_PUBLIC_PRIVACY_URL` /
 `EXPO_PUBLIC_TERMS_URL` are configured — no placeholder is presented as an
 official policy. Phase 2/3 destinations (rentals, listings, addresses,
 notifications, payments) are not shown until their infrastructure exists; see
@@ -673,6 +678,7 @@ Recorded so the next contributor can tell an intentional choice from a mistake.
 
 | Date | Change |
 | --- | --- |
+| 2026-11-24 | Favourites confirm every completed toggle (§7.10): saving shows the success tone ("Saved — it'll be waiting in your profile", or "Saved on this device — sign in to keep it with you" as a guest), removing shows the information tone, and a failed write reverts the optimistic heart with the error tone. Copy lives in `features/favourites/lib/favourites-copy.ts`. |
 | 2026-11-23 | Filter behaviour fixed (§7.2): `use-discover-listings` keeps the previous result (`placeholderData: keepPreviousData`) while re-querying — the footer button shows a small spinner and reads "Updating…" instead of "Show 0 pieces", and the grid keeps previous results rather than flashing a full-screen spinner. §7.2. |
 | 2026-11-23 | Condition vocabulary lands as one enum (`packages/shared/enums/condition.ts`): canonical five values, legacy values translated on read (`normaliseCondition`), filter values match stored data, unknown strings read as "Not stated"; unstated badges are hidden rather than empty; the hardcoded `Care: Dry clean only` row is removed from the product page. §7.2–7.3. Rental and rentals cards (§7.3, §7.9): renter avatars replace the missing counterparty photos, so Activity and Rentals list is no longer missing renderer for the counterparty. Button width contract: see `DESIGN_SYSTEM.md` §9.4 — row buttons size to their labels, fixing the tall Activity/Rentals cards. Product page lender card shows the lender photo when the API provides one (`piece.lender.image`), with the Avatar initials fallback otherwise. Saved-pieces architecture: local storage while a guest; account via `GET /api/favourites` + `POST /api/favourites/merge` on sign-in; sign-out empties the device; the "No longer available" notice on the product grid comes from unpublished saved listings. |
 

@@ -8,9 +8,9 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { toListing } from "../listings/listing-mapper.js";
 
 /**
- * Saved pieces. Every read and every write is scoped by `userId` — the lender:
- * the same `user` row `listings.lenderId` points at, so the account's saves are
- * exactly the pieces this lender favourited.
+ * Saved pieces. Every read and every write is scoped by `userId` — the account
+ * that saved the piece, not the listing's lender. You save other people's
+ * pieces, so the row records who saved what.
  *
  * Saves are idempotent: the API accepts re-saving a piece and re-merging a
  * guest list, and `onConflictDoNothing` makes both safe to retry.
@@ -26,7 +26,7 @@ export class FavouritesService {
       })
       .from(favourites)
       .innerJoin(listings, eq(listings.id, favourites.listingId))
-      .innerJoin(user, eq(user.id, favourites.userId))
+      .innerJoin(user, eq(user.id, listings.lenderId))
       .where(eq(favourites.userId, userId))
       .orderBy(desc(favourites.createdAt));
     return rows.map(({ lenderImage, lenderName, listing }) =>
@@ -50,10 +50,10 @@ export class FavouritesService {
   }
 
   /**
-   * Sign-in merge: union the guest's favourited ids into the lender's saves.
-   * Only listings the lender still owns are accepted — the FK on `listingId`
-   * would reject anything else, and a listing the lender unlisted is gone, not
-   * merely unloved. Returns the full list afterwards, newest first.
+   * Sign-in merge: union the guest's saved ids into the account. Any listing
+   * that still exists is accepted — saving is about pieces you want, not
+   * pieces you own — and the FK rejects ids that were deleted. Returns the
+   * full list afterwards, newest first.
    */
   async merge(
     userId: string,
@@ -61,20 +61,13 @@ export class FavouritesService {
   ): Promise<FavouritesResponse> {
     if (listingIds.length > 0) {
       const rows = await db
-        .select({ id: listings.id, lenderId: listings.lenderId })
+        .select({ id: listings.id })
         .from(listings)
-        .where(
-          and(eq(listings.lenderId, userId), inArray(listings.id, listingIds))
-        );
+        .where(inArray(listings.id, listingIds));
       if (rows.length > 0) {
         await db
           .insert(favourites)
-          .values(
-            rows.map(({ id, lenderId }) => ({
-              listingId: id,
-              userId: lenderId,
-            }))
-          )
+          .values(rows.map(({ id }) => ({ listingId: id, userId })))
           .onConflictDoNothing();
       }
     }

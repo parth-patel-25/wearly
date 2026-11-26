@@ -9,7 +9,6 @@ import {
 import type {
   FavouriteInput,
   FavouritesResponse,
-  Listing,
   MergeFavouritesInput,
 } from "@wearly/shared/api/types";
 import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe.js";
@@ -18,15 +17,15 @@ import { FavouritesService } from "./favourites.service.js";
 /**
  * Session-scoped: every endpoint needs `@Session()`. This is the "save these
  * pieces" surface, so the Save button and the profile grid hit the same
- * lender-scoped list the owner sees.
+ * account-scoped list the owner sees.
  */
 @Controller("favourites")
 export class FavouritesController {
   constructor(private readonly service: FavouritesService) {}
 
   @Get()
-  list(@Session() session: UserSession): Promise<Listing[]> {
-    return this.service.getByUser(session.user.id);
+  async list(@Session() session: UserSession): Promise<FavouritesResponse> {
+    return { items: await this.service.getByUser(session.user.id) };
   }
 
   @Post()
